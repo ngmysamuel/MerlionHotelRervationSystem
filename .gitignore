@@ -1,0 +1,33 @@
+#compiled class file 
+*.class
+
+#log file
+*.log
+
+#package files
+*.jar
+*.war
+*.ear
+*.zip
+
+#user defined
+*.[oa]
+nbproject/private/
+build/
+dist/
+
+MerlionHotelClient/nbproject/private/
+MerlionHotelClient/dist/
+MerlionHotelClient/build/
+MerlionHotel-ejb/nbproject/private/
+MerlionHotel-war/nbproject/private/
+MerlionHotelLibrary/nbproject/private/
+MerlionHotel-ejb/dist/
+MerlionHotel-ejb/build/
+MerlionHotel-war/dist/
+MerlionHotel-war/build/
+MerlionHotelLibrary/dist/
+MerlionHotelLibrary/build/
+
+#vm crash log
+hs_err_pid*
