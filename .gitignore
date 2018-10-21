@@ -31,3 +31,6 @@ MerlionHotelLibrary/build/
 
 #vm crash log
 hs_err_pid*
+nbproject/project.properties
+MerlionHotelClient/nbproject/project.properties
+MerlionHotel-ejb/nbproject/project.properties
