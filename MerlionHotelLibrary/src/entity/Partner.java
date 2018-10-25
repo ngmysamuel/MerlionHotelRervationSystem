@@ -34,6 +34,41 @@ public class Partner implements Serializable {
     @OneToMany(mappedBy = "partner")
     private List<Reservation> reservations;
 
+    public Partner() {
+    }
+
+    public String getEmployeePassword() {
+        return employeePassword;
+    }
+
+    public void setEmployeePassword(String employeePassword) {
+        this.employeePassword = employeePassword;
+    }
+
+    public String getManagerPassword() {
+        return managerPassword;
+    }
+
+    public void setManagerPassword(String managerPassword) {
+        this.managerPassword = managerPassword;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
     public Long getId() {
         return id;
     }

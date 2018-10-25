@@ -37,6 +37,41 @@ public class Rate implements Serializable {
     private LocalDate dateStart;
     @Column(nullable = false)
     private LocalDate dateEnd;
+
+    public Rate() {
+    }
+
+    public RateTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(RateTypeEnum type) {
+        this.type = type;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public LocalDate getDateStart() {
+        return dateStart;
+    }
+
+    public void setDateStart(LocalDate dateStart) {
+        this.dateStart = dateStart;
+    }
+
+    public LocalDate getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(LocalDate dateEnd) {
+        this.dateEnd = dateEnd;
+    }
     
 
     public Long getId() {

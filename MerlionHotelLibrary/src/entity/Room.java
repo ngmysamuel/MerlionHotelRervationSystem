@@ -38,6 +38,41 @@ public class Room implements Serializable {
     @ManyToMany(mappedBy = "allocatedRooms")
     private List<Reservation> reservations;
 
+    public Room() {
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public RoomType getType() {
+        return type;
+    }
+
+    public void setType(RoomType type) {
+        this.type = type;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
     public Long getId() {
         return id;
     }

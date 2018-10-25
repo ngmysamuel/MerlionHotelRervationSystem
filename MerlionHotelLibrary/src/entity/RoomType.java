@@ -47,6 +47,89 @@ public class RoomType implements Serializable {
     @Column(nullable = false)
     private List<Rate> rates;
 
+    public RoomType() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getRoomSize() {
+        return roomSize;
+    }
+
+    public void setRoomSize(Integer roomSize) {
+        this.roomSize = roomSize;
+    }
+
+    public String getBed() {
+        return bed;
+    }
+
+    public void setBed(String bed) {
+        this.bed = bed;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(String amenities) {
+        this.amenities = amenities;
+    }
+
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
+    public Integer getRoomsLeft() {
+        return roomsLeft;
+    }
+
+    public void setRoomsLeft(Integer roomsLeft) {
+        this.roomsLeft = roomsLeft;
+    }
+
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
+    }
+
+    public List<Rate> getRates() {
+        return rates;
+    }
+
+    public void setRates(List<Rate> rates) {
+        this.rates = rates;
+    }
+
     public Long getId() {
         return id;
     }

@@ -47,6 +47,65 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Partner partner;
 
+    public Reservation() {
+    }
+
+    public LocalDateTime getReservationDateTime() {
+        return reservationDateTime;
+    }
+
+    public void setReservationDateTime(LocalDateTime reservationDateTime) {
+        this.reservationDateTime = reservationDateTime;
+    }
+
+    public LocalDate getDateStart() {
+        return dateStart;
+    }
+
+    public void setDateStart(LocalDate dateStart) {
+        this.dateStart = dateStart;
+    }
+
+    public LocalDate getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(LocalDate dateEnd) {
+        this.dateEnd = dateEnd;
+    }
+
+    public List<Room> getAllocatedRooms() {
+        return allocatedRooms;
+    }
+
+    public void setAllocatedRooms(List<Room> allocatedRooms) {
+        this.allocatedRooms = allocatedRooms;
+    }
+
+    public List<Pair<RoomType, Integer>> getRoomsReserved() {
+        return roomsReserved;
+    }
+
+    public void setRoomsReserved(List<Pair<RoomType, Integer>> roomsReserved) {
+        this.roomsReserved = roomsReserved;
+    }
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
+
     public Long getId() {
         return id;
     }

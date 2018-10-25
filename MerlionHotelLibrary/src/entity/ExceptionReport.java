@@ -29,6 +29,25 @@ public class ExceptionReport implements Serializable {
     private LocalDate date;
     private List<String> exceptions;
 
+    public ExceptionReport() {
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public List<String> getExceptions() {
+        return exceptions;
+    }
+
+    public void setExceptions(List<String> exceptions) {
+        this.exceptions = exceptions;
+    }
+
     public Long getId() {
         return id;
     }
