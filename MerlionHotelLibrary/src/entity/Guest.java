@@ -25,10 +25,13 @@ public class Guest implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
+    @Column
     private String telephone;
+    @Column(unique=true)
     private String passportNumber;
+    @Column(nullable=false)
     private String status;
     @OneToMany(mappedBy = "guest")
     private List<Reservation> reservations;

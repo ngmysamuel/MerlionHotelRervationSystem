@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import javafx.util.Pair;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,14 +31,21 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable=false)
     private LocalDateTime reservationDateTime;
+    @Column(nullable=false)
     private LocalDate dateStart;
+    @Column(nullable=false)
     private LocalDate dateEnd;
     @ManyToMany
     private List<Room> allocatedRooms;
+    @Column(nullable = false)
     private List<Pair<RoomType, Integer>> roomsReserved;
     @ManyToOne
+    @Column(nullable=false)
     private Guest guest;
+    @ManyToOne
+    private Partner partner;
 
     public Long getId() {
         return id;

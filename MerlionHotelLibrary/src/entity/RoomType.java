@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,17 +25,26 @@ public class RoomType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private Integer roomSize;
+    @Column(nullable = false)
     private String bed;
+    @Column(nullable = false)
     private Integer capacity;
+    @Column(nullable = false)
     private String amenities;
+    @Column(nullable = false, unique = true)
     private Integer grade;
+    @Column(nullable = false)
     private Integer roomsLeft;
     @OneToMany(mappedBy = "type")
     private List<Room> rooms;
     @OneToMany
+    @Column(nullable = false)
     private List<Rate> rates;
 
     public Long getId() {

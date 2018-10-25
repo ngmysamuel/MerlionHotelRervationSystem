@@ -7,10 +7,12 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -23,9 +25,13 @@ public class Partner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable = false)
     private String employeePassword;
+    @Column(nullable = false)
     private String managerPassword;
+    @Column(nullable = false, unique = true)
     private String username;
+    @OneToMany(mappedBy = "partner")
     private List<Reservation> reservations;
 
     public Long getId() {

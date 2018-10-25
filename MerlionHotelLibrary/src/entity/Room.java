@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,12 +28,13 @@ public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable = false, unique = true)
     private Integer number;
+    @Column(nullable = false)
     private String status;
     @ManyToOne
+    @Column(nullable = false)
     private RoomType type;
-    @OneToMany
-    private List<Rate> rates; 
     @ManyToMany(mappedBy = "allocatedRooms")
     private List<Reservation> reservations;
 

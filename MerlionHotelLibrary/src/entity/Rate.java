@@ -9,6 +9,7 @@ import Enum.RateTypeEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -27,10 +28,14 @@ public class Rate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RateTypeEnum type;
+    @Column(nullable = false)
     private BigDecimal price;
+    @Column(nullable = false)
     private LocalDate dateStart;
+    @Column(nullable = false)
     private LocalDate dateEnd;
     
 
