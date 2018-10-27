@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -26,14 +27,14 @@ public class Room implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
     private Integer number;
     @Column(nullable = false)
     private String status;
     @ManyToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private RoomType type;
     @ManyToMany(mappedBy = "allocatedRooms")
     private List<Reservation> reservations;

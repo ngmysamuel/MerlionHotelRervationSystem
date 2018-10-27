@@ -5,6 +5,7 @@
  */
 package stateless;
 
+import Enum.EmployeeTypeEnum;
 import javax.ejb.Remote;
 
 /**
@@ -14,5 +15,5 @@ import javax.ejb.Remote;
 @Remote
 public interface EmployeeControllerBeanRemote {
     public Long getIdAndAddOne(Long id);
-    public Long create();
+    
 }

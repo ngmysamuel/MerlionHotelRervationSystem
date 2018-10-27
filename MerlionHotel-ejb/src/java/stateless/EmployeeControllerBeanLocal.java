@@ -5,6 +5,9 @@
  */
 package stateless;
 
+import entity.Employee;
+import Enum.EmployeeTypeEnum;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,6 @@ import javax.ejb.Local;
  */
 @Local
 public interface EmployeeControllerBeanLocal {
-    
+    public Employee create(String username, String password, EmployeeTypeEnum employeeTypeEnum);
+    public List<Employee> viewAll();
 }

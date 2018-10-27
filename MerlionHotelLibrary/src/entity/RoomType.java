@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 /**
@@ -23,7 +24,7 @@ public class RoomType implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
@@ -44,7 +45,7 @@ public class RoomType implements Serializable {
     @OneToMany(mappedBy = "type")
     private List<Room> rooms;
     @OneToMany
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private List<Rate> rates;
 
     public RoomType() {

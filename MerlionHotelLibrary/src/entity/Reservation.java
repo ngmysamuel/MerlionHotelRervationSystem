@@ -15,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
@@ -29,7 +30,7 @@ public class Reservation implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable=false)
     private LocalDateTime reservationDateTime;
@@ -42,7 +43,7 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     private List<Pair<RoomType, Integer>> roomsReserved;
     @ManyToOne
-    @Column(nullable=false)
+    @JoinColumn(nullable=false)
     private Guest guest;
     @ManyToOne
     private Partner partner;

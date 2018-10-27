@@ -23,7 +23,7 @@ public class Partner implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String employeePassword;
@@ -36,7 +36,13 @@ public class Partner implements Serializable {
 
     public Partner() {
     }
-
+    
+    public Partner(String emp, String manager, String username) {
+        this.employeePassword = emp;
+        this.managerPassword = manager;
+        this.username = username;
+    }
+    
     public String getEmployeePassword() {
         return employeePassword;
     }

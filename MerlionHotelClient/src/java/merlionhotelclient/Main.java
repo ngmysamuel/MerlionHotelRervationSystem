@@ -5,9 +5,8 @@
  */
 package merlionhotelclient;
 
-import java.util.Scanner;
 import javax.ejb.EJB;
-import stateless.EmployeeControllerBeanRemote;
+import stateless.MainControllerBeanRemote;
 
 /**
  *
@@ -16,15 +15,11 @@ import stateless.EmployeeControllerBeanRemote;
 public class Main {
 
     @EJB
-    private static EmployeeControllerBeanRemote employeeControllerBean;
+    private static MainControllerBeanRemote mainControllerBean;
 
     public static void main(String[] args) {
-        System.out.println(employeeControllerBean.create());
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter id:");
-        Integer id = sc.nextInt();
-        Long id2 = id.longValue();
-        System.out.println(employeeControllerBean.getIdAndAddOne(id2));
+        MainApp mainApp = new MainApp();
+        mainApp.run(mainControllerBean);
     }
     
 }

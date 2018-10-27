@@ -5,10 +5,13 @@
  */
 package stateless;
 
-import Entity.Employee;
+import entity.Employee;
+import Enum.EmployeeTypeEnum;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -24,11 +27,16 @@ public class EmployeeControllerBean implements EmployeeControllerBeanRemote, Emp
         Employee emp1 = em.find(Employee.class, id);
         return emp1.getId()+1;
     }
-
-    public Long create() {
-        Employee emp = new Employee();
+    
+    public Employee create(String username, String password, EmployeeTypeEnum employeeTypeEnum) {
+        Employee emp = new Employee(username, password, employeeTypeEnum);
         em.persist(emp);
         em.flush();
-        return emp.getId();
+        return emp;
+    }
+    
+    public List<Employee> viewAll() {
+        Query q = em.createQuery("SELECT e FROM Employee e");
+        return q.getResultList();
     }
 }
