@@ -31,3 +31,4 @@ MerlionHotelLibrary/build/
 
 #vm crash log
 hs_err_pid*
+/MerlionHotelReservation/nbproject/private/

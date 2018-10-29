@@ -3,13 +3,13 @@
     <type>org.netbeans.modules.j2ee.clientproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/car-project/1">
-            <name>MerlionHotelClient</name>
+            <name>MerlionHotelReservation</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <source-roots>
-                <root id="src.dir"/>
+                <root id="src.dir" name="Source Packages"/>
             </source-roots>
             <test-roots>
-                <root id="test.src.dir"/>
+                <root id="test.src.dir" name="Test Packages"/>
             </test-roots>
             <included-library dirs="200">reference.MerlionHotelLibrary.jar</included-library>
         </data>
