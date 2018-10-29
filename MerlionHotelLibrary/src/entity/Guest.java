@@ -27,6 +27,8 @@ public class Guest implements Serializable {
     private Long id;
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(nullable = false)
+    private String password;
     @Column
     private String telephone;
     @Column(unique=true)
@@ -37,6 +39,22 @@ public class Guest implements Serializable {
     private List<Reservation> reservations;
 
     public Guest() {
+    }
+
+    public Guest(String email, String password, String telephone, String passportNumber) {
+        this.email = email;
+        this.password = password;
+        this.telephone = telephone;
+        this.passportNumber = passportNumber;
+        this.status = "idle";
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getId() {
