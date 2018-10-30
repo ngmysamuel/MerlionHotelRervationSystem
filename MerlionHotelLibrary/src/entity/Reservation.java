@@ -5,7 +5,9 @@
  */
 package entity;
 
+import Enum.ReservationTypeEnum;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -38,19 +41,61 @@ public class Reservation implements Serializable {
     private LocalDate dateStart;
     @Column(nullable=false)
     private LocalDate dateEnd;
-    @ManyToMany
-    private List<Room> allocatedRooms;
-    @Column(nullable = false)
-    private List<Pair<RoomType, Integer>> roomsReserved;
+    @Column(nullable=false)
+    private ReservationTypeEnum type;
+    @JoinColumn(nullable = false)
+    @OneToMany(mappedBy = "reservation")
+    private List<ReservationLineItem> reservationLineItems;
     @ManyToOne
     @JoinColumn(nullable=false)
     private Guest guest;
     @ManyToOne
     private Partner partner;
-
+    @Column(nullable = false)
+    private BigDecimal price;
+    
     public Reservation() {
     }
 
+    //For Walk-in or Online Reservation
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, List<ReservationLineItem> reservationLineItems, Guest guest, BigDecimal price) {
+        this.reservationDateTime = reservationDateTime;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.type = type;
+        this.reservationLineItems = reservationLineItems;
+        this.guest = guest;
+        this.price = price;
+    }
+
+    //For Partner reservation
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, List<ReservationLineItem> reservationLineItems, Guest guest, Partner partner, BigDecimal price) {
+        this.reservationDateTime = reservationDateTime;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.type = type;
+        this.reservationLineItems = reservationLineItems;
+        this.guest = guest;
+        this.partner = partner;
+        this.price = price;
+    }
+
+    public ReservationTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(ReservationTypeEnum type) {
+        this.type = type;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+    
     public LocalDateTime getReservationDateTime() {
         return reservationDateTime;
     }
@@ -75,20 +120,12 @@ public class Reservation implements Serializable {
         this.dateEnd = dateEnd;
     }
 
-    public List<Room> getAllocatedRooms() {
-        return allocatedRooms;
+    public List<ReservationLineItem> getReservationLineItems() {
+        return reservationLineItems;
     }
 
-    public void setAllocatedRooms(List<Room> allocatedRooms) {
-        this.allocatedRooms = allocatedRooms;
-    }
-
-    public List<Pair<RoomType, Integer>> getRoomsReserved() {
-        return roomsReserved;
-    }
-
-    public void setRoomsReserved(List<Pair<RoomType, Integer>> roomsReserved) {
-        this.roomsReserved = roomsReserved;
+    public void setReservationLineItems(List<ReservationLineItem> reservationLineItems) {
+        this.reservationLineItems = reservationLineItems;
     }
 
     public Guest getGuest() {

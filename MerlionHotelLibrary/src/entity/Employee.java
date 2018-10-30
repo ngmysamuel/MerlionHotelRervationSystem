@@ -29,22 +29,26 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable=false)
     private String name;
     
+    @Column(nullable=false)
     private EmployeeTypeEnum employeeType;
     
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private String password;
     
-    //@Column (nullable = false, unique = true)
+    @Column (nullable = false, unique = true)
     private String username;
     
     public Employee() {
     }
-    public Employee (String username, String password, EmployeeTypeEnum employeeTypeEnum) {
+    
+    public Employee (String username, String password, EmployeeTypeEnum employeeTypeEnum, String name) {
         this.username = username;
         this.password = password;
         this.employeeType = employeeTypeEnum;
+        this.name = name;
     }
     
     public Long getId() {
@@ -81,10 +85,7 @@ public class Employee implements Serializable {
             return false;
         }
         Employee other = (Employee) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
 
     @Override

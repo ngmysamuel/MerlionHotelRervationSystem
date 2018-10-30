@@ -37,7 +37,7 @@ public class Room implements Serializable {
     @JoinColumn(nullable = false)
     private RoomType type;
     @ManyToMany(mappedBy = "allocatedRooms")
-    private List<Reservation> reservations;
+    private List<ReservationLineItem> reservationLineItems;
 
     public Room() {
     }
@@ -66,12 +66,12 @@ public class Room implements Serializable {
         this.type = type;
     }
 
-    public List<Reservation> getReservations() {
-        return reservations;
+    public List<ReservationLineItem> getReservationLineItems() {
+        return reservationLineItems;
     }
 
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
+    public void setReservationLineItems(List<ReservationLineItem> reservationLineItems) {
+        this.reservationLineItems = reservationLineItems;
     }
 
     public Long getId() {

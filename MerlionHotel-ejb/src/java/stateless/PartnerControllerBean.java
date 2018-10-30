@@ -24,7 +24,7 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
 
     public Partner create(String emp, String manager, String username) {
         System.out.println("Partner controller bean is called");
-        Partner part = new Partner(emp, manager, username);
+        Partner part = new Partner("name", "password");
         em.persist(part);
         em.flush();
         return part;

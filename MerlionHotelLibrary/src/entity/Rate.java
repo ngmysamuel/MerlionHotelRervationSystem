@@ -33,13 +33,29 @@ public class Rate implements Serializable {
     private RateTypeEnum type;
     @Column(nullable = false)
     private BigDecimal price;
-    @Column(nullable = false)
+    @Column
     private LocalDate dateStart;
-    @Column(nullable = false)
+    @Column
     private LocalDate dateEnd;
 
     public Rate() {
     }
+
+    // Normal and Published rate
+    public Rate(RateTypeEnum type, BigDecimal price) {
+        this.type = type;
+        this.price = price;
+    }
+
+    // Peak and Promotion rate
+    public Rate(RateTypeEnum type, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) {
+        this.type = type;
+        this.price = price;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+    }
+    
+    
 
     public RateTypeEnum getType() {
         return type;

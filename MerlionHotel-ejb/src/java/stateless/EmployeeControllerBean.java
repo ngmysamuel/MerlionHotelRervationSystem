@@ -29,7 +29,7 @@ public class EmployeeControllerBean implements EmployeeControllerBeanRemote, Emp
     }
     
     public Employee create(String username, String password, EmployeeTypeEnum employeeTypeEnum) {
-        Employee emp = new Employee(username, password, employeeTypeEnum);
+        Employee emp = new Employee(username, password, employeeTypeEnum, "name");
         em.persist(emp);
         em.flush();
         return emp;

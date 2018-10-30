@@ -6,6 +6,7 @@
 package stateless;
 
 import entity.Guest;
+import entity.RegisteredGuest;
 import entity.Reservation;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -30,9 +31,9 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     private EntityManager em;
 
     @Override
-    public Guest createGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException {
+    public RegisteredGuest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException {
         try {
-            Guest newGuest = new Guest(email, password, telephone, passport);
+            RegisteredGuest newGuest = new RegisteredGuest(email, password, telephone, passport);
             em.persist(newGuest);
             em.flush();
             return newGuest;
@@ -49,9 +50,9 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     }
 
     @Override
-    public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException {
+    public RegisteredGuest guestLogin(String email, String password) throws InvalidLoginCredentialException {
         try{
-            Guest guest = retrieveGuestByEmail(email);
+            RegisteredGuest guest = retrieveGuestByEmail(email);
             
             if(guest.getPassword().equals(password)){
                 return guest;
@@ -64,13 +65,13 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     }
 
     @Override
-    public Guest retrieveGuestByEmail(String email) throws GuestNotFoundException {
-        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.email = :inEmail");
+    public RegisteredGuest retrieveGuestByEmail(String email) throws GuestNotFoundException {
+        Query query = em.createQuery("SELECT g FROM RegisteredGuest g WHERE g.email = :inEmail");
         query.setParameter("inEmail", email);
         
         try
         {
-            return (Guest)query.getSingleResult();
+            return (RegisteredGuest)query.getSingleResult();
         }
         catch(NoResultException | NonUniqueResultException ex)
         {

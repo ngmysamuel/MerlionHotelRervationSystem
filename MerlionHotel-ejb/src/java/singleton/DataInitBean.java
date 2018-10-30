@@ -44,7 +44,8 @@ public class DataInitBean {
         }
     }
     public void initApplication() {
-        Employee e = new Employee("1", "1", EmployeeTypeEnum.SystemAdministrator);
+        EmployeeTypeEnum type = EmployeeTypeEnum.SystemAdministrator;
+        Employee e = new Employee("1", "1", type, "name");
         em.persist(e);
         em.flush();
         System.out.println("New SysAdmin created with Username: 1 and Password: 1 and ID = "+e.getId());

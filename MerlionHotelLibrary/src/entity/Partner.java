@@ -26,37 +26,26 @@ public class Partner implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String employeePassword;
-    @Column(nullable = false)
-    private String managerPassword;
-    @Column(nullable = false, unique = true)
+    private String password;
+    @Column(nullable=false, unique=true)
     private String username;
     @OneToMany(mappedBy = "partner")
     private List<Reservation> reservations;
 
     public Partner() {
     }
-    
-    public Partner(String emp, String manager, String username) {
-        this.employeePassword = emp;
-        this.managerPassword = manager;
+
+    public Partner(String password, String username) {
+        this.password = password;
         this.username = username;
     }
     
-    public String getEmployeePassword() {
-        return employeePassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setEmployeePassword(String employeePassword) {
-        this.employeePassword = employeePassword;
-    }
-
-    public String getManagerPassword() {
-        return managerPassword;
-    }
-
-    public void setManagerPassword(String managerPassword) {
-        this.managerPassword = managerPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getUsername() {

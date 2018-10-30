@@ -6,6 +6,8 @@
 package merlionhotelreservation;
 
 import entity.Guest;
+import entity.Reservation;
+import java.util.List;
 import java.util.Scanner;
 import stateless.GuestControllerBeanRemote;
 import util.exception.GuestAlreadyExistException;
@@ -88,7 +90,7 @@ public class MainApp {
         String passport = sc.next();
                 
         try{
-            currentGuest = guestControllerBeanRemote.createGuest(email, password, telephone, passport);
+            currentGuest = guestControllerBeanRemote.createRegisteredGuest(email, password, telephone, passport);
             mainMenu();
         } catch (GuestAlreadyExistException ex){
             System.out.println("Your email or passport number has been used.");
@@ -101,10 +103,22 @@ public class MainApp {
     
     private void viewMyReservationDetails(){
         System.out.println("Use case not supported yet!");
+        /*System.out.print("Check-in Date>");
+        String startDate = sc.next();
+        System.out.print("Check-out Date>");
+        String endDate = sc.next();
+        Reservation reservation = ReservationControllerBean.retrieveReservation();
+        System.out.println(reservation);*/
     }
     
     private void viewAllMyReservations(){
-        System.out.println("Use case not supported yet!");
+        System.out.println("***Your Reservations***");
+        List<Reservation> reservations = currentGuest.getReservations();
+        int i = 1;
+        for(Reservation reservation: reservations){
+            System.out.println(i + ". Check-in Date" + reservation.getDateStart());
+            System.out.println("   Check-out Date" + reservation.getDateEnd());
+        }
     }
     
     

@@ -47,6 +47,8 @@ public class RoomType implements Serializable {
     @OneToMany
     @JoinColumn(nullable = false)
     private List<Rate> rates;
+    @OneToMany(mappedBy = "roomType")
+    private List<ReservationLineItem> reservationLineItems;
 
     public RoomType() {
     }

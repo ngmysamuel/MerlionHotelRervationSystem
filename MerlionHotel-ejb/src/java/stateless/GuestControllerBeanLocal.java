@@ -6,6 +6,7 @@
 package stateless;
 
 import entity.Guest;
+import entity.RegisteredGuest;
 import entity.Reservation;
 import javax.ejb.Local;
 import util.exception.GuestAlreadyExistException;
@@ -19,12 +20,12 @@ import util.exception.InvalidLoginCredentialException;
 @Local
 public interface GuestControllerBeanLocal {
 
-    Guest createGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
+    RegisteredGuest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
 
     void addReservation(Reservation reservation, entity.Guest guest);
 
-    Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
+    RegisteredGuest guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
-    Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
+    RegisteredGuest retrieveGuestByEmail(String email) throws GuestNotFoundException;
     
 }
