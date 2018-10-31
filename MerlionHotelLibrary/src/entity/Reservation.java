@@ -14,6 +14,8 @@ import java.util.List;
 import javafx.util.Pair;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,6 +43,7 @@ public class Reservation implements Serializable {
     private LocalDate dateStart;
     @Column(nullable=false)
     private LocalDate dateEnd;
+    @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ReservationTypeEnum type;
     @JoinColumn(nullable = false)
@@ -69,11 +72,11 @@ public class Reservation implements Serializable {
     }
 
     //For Partner reservation
-    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, List<ReservationLineItem> reservationLineItems, Guest guest, Partner partner, BigDecimal price) {
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> reservationLineItems, Guest guest, Partner partner, BigDecimal price) {
         this.reservationDateTime = reservationDateTime;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
-        this.type = type;
+        this.type = ReservationTypeEnum.Partner;
         this.reservationLineItems = reservationLineItems;
         this.guest = guest;
         this.partner = partner;

@@ -7,6 +7,7 @@ package merlionhotelreservation;
 
 import javax.ejb.EJB;
 import stateless.GuestControllerBeanRemote;
+import stateless.ReservationControllerBeanRemote;
 
 /**
  *
@@ -14,13 +15,17 @@ import stateless.GuestControllerBeanRemote;
  */
 public class Main {
 
+    @EJB(name = "ReservationControllerBeanRemote")
+    private static ReservationControllerBeanRemote reservationControllerBeanRemote;
+
     @EJB(name = "GuestControllerBeanRemote")
     private static GuestControllerBeanRemote guestControllerBeanRemote;
+    
 
     public static void main(String[] args) {
         // TODO code application logic here
         System.out.println(guestControllerBeanRemote);
-        MainApp main = new MainApp(guestControllerBeanRemote);
+        MainApp main = new MainApp(guestControllerBeanRemote, reservationControllerBeanRemote);
         main.runApp();
     }
     

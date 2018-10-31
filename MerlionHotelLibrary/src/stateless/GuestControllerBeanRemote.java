@@ -20,12 +20,12 @@ import util.exception.InvalidLoginCredentialException;
 @Remote
 public interface GuestControllerBeanRemote {
 
-    public RegisteredGuest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
+    public Guest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
 
     public void addReservation(Reservation reservation, Guest guest);
 
-    public RegisteredGuest guestLogin(String email, String password) throws InvalidLoginCredentialException;
+    public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
-    public RegisteredGuest retrieveGuestByEmail(String email) throws GuestNotFoundException;
+    public Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
     
 }

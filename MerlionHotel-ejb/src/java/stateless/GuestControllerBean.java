@@ -31,7 +31,7 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     private EntityManager em;
 
     @Override
-    public RegisteredGuest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException {
+    public Guest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException {
         try {
             RegisteredGuest newGuest = new RegisteredGuest(email, password, telephone, passport);
             em.persist(newGuest);
@@ -50,11 +50,12 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     }
 
     @Override
-    public RegisteredGuest guestLogin(String email, String password) throws InvalidLoginCredentialException {
+    public Guest guestLogin(String email, String password) throws InvalidLoginCredentialException {
         try{
-            RegisteredGuest guest = retrieveGuestByEmail(email);
-            
-            if(guest.getPassword().equals(password)){
+            Guest guest = retrieveGuestByEmail(email);
+            Query query = em.createQuery("SELECT r.password FROM RegisteredGuest r WHERE r.id = :inGuest");
+            query.setParameter("inGuest", guest.getId());
+            if(password.equals(query.getSingleResult())){
                 return guest;
             } else {
                 throw new InvalidLoginCredentialException("Guest does not exist or invalid password");
@@ -65,13 +66,13 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
     }
 
     @Override
-    public RegisteredGuest retrieveGuestByEmail(String email) throws GuestNotFoundException {
-        Query query = em.createQuery("SELECT g FROM RegisteredGuest g WHERE g.email = :inEmail");
+    public Guest retrieveGuestByEmail(String email) throws GuestNotFoundException {
+        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.email = :inEmail");
         query.setParameter("inEmail", email);
         
         try
         {
-            return (RegisteredGuest)query.getSingleResult();
+            return (Guest)query.getSingleResult();
         }
         catch(NoResultException | NonUniqueResultException ex)
         {

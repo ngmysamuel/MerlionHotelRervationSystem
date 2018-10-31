@@ -20,12 +20,12 @@ import util.exception.InvalidLoginCredentialException;
 @Local
 public interface GuestControllerBeanLocal {
 
-    RegisteredGuest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
+    Guest createRegisteredGuest(String email, String password, String telephone, String passport) throws GuestAlreadyExistException;
 
     void addReservation(Reservation reservation, entity.Guest guest);
 
-    RegisteredGuest guestLogin(String email, String password) throws InvalidLoginCredentialException;
+    Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
-    RegisteredGuest retrieveGuestByEmail(String email) throws GuestNotFoundException;
+    Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
     
 }
