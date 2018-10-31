@@ -7,6 +7,7 @@ package stateless;
 
 import Enum.ReservationTypeEnum;
 import entity.Guest;
+import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import java.math.BigDecimal;
@@ -43,23 +44,24 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     }
 
     @Override
-    public Reservation retrieveGuestReservationDetails(String guestEmail, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException {
-        Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.guest.email = :inEmail AND r.dateStart = :inDateStart AND r.dateEnd = :inDateEnd");
-        q.setParameter("inEmail", guestEmail);
+    public Reservation retrieveGuestReservationDetails(Long guestId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException {
+        Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.guest.id = :inId AND r.dateStart = :inDateStart AND r.dateEnd = :inDateEnd");
+        q.setParameter("inId", guestId);
         q.setParameter("inDateStart", dateStart);
         q.setParameter("inDateEnd", dateEnd);
         
         try{
             return (Reservation) q.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex){
-            throw new ReservationNotFoundException("Reservation of " + guestEmail + " for " + dateStart + " to " + dateEnd + " not found.");
+            throw new ReservationNotFoundException("Reservation of " + guestId + " for " + dateStart + " to " + dateEnd + " not found.");
         }
     }
 
     @Override
-    public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, Guest guest, List<ReservationLineItem> rooms) {
+    public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         BigDecimal price = rateControllerBeanLocal.countRate(dateStart, dateEnd);
+        Guest guest = em.find(Guest.class, guestId);
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, rooms, guest, price);
         em.persist(newReservation);
         em.flush();
@@ -74,27 +76,39 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     }
 
     @Override
-    public Reservation retrievePartnerReservationDetails(String partner, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException {
-        Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.username = :inUsername AND r.dateStart = :inDateStart AND r.dateEnd = :inDateEnd");
-        q.setParameter("inUsername", partner);
+    public Reservation retrievePartnerReservationDetails(java.lang.Long partnerId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException {
+        Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.id = :inId AND r.dateStart = :inDateStart AND r.dateEnd = :inDateEnd");
+        q.setParameter("inId", partnerId);
         q.setParameter("inDateStart", dateStart);
         q.setParameter("inDateEnd", dateEnd);
         
         try{
             return (Reservation) q.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex){
-            throw new ReservationNotFoundException("Reservation of " + partner + " for " + dateStart + " to " + dateEnd + " not found.");
+            throw new ReservationNotFoundException("Reservation of " + partnerId + " for " + dateStart + " to " + dateEnd + " not found.");
         }
     }
 
     @Override
-    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, entity.Guest guest, entity.Partner partner, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
         LocalDateTime currentDateTime = LocalDateTime.now();
         BigDecimal price = rateControllerBeanLocal.countRate(dateStart, dateEnd);
+        Guest guest = em.find(Guest.class, guestId);
+        Partner partner = em.find(Partner.class, partnerId);
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, rooms, guest, partner, price);
         em.persist(newReservation);
         em.flush();
         return newReservation;
+    }
+
+    @Override
+    public List<Reservation> retrieveAllGuestReservations(long guestId) {
+        Guest guest = em.find(Guest.class, guestId);
+        List<Reservation> reservations = guest.getReservations();
+        for(Reservation reservation: reservations){
+            reservation.getId();
+        }
+        return reservations;
     }
     
 }
