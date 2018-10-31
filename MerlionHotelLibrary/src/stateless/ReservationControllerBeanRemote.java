@@ -6,8 +6,6 @@
 package stateless;
 
 import Enum.ReservationTypeEnum;
-import entity.Guest;
-import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import java.time.LocalDate;
@@ -22,11 +20,13 @@ import util.exception.ReservationNotFoundException;
 @Remote
 public interface ReservationControllerBeanRemote {
 
-    Reservation retrieveGuestReservationDetails(String guestEmail, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
+    Reservation retrieveGuestReservationDetails(Long guestId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
 
-    Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, Guest guest, List<ReservationLineItem> rooms);
+    Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms);
 
-    Reservation retrievePartnerReservationDetails(String partner, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
+    Reservation retrievePartnerReservationDetails(java.lang.Long partnerId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
     
-    Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, entity.Guest guest, entity.Partner partner, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
+    Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
+
+    List<Reservation> retrieveAllGuestReservations(long guestId);
 }

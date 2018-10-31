@@ -36,6 +36,7 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
             RegisteredGuest newGuest = new RegisteredGuest(email, password, telephone, passport);
             em.persist(newGuest);
             em.flush();
+            newGuest.getId();
             return newGuest;
         } catch (EntityExistsException ex){
             throw new GuestAlreadyExistException("Guest with similar email or passport exists");
@@ -56,6 +57,7 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
             Query query = em.createQuery("SELECT r.password FROM RegisteredGuest r WHERE r.id = :inGuest");
             query.setParameter("inGuest", guest.getId());
             if(password.equals(query.getSingleResult())){
+                guest.getId();
                 return guest;
             } else {
                 throw new InvalidLoginCredentialException("Guest does not exist or invalid password");
