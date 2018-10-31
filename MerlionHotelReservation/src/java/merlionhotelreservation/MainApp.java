@@ -7,11 +7,15 @@ package merlionhotelreservation;
 
 import entity.Guest;
 import entity.Reservation;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 import stateless.GuestControllerBeanRemote;
+import stateless.ReservationControllerBeanRemote;
 import util.exception.GuestAlreadyExistException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -21,10 +25,12 @@ public class MainApp {
     
     Scanner sc = new Scanner(System.in);
     private GuestControllerBeanRemote guestControllerBeanRemote;
+    private ReservationControllerBeanRemote reservationControllerBeanRemote;
     private Guest currentGuest;
 
-    public MainApp(GuestControllerBeanRemote guestControllerBeanRemote) {
+    public MainApp(GuestControllerBeanRemote guestControllerBeanRemote, ReservationControllerBeanRemote reservationControllerBeanRemote) {
         this.guestControllerBeanRemote = guestControllerBeanRemote;
+        this.reservationControllerBeanRemote = reservationControllerBeanRemote;
     }
     
     public void runApp(){
@@ -102,13 +108,18 @@ public class MainApp {
     }
     
     private void viewMyReservationDetails(){
-        System.out.println("Use case not supported yet!");
-        /*System.out.print("Check-in Date>");
-        String startDate = sc.next();
-        System.out.print("Check-out Date>");
-        String endDate = sc.next();
-        Reservation reservation = ReservationControllerBean.retrieveReservation();
-        System.out.println(reservation);*/
+        System.out.print("Check-in Date(YYYY-MM-DD)>");
+        String start = sc.next();
+        System.out.print("Check-out Date(YYYY-MM-DD)>");
+        String end = sc.next();
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+        try {
+            Reservation reservation = reservationControllerBeanRemote.retrieveGuestReservationDetails(currentGuest.getEmail(), startDate, endDate);
+            System.out.println(reservation);
+        } catch(ReservationNotFoundException ex){
+            System.out.println("Reservation not found!");
+        }
     }
     
     private void viewAllMyReservations(){
@@ -118,6 +129,7 @@ public class MainApp {
         for(Reservation reservation: reservations){
             System.out.println(i + ". Check-in Date" + reservation.getDateStart());
             System.out.println("   Check-out Date" + reservation.getDateEnd());
+            i++;
         }
     }
     
