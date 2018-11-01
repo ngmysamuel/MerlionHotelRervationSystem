@@ -6,8 +6,11 @@
 package stateless;
 
 import entity.Partner;
+import entity.Reservation;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -17,4 +20,9 @@ import javax.ejb.Local;
 public interface PartnerControllerBeanLocal {
     public Partner create(String emp, String manager, String username);
     public List<Partner> viewAll();
+    public boolean login(String username, String password);
+    public List<Reservation> viewAllReservations();
+    public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException;
+    public Reservation viewReservationDetails(Long partner, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
+
 }

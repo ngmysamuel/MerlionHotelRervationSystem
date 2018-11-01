@@ -16,11 +16,7 @@
                     <path-in-war>/</path-in-war>
                 </library>
                 <library>
-                    <file>${reference.MerlionHotelReservationClient.j2ee-module-car}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
-                    <file>${reference.MerlionHotelReservation.j2ee-module-car}</file>
+                    <file>${reference.MerlionHotelLibrary.jar}</file>
                     <path-in-war>/</path-in-war>
                 </library>
             </web-module-additional-libraries>
@@ -43,20 +39,12 @@
                 <id>j2ee-module-car</id>
             </reference>
             <reference>
-                <foreign-project>MerlionHotelReservation</foreign-project>
-                <artifact-type>j2ee_ear_archive</artifact-type>
+                <foreign-project>MerlionHotelLibrary</foreign-project>
+                <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
-                <target>dist-ear</target>
-                <clean-target>clean-ear</clean-target>
-                <id>j2ee-module-car</id>
-            </reference>
-            <reference>
-                <foreign-project>MerlionHotelReservationClient</foreign-project>
-                <artifact-type>j2ee_ear_archive</artifact-type>
-                <script>build.xml</script>
-                <target>dist-ear</target>
-                <clean-target>clean-ear</clean-target>
-                <id>j2ee-module-car</id>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
             </reference>
         </references>
     </configuration>
