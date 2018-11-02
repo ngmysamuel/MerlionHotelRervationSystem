@@ -7,6 +7,7 @@ package stateless;
 
 import entity.Partner;
 import entity.Reservation;
+import entity.ReservationLineItem;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
@@ -23,6 +24,7 @@ public interface PartnerControllerBeanLocal {
     public boolean login(String username, String password);
     public List<Reservation> viewAllReservations();
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException;
-    public Reservation viewReservationDetails(Long partner, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
+    public Long createReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
+    public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd);
 
 }

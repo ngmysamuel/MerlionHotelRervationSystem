@@ -7,6 +7,8 @@ package singleton;
 
 import entity.Employee;
 import Enum.EmployeeTypeEnum;
+import entity.Partner;
+import entity.RoomType;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -46,8 +48,14 @@ public class DataInitBean {
     public void initApplication() {
         EmployeeTypeEnum type = EmployeeTypeEnum.SystemAdministrator;
         Employee e = new Employee("1", "1", type, "name");
+        Partner p = new Partner("1", "1");
+        RoomType rt = new RoomType("Super", 100);
+        RoomType rt2 = new RoomType("Max", 50);
+        em.persist(rt);
+        em.persist(rt2);
         em.persist(e);
+        em.persist(p);
         em.flush();
-        System.out.println("New SysAdmin created with Username: 1 and Password: 1 and ID = "+e.getId());
+        System.out.println("New SysAdmin and Partner and 2 room types with 100 and 50 rooms avail created with Username: 1 and Password: 1 and SysAdminID = "+e.getId());
     }
 }

@@ -3,19 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package partnerseclient;
+package stateless;
 
-import java.io.ObjectStreamConstants;
+import javax.ejb.Remote;
 
 /**
  *
  * @author samue
  */
-public class PartnerSEClient {
-
+@Remote
+public interface RoomInventorySessionBeanRemote {
     
-    public static void main(String[] args) {
-        MainApp ma = new MainApp();
-        ma.run();
-    }
 }

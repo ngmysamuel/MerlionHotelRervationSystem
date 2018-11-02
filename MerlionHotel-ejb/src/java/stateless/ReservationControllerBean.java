@@ -10,9 +10,11 @@ import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
+import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -30,15 +32,15 @@ import util.exception.ReservationNotFoundException;
 @Stateless
 public class ReservationControllerBean implements ReservationControllerBeanRemote, ReservationControllerBeanLocal {
 
-    @EJB(name = "GuestControllerBeanLocal")
-    private GuestControllerBeanLocal guestControllerBeanLocal;
+    @EJB
+    private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
 
-    @EJB(name = "RateControllerBeanLocal")
+    @EJB
     private RateControllerBeanLocal rateControllerBeanLocal;
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
-
+    
     public void persist(Object object) {
         em.persist(object);
     }
@@ -90,11 +92,25 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     }
 
     @Override
-    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, Long guestId, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        BigDecimal price = rateControllerBeanLocal.countRate(dateStart, dateEnd);
+        LocalDate oneYearOnDateTime = currentDateTime.plus(1, ChronoUnit.YEARS).toLocalDate();
+        if (dateStart.isAfter(oneYearOnDateTime)) {
+            throw new ReservationNotFoundException("Date reserved is too far ahead");
+        }
+        BigDecimal price = new BigDecimal(1);
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
+        //Get the dates for reservation
+        for (ReservationLineItem rli : rooms) {
+            RoomType rt = rli.getRoomType();
+            Integer numOfRooms = rli.getNumberOfRooms();
+            while (!dateStart.isAfter(dateEnd)) {
+                roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStart, numOfRooms);
+                dateStart = dateStart.plusDays(1);          
+            }
+            em.persist(rli);
+        }
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, rooms, guest, partner, price);
         em.persist(newReservation);
         em.flush();

@@ -18,8 +18,9 @@ public class MainApp {
     private MainControllerBeanRemote mainControllerBeanRemote;
     private Scanner sc = new Scanner(System.in);
 
-    public void run(MainControllerBeanRemote mainControllerBeanRemote) {
-        this.mainControllerBeanRemote = mainControllerBeanRemote;
+    public void run(MainControllerBeanRemote mainControllerBean) {
+        this.mainControllerBeanRemote = mainControllerBean;
+        System.out.println("\n\n"+mainControllerBeanRemote+"\n\n");
         while (true) {
             System.out.println("Welcome you!\n1. Login\n2. Exit");
             int c = sc.nextInt();

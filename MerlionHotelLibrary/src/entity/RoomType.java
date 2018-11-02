@@ -6,13 +6,13 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 /**
@@ -41,16 +41,27 @@ public class RoomType implements Serializable {
     @Column(nullable = false, unique = true)
     private Integer grade;
     @Column(nullable = false)
-    private Integer roomsLeft;
+    private Integer initialRoomAvailability;
+    
     @OneToMany(mappedBy = "type")
     private List<Room> rooms;
+    
     @OneToMany
-    @JoinColumn(nullable = false)
+    //@JoinColumn(nullable = false)
     private List<Rate> rates;
+    
     @OneToMany(mappedBy = "roomType")
     private List<ReservationLineItem> reservationLineItems;
+    
+    @OneToMany(mappedBy = "rt")
+    private List<RoomInventory> roomInventory = new ArrayList<RoomInventory>();
 
     public RoomType() {
+    }
+
+    public RoomType(String name, Integer initialRoomAvailability) {
+        this.name = name;
+        this.initialRoomAvailability = initialRoomAvailability;
     }
 
     public String getName() {
@@ -109,13 +120,7 @@ public class RoomType implements Serializable {
         this.grade = grade;
     }
 
-    public Integer getRoomsLeft() {
-        return roomsLeft;
-    }
-
-    public void setRoomsLeft(Integer roomsLeft) {
-        this.roomsLeft = roomsLeft;
-    }
+    
 
     public List<Room> getRooms() {
         return rooms;
@@ -164,6 +169,23 @@ public class RoomType implements Serializable {
     @Override
     public String toString() {
         return "entity.RoomTypeEntity[ id=" + id + " ]";
+    }
+    
+    //@XmlTransient
+    public List<RoomInventory> getRoomInventory() {
+        return roomInventory;
+    }
+
+    public void setRoomInventory(List<RoomInventory> roomInventory) {
+        this.roomInventory = roomInventory;
+    }
+
+    public Integer getInitialRoomAvailability() {
+        return initialRoomAvailability;
+    }
+
+    public void setInitialRoomAvailability(Integer initialRoomAvailability) {
+        this.initialRoomAvailability = initialRoomAvailability;
     }
     
 }

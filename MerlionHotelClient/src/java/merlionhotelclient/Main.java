@@ -19,6 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         MainApp mainApp = new MainApp();
+        System.out.println(mainControllerBean);
         mainApp.run(mainControllerBean);
     }
     

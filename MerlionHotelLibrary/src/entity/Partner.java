@@ -34,10 +34,11 @@ public class Partner implements Serializable {
 
     public Partner() {
     }
-
-    public Partner(String password, String username) {
-        this.password = password;
+    
+    public Partner(String username, String password) {
+        super();
         this.username = username;
+        this.password = password;
     }
     
     public String getPassword() {

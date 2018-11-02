@@ -43,14 +43,15 @@ public class Reservation implements Serializable {
     private LocalDate dateStart;
     @Column(nullable=false)
     private LocalDate dateEnd;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ReservationTypeEnum type;
+    
     @JoinColumn(nullable = false)
     @OneToMany(mappedBy = "reservation")
     private List<ReservationLineItem> reservationLineItems;
     @ManyToOne
-    @JoinColumn(nullable=false)
     private Guest guest;
     @ManyToOne
     private Partner partner;

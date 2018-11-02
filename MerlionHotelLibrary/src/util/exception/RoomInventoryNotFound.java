@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package partnerseclient;
-
-import java.io.ObjectStreamConstants;
+package util.exception;
 
 /**
  *
  * @author samue
  */
-public class PartnerSEClient {
+public class RoomInventoryNotFound extends Exception {
 
-    
-    public static void main(String[] args) {
-        MainApp ma = new MainApp();
-        ma.run();
+    public RoomInventoryNotFound() {
     }
+
+    public RoomInventoryNotFound(String message) {
+        super(message);
+    }
+    
 }
