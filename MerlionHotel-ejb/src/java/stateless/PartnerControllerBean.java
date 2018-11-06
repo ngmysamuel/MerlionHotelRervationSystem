@@ -9,6 +9,7 @@ import Enum.ReservationTypeEnum;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
+import entity.RoomInventory;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,20 +98,89 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
             throw e;
         }
     }
+    
+    public void printRoomType() {
+        RoomType roomType = em.find(RoomType.class, (long) 1);
+        
+        RoomInventory ri = new RoomInventory();
+        ri.setDate(LocalDate.now());
+        ri.setRt(roomType);
+        ri.setRoomCountForAllocation(789);
+        ri.setRoomAvail(789);
+        em.persist(ri);
+        em.flush();
+System.out.println("XVI id is "+ri.getId());
+//        Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date");
+//        q.setParameter("date", LocalDate.now());
+//        //q.setParameter("roomType", 2);
+//        System.out.println(q.getResultList());
+//        List<RoomInventory> ls = q.getResultList();
+//        RoomInventory ri = ls.get(0);
+//        System.out.println(ri.getRt());
+    }
 
     public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd) {
+        RoomType roomType = em.find(RoomType.class, (long) 1);
+        
+        RoomInventory ri = new RoomInventory();
+        ri.setDate(LocalDate.now());
+        ri.setRt(roomType);
+        ri.setRoomCountForAllocation(123);
+        ri.setRoomAvail(123);
+        em.persist(ri);
+        em.flush();
+System.out.println("XV id is "+ri.getId());
+
         int i = 0;
         LocalDate dateStartTemp = dateStart;
-        System.out.println("V");
         List<Boolean> bo = new ArrayList<>();
         List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+//        for (RoomType rt : ls) {
+//System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
+//            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
+//                ++i;
+//                boolean full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
+//                if (!full) { //this evaluates to true but is then negated to false
+//                    bo.add(false);
+//                    break;
+//                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
+//                    bo.add(true);
+//                }
+//                dateStartTemp = dateStartTemp.plusDays(1);
+//            }
+//            dateStartTemp = dateStart;
+//        }
+//        
+        bo.add(Boolean.TRUE);
+        bo.add(Boolean.TRUE);
+        return bo;
+    }
+    
+    public List<Boolean> search (LocalDate dateStart, LocalDate dateEnd) {
+//        RoomType roomType = em.find(RoomType.class, (long) 1);
+//        
+//        RoomInventory ri = new RoomInventory();
+//        ri.setDate(LocalDate.now());
+//        ri.setRt(roomType);
+//        ri.setRoomCountForAllocation(123);
+//        ri.setRoomAvail(123);
+//        em.persist(ri);
+//        em.flush();
+//System.out.println("XV id is "+ri.getId());
+
+        int i = 0;
+        LocalDate dateStartTemp = dateStart;
+        List<Boolean> bo = new ArrayList<>();
+        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+        boolean full = true;
         for (RoomType rt : ls) {
-            while (!dateStartTemp.isAfter(dateEnd)) {
+            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
                 ++i;
-                if (!roomInventorySessionBean.isItFull(dateStart, rt)) {
+                full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
+                if (!full) { //this evaluates to true but is then negated to false
                     bo.add(false);
                     break;
-                } else if (roomInventorySessionBean.isItFull(dateEnd, rt)&& (dateStartTemp.isEqual(dateEnd))) {
+                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
                     bo.add(true);
                 }
                 dateStartTemp = dateStartTemp.plusDays(1);

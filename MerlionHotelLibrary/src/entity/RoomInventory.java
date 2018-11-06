@@ -13,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-
 /**
  *
  * @author samue
@@ -25,14 +24,17 @@ public class RoomInventory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     
     private LocalDate date;
-    
-    private Integer roomAvail = 100;
-    
+
+    private Integer roomCountForAllocation;
+
+    private Integer roomAvail;
+
     @ManyToOne
-    private RoomType rt; 
-    
+    private RoomType rt;
+
     public Long getId() {
         return id;
     }
@@ -81,7 +83,7 @@ public class RoomInventory implements Serializable {
     public void setRoomAvail(Integer roomAvail) {
         this.roomAvail = roomAvail;
     }
-    
+
     public RoomType getRt() {
         return rt;
     }
@@ -89,5 +91,12 @@ public class RoomInventory implements Serializable {
     public void setRt(RoomType rt) {
         this.rt = rt;
     }
-    
+
+    public Integer getRoomCountForAllocation() {
+        return roomCountForAllocation;
+    }
+
+    public void setRoomCountForAllocation(Integer roomCountForAllocation) {
+        this.roomCountForAllocation = roomCountForAllocation;
+    }
 }

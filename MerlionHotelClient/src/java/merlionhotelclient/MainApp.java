@@ -30,8 +30,16 @@ public class MainApp {
                 System.out.println("Your password: ");
                 String password = sc.next();
                 if (mainControllerBeanRemote.doLogin(username, password)) {
-                    System.out.println("What is goingo n?");
-                    loggedin(username);
+                    EmployeeTypeEnum e = mainControllerBeanRemote.getEmployeeTypeEnum(username);
+                    if (e.equals(EmployeeTypeEnum.SystemAdministrator)) {
+                        loggedInSysAdmin(username); 
+                    } else if (e.equals(EmployeeTypeEnum.GuestRelationOfficer)) {
+                        loggedInGuestRelations(username);
+                    } else if (e.equals(EmployeeTypeEnum.OperationManager)) {
+                        loggedInOperationManager(username);
+                    } else if (e.equals(EmployeeTypeEnum.SalesManager)) {
+                        loggedInSalesManager(username);
+                    }
                 } else {
                     System.out.println("Wrong user name or password");
                     continue;
@@ -41,13 +49,25 @@ public class MainApp {
             }
         }
     }
-
-    public void loggedin(String username) {
+    
+    public void loggedInOperationManager(String username) {
+        
+    }
+    
+    public void loggedInGuestRelations(String username) {
+        
+    }
+    
+    public void loggedInSalesManager(String username) {
+        
+    }
+    
+    public void loggedInSysAdmin(String username) {
         System.out.println("I have logged in");
         EmployeeTypeEnum eType = mainControllerBeanRemote.getEmployeeTypeEnum(username);
         if (eType == EmployeeTypeEnum.SystemAdministrator) {
             while (true) {
-                System.out.println("1. Create New Employee\n2. View All Employees\n3. Create Partner\n4. View All Partners\n5. Exit");
+                System.out.println("1. Create New Employee\n2. View All Employees\n3. Create Partner\n4. View All Partners\n5. timer\n6. Exit");
                 int choice = sc.nextInt();
                 if (choice == 1) {
                     System.out.println("What is the employee type?\n0. GuestRelations\n1. Operations\n2. Sales");
@@ -70,6 +90,8 @@ public class MainApp {
                 } else if (choice == 4) {
                     System.out.println(mainControllerBeanRemote.viewPartners());
                 } else if (choice == 5) {
+                    mainControllerBeanRemote.timer();
+                } else if (choice == 6) {
                     break;
                 } else {
                     continue;

@@ -23,6 +23,14 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ReservationLineItem implements Serializable {
 
+    public List<Room> getAllocatedRooms() {
+        return allocatedRooms;
+    }
+
+    public void setAllocatedRooms(List<Room> allocatedRooms) {
+        this.allocatedRooms = allocatedRooms;
+    }
+
 
 
     private static final long serialVersionUID = 1L;
@@ -34,7 +42,8 @@ public class ReservationLineItem implements Serializable {
     @JoinColumn(nullable=false)
     @ManyToOne
     private RoomType roomType;
-    @JoinColumn(nullable=false)
+    
+    //@JoinColumn(nullable=false)
     @ManyToOne
     private Reservation reservation;
     @ManyToMany

@@ -49,8 +49,8 @@ public class DataInitBean {
         EmployeeTypeEnum type = EmployeeTypeEnum.SystemAdministrator;
         Employee e = new Employee("1", "1", type, "name");
         Partner p = new Partner("1", "1");
-        RoomType rt = new RoomType("Super", 100);
-        RoomType rt2 = new RoomType("Max", 50);
+        RoomType rt = new RoomType("Super", "lala", 200, "Big", 4, "Toilets", 1, 100);
+        RoomType rt2 = new RoomType("Max", "lala2", 200, "Med", 4, "Toilet", 2, 50);
         em.persist(rt);
         em.persist(rt2);
         em.persist(e);
@@ -58,4 +58,6 @@ public class DataInitBean {
         em.flush();
         System.out.println("New SysAdmin and Partner and 2 room types with 100 and 50 rooms avail created with Username: 1 and Password: 1 and SysAdminID = "+e.getId());
     }
+    
+    
 }

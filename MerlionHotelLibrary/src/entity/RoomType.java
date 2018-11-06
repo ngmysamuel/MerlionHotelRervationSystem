@@ -42,17 +42,25 @@ public class RoomType implements Serializable {
     private Integer grade;
     @Column(nullable = false)
     private Integer initialRoomAvailability;
-    
+
     @OneToMany(mappedBy = "type")
     private List<Room> rooms;
-    
+
     @OneToMany
     //@JoinColumn(nullable = false)
     private List<Rate> rates;
-    
+
     @OneToMany(mappedBy = "roomType")
     private List<ReservationLineItem> reservationLineItems;
-    
+
+    public List<ReservationLineItem> getReservationLineItems() {
+        return reservationLineItems;
+    }
+
+    public void setReservationLineItems(List<ReservationLineItem> reservationLineItems) {
+        this.reservationLineItems = reservationLineItems;
+    }
+
     @OneToMany(mappedBy = "rt")
     private List<RoomInventory> roomInventory = new ArrayList<RoomInventory>();
 
@@ -61,6 +69,17 @@ public class RoomType implements Serializable {
 
     public RoomType(String name, Integer initialRoomAvailability) {
         this.name = name;
+        this.initialRoomAvailability = initialRoomAvailability;
+    }
+
+    public RoomType(String name, String description, Integer roomSize, String bed, Integer capacity, String amenities, Integer grade, Integer initialRoomAvailability) {
+        this.name = name;
+        this.description = description;
+        this.roomSize = roomSize;
+        this.bed = bed;
+        this.capacity = capacity;
+        this.amenities = amenities;
+        this.grade = grade;
         this.initialRoomAvailability = initialRoomAvailability;
     }
 
@@ -120,8 +139,6 @@ public class RoomType implements Serializable {
         this.grade = grade;
     }
 
-    
-
     public List<Room> getRooms() {
         return rooms;
     }
@@ -170,7 +187,7 @@ public class RoomType implements Serializable {
     public String toString() {
         return "entity.RoomTypeEntity[ id=" + id + " ]";
     }
-    
+
     //@XmlTransient
     public List<RoomInventory> getRoomInventory() {
         return roomInventory;
@@ -187,5 +204,5 @@ public class RoomType implements Serializable {
     public void setInitialRoomAvailability(Integer initialRoomAvailability) {
         this.initialRoomAvailability = initialRoomAvailability;
     }
-    
+
 }

@@ -48,9 +48,10 @@ public class Reservation implements Serializable {
     @Column(nullable=false)
     private ReservationTypeEnum type;
     
-    @JoinColumn(nullable = false)
+    //@JoinColumn(nullable = false)
     @OneToMany(mappedBy = "reservation")
     private List<ReservationLineItem> reservationLineItems;
+    
     @ManyToOne
     private Guest guest;
     @ManyToOne
@@ -73,7 +74,17 @@ public class Reservation implements Serializable {
     }
 
     //For Partner reservation
-    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> reservationLineItems, Guest guest, Partner partner, BigDecimal price) {
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, Guest guest, Partner partner, BigDecimal price) {
+        this.reservationDateTime = reservationDateTime;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.type = ReservationTypeEnum.Partner;
+        this.guest = guest;
+        this.partner = partner;
+        this.price = price;
+    }
+    
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms, Guest guest, Partner partner, BigDecimal price) {
         this.reservationDateTime = reservationDateTime;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
@@ -83,7 +94,7 @@ public class Reservation implements Serializable {
         this.partner = partner;
         this.price = price;
     }
-
+    
     public ReservationTypeEnum getType() {
         return type;
     }

@@ -38,6 +38,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             ri.setDate(date);
             ri.setRt(rt);
             ri.setRoomAvail(rt.getInitialRoomAvailability());
+            ri.setRoomCountForAllocation(rt.getInitialRoomAvailability());
             if (ri.getRoomAvail() < numOfRooms) {
                 eJBContext.setRollbackOnly();
                 return;

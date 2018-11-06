@@ -23,4 +23,5 @@ public interface MainControllerBeanRemote {
     public List<Employee> viewEmployees();
     public Partner createPartner(String emp, String manager, String username);
     public List<Partner> viewPartners();
+    public void timer();
 }

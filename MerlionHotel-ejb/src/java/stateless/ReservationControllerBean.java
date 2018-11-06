@@ -101,7 +101,8 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         BigDecimal price = new BigDecimal(1);
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
-        //Get the dates for reservation
+        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);
+        em.persist(newReservation);
         for (ReservationLineItem rli : rooms) {
             RoomType rt = rli.getRoomType();
             Integer numOfRooms = rli.getNumberOfRooms();
@@ -109,11 +110,10 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
                 roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStart, numOfRooms);
                 dateStart = dateStart.plusDays(1);          
             }
+            rli.setReservation(newReservation);
             em.persist(rli);
         }
-        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, rooms, guest, partner, price);
-        em.persist(newReservation);
-        em.flush();
+        newReservation.setReservationLineItems(rooms);
         return newReservation;
     }
 

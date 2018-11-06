@@ -13,6 +13,9 @@
     <class>entity.ReservationLineItem</class>
     <class>entity.RegisteredGuest</class>
     <class>entity.RoomInventory</class>
+    <class>
+        util.attributeConverter.LocalDateAttributeConverter
+    </class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

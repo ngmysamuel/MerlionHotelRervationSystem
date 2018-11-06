@@ -26,5 +26,7 @@ public interface PartnerControllerBeanLocal {
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException;
     public Long createReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
     public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd);
+    public void printRoomType();
+    public List<Boolean> search (LocalDate dateStart, LocalDate end);
 
 }

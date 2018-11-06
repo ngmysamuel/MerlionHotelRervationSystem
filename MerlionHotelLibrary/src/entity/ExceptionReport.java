@@ -28,6 +28,9 @@ public class ExceptionReport implements Serializable {
     @Column(nullable = false)
     private LocalDate date;
     private List<String> exceptions;
+    
+
+   
 
     public ExceptionReport() {
     }
