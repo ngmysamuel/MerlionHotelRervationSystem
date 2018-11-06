@@ -69,7 +69,6 @@ public class PartnerReservationWebService {
     }
 
     public Long createReservation(String startString, String endString, Long guestId, Long partnerId, /*List<Pair<String, Integer>>*/List<String> rooms) throws ReservationNotFoundException {
-        try {
             LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             List<ReservationLineItem> rliList = new ArrayList<ReservationLineItem>();
@@ -83,11 +82,13 @@ public class PartnerReservationWebService {
                 //RoomType rt = (RoomType) em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :name").setParameter("name", p.getKey()).getResultList().get(0);
                 rli.setRoomType(rt);
                 rliList.add(rli);
+System.out.println(rliList.size());     
             }
-            return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
-        } catch (ReservationNotFoundException e) {
-            throw e;
-        }
+            try {
+                return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
+            } catch (ReservationNotFoundException e) {
+                throw e;
+            }
     }
 
     public List<Boolean> searchRoom(String startString, String endString) {

@@ -15,6 +15,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -29,10 +30,12 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     @Resource
     private EJBContext eJBContext;
 
-    public void editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) {
-        Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt = :rt");
+    @Override
+    public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
+        Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt= :rt");
         q.setParameter("date", date);
         q.setParameter("rt", rt);
+System.out.println("in edieiie "+date);
         if (q.getResultList().isEmpty()) {
             RoomInventory ri = new RoomInventory();
             ri.setDate(date);
@@ -41,17 +44,20 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             ri.setRoomCountForAllocation(rt.getInitialRoomAvailability());
             if (ri.getRoomAvail() < numOfRooms) {
                 eJBContext.setRollbackOnly();
-                return;
+                throw new ReservationNotFoundException();
             } else {
                 ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
                 em.persist(ri);
+                return true;
             }
         } else {
             RoomInventory ri = (RoomInventory) q.getResultList().get(0);
             if (ri.getRoomAvail() < numOfRooms) {
                 eJBContext.setRollbackOnly();
+                throw new ReservationNotFoundException();
             }
             ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
+            return true;
         }
     }
     

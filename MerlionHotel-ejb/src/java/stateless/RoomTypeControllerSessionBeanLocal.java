@@ -9,6 +9,7 @@ import entity.RoomType;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -16,6 +17,6 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomTypeControllerSessionBeanLocal {
-    public void editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms);
+    public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException;
     public List<RoomType> getRoomTypes();
 }

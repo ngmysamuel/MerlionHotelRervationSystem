@@ -43,7 +43,7 @@ public class ReservationLineItem implements Serializable {
     @ManyToOne
     private RoomType roomType;
     
-    //@JoinColumn(nullable=false)
+    @JoinColumn(nullable=false)
     @ManyToOne
     private Reservation reservation;
     @ManyToMany
