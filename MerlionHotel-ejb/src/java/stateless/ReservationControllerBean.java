@@ -110,7 +110,6 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             RoomType rt = rli.getRoomType();
             Integer numOfRooms = rli.getNumberOfRooms();
             while (!dateStartTemp.isAfter(dateEnd)) { //for each day booked
-System.out.println("date now is "+dateStartTemp);
                 try {
                 roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
                 } catch (ReservationNotFoundException e) {

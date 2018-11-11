@@ -120,14 +120,11 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         q.setParameter("date", date);
         List<Reservation> todayCheckInList = q.getResultList();
         for (int i = 0; i < sortedListOfRT.size(); i++) { //for each type of roomType
-System.out.println("roomType now is " + sortedListOfRT.get(i));
             for (Reservation r : todayCheckInList) { //for each reservation checking in today
-System.out.println("reservation now is " + r.getId());
                 List<ReservationLineItem> listOfReservationLineItems = r.getReservationLineItems();
                 LocalDate dateEnd = r.getDateEnd();
                 LocalDate dateStart = r.getDateStart();
                 for (ReservationLineItem rli : listOfReservationLineItems) { //for each line item in the reservation
-System.out.println("ReservationLineItem now is " + rli.getId());
                     RoomType rt = rli.getRoomType();
                     Integer numOfRooms = rli.getNumberOfRooms();
                     if (rli.getRoomType().getGrade() == sortedListOfRT.get(i).getGrade()) {
@@ -162,9 +159,8 @@ System.out.println("ReservationLineItem now is " + rli.getId());
                 System.out.println("\n\n\nOops No such reservation found for that date\n\n\n");
                 return false;
             }
-            //if (ri.getRoomCountForAllocation() < numOfRooms) {
-            if (0 < numOfRooms) {    
-System.out.println("There is 0 < numOfRooms");
+            if (ri.getRoomCountForAllocation() < numOfRooms) {
+            //if (0 < numOfRooms) {    
                 eJBContext.setRollbackOnly();
                 return false;
             } else {
@@ -200,9 +196,7 @@ System.out.println("There is 0 < numOfRooms");
         q.setParameter("status", "Available");
         List<Room> ls = q.getResultList();
         for (int i = 0; i < numOfRooms; i++) {
-System.out.println("list of rooms avail " + ls);
             List<Room> ls2 = rli.getAllocatedRooms();
-System.out.println("ls.get(i) is "+ls.get(i));
             ls2.add(ls.get(i));
             rli.setAllocatedRooms(ls2);
             ls.get(i).setStatus("Occupied");

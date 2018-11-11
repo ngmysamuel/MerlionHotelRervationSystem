@@ -122,7 +122,6 @@ public class PartnerReservationWebService {
             System.out.println("number of rli to be booked is: " + rliList.size());
         }
         try {
-            System.out.println("PLESAE stop thijs");
             return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
         } catch (ReservationNotFoundException e) {
             throw e;
@@ -145,7 +144,6 @@ public class PartnerReservationWebService {
             ++lsIntegerCounter;
         }
         try {
-            System.out.println("size of rliList is " + rliList.size());
             return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
         } catch (ReservationNotFoundException e) {
             throw e;
@@ -153,10 +151,8 @@ public class PartnerReservationWebService {
     }
 
     public List<Boolean> searchRoom(String startString, String endString) {
-        System.out.println("VI");
         LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        System.out.println("IV");
         return partnerControllerBean.searchRooms(dateStart, dateEnd);
     }
 

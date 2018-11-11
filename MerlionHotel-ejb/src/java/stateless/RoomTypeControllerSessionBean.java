@@ -32,11 +32,9 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
 
     @Override
     public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
-System.out.println("rt is "+rt+" date is "+date+" numofrooms is ");
         Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt= :rt");
         q.setParameter("date", date);
         q.setParameter("rt", rt);
-System.out.println("in edieiie "+date);
         if (q.getResultList().isEmpty()) {
             RoomInventory ri = new RoomInventory();
             ri.setDate(date);
