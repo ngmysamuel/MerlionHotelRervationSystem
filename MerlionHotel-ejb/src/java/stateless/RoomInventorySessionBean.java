@@ -3,6 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+//PROBLEM ROOM COUNT IS NOT CORRECT IN THE ROOM INVENTORY
+
 package stateless;
 
 import entity.RoomInventory;

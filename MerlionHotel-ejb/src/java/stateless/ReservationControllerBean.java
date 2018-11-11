@@ -99,26 +99,26 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             throw new ReservationNotFoundException("Date reserved is too far ahead");
         }
         BigDecimal price = new BigDecimal(1);
-        Boolean b = true;
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
+        
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);
         em.persist(newReservation);
+        
         LocalDate dateStartTemp = dateStart;
-        for (ReservationLineItem rli : rooms) {
+        for (ReservationLineItem rli : rooms) { //for each room line item
             RoomType rt = rli.getRoomType();
-System.out.println("room type is  "+rt.getName());
             Integer numOfRooms = rli.getNumberOfRooms();
-            while (!dateStartTemp.isAfter(dateEnd)) {
+            while (!dateStartTemp.isAfter(dateEnd)) { //for each day booked
 System.out.println("date now is "+dateStartTemp);
                 try {
                 roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
                 } catch (ReservationNotFoundException e) {
                     throw e;
                 }
-                dateStartTemp = dateStartTemp.plusDays(1);          
+                dateStartTemp = dateStartTemp.plusDays(1);//the next day
             }
-            dateStartTemp = dateStart;
+            dateStartTemp = dateStart;//the next room line item
             rli.setReservation(newReservation);
             em.persist(rli);
         }

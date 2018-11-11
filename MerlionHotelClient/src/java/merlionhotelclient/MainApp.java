@@ -6,6 +6,9 @@
 package merlionhotelclient;
 
 import Enum.EmployeeTypeEnum;
+import entity.ExceptionReport;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 import stateless.MainControllerBeanRemote;
 
@@ -67,7 +70,7 @@ public class MainApp {
         EmployeeTypeEnum eType = mainControllerBeanRemote.getEmployeeTypeEnum(username);
         if (eType == EmployeeTypeEnum.SystemAdministrator) {
             while (true) {
-                System.out.println("1. Create New Employee\n2. View All Employees\n3. Create Partner\n4. View All Partners\n5. timer\n6. Exit");
+                System.out.println("1. Create New Employee\n2. View All Employees\n3. Create Partner\n4. View All Partners\n5. timer\n6. Exit\n7. View Exception Report\n8. Persist a er");
                 int choice = sc.nextInt();
                 if (choice == 1) {
                     System.out.println("What is the employee type?\n0. GuestRelations\n1. Operations\n2. Sales");
@@ -93,9 +96,25 @@ public class MainApp {
                     mainControllerBeanRemote.timer();
                 } else if (choice == 6) {
                     break;
+                } else if (choice == 7) {
+                    viewExceptionReport();
+                } else if (choice == 8) {
+                    mainControllerBeanRemote.persistEr();
                 } else {
                     continue;
                 }
+            }
+        }
+    }
+    
+    private void viewExceptionReport() {
+        ExceptionReport er = mainControllerBeanRemote.viewExceptionReport(LocalDate.now());
+        List<String> ls = er.getExceptions();
+        if (ls.isEmpty()) {
+            System.out.println("There is no excpetions");
+        } else {
+            for (String s : ls) {
+                System.out.println(s);
             }
         }
     }

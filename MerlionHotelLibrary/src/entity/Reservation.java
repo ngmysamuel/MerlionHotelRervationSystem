@@ -48,7 +48,7 @@ public class Reservation implements Serializable {
     @Column(nullable=false)
     private ReservationTypeEnum type;
     
-    //@JoinColumn(nullable = false)
+    @JoinColumn(nullable = false)
     @OneToMany(mappedBy = "reservation")
     private List<ReservationLineItem> reservationLineItems;
     

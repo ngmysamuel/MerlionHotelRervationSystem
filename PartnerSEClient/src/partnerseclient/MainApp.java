@@ -10,6 +10,8 @@ import artifacts.ReservationNotFoundException_Exception;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import artifacts.CreateReservation.Arg4;
+import artifacts.CreateReservation.Arg4.Entry;
 
 /**
  *
@@ -24,10 +26,10 @@ public class MainApp {
         System.out.println("Login status is: " + login("1", "1"));
 
         while (true) {
-            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Search");
+            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Search\n8. Wrong reservation");
             int selection = sc.nextInt();
             if (selection == 1) {
-                makeReservation();
+                makeReservation2();
             } else if (selection == 2) {
                 searchRooms();
             } else if (selection == 3) {
@@ -40,6 +42,8 @@ public class MainApp {
                 printRoomType();
             } else if (selection == 7) {
                 sear();
+            } else if (selection ==8) {
+                makeReservation();
             } else {
                 System.out.println("what?");
             }
@@ -73,6 +77,7 @@ public class MainApp {
         System.out.println(r.getPrice());
         System.out.println(r.getDateEnd());
         System.out.println(r.getDateStart());
+        System.out.println(r.getReservationLineItems());
     }
     
     private void searchRooms() {
@@ -92,6 +97,7 @@ public class MainApp {
     }
 
     private void makeReservation() {
+        Arg4 arg = new Arg4();
         System.out.println("Type in the date you want to start. DD/MM/YYYY");
         String startString = sc.next();
         System.out.println("Type in the date you want to end. DD/MM/YYYY");
@@ -100,8 +106,6 @@ public class MainApp {
         Long guestId = sc.nextLong();
         System.out.println("What is partner id?");
         Long partnerId = sc.nextLong();
-        //List<Pair<String, Integer>> rli= new ArrayList<>();
-        List<String> rliString = new ArrayList<>();
         while (true) {
             System.out.println("What room type?");
             List<String> ls = getRoomType();
@@ -110,12 +114,13 @@ public class MainApp {
             }
             int j = sc.nextInt();
             String rt = ls.get(j - 1);
-            rliString.add(rt);
             System.out.println("How many rooms?");
             Integer k = sc.nextInt();
-            rliString.add(k.toString());
-            //Pair p = new Pair(rt, k);
-            //rli.add(p);
+            Entry e = new Entry();
+            e.setKey(rt);
+            e.setValue(k);
+            arg.getEntry().add(e);
+System.out.println("ls2 size is "+arg.getEntry().size());
             System.out.println("Do you want to book more? Press 1 for yes and 2 for no");
             int l = sc.nextInt();
             if (l == 2) {
@@ -123,13 +128,54 @@ public class MainApp {
             }
         }
         try {
-            createReservation(startString, endString, guestId, partnerId, rliString);
+            createReservation(startString, endString, guestId, partnerId, arg);
+            System.out.println("STOTTTOTO");
         } catch (ReservationNotFoundException_Exception e) {
             System.out.println("Oh no, reservation is not ok");
             System.out.println(e);
         }
     }
 
+    private void makeReservation2() {
+        Arg4 arg = new Arg4();
+        System.out.println("Type in the date you want to start. DD/MM/YYYY");
+        String startString = sc.next();
+        System.out.println("Type in the date you want to end. DD/MM/YYYY");
+        String endString = sc.next();
+        System.out.println("What is the guest id?");
+        Long guestId = sc.nextLong();
+        System.out.println("What is partner id?");
+        Long partnerId = sc.nextLong();
+        List<String> lsString = new ArrayList<>();
+        List<Integer> lsInteger = new ArrayList<>();
+        while (true) {
+            System.out.println("What room type?");
+            List<String> ls = getRoomType();
+            for (int i = 1; i <= ls.size(); i++) {
+                System.out.println(i + ". " + ls.get(i - 1));
+            }
+            int j = sc.nextInt();
+            String rt = ls.get(j - 1);
+            System.out.println("How many rooms?");
+            Integer k = sc.nextInt();
+            lsString.add(rt);
+            lsInteger.add(k);
+System.out.println("ls2 size is "+arg.getEntry().size());
+            System.out.println("Do you want to book more? Press 1 for yes and 2 for no");
+            int l = sc.nextInt();
+            if (l == 2) {
+                break;
+            }
+        }
+        try {
+            createReservation2(startString, endString, guestId, partnerId, lsString, lsInteger);
+            System.out.println("STOTTTOTO");
+        } catch (ReservationNotFoundException_Exception e) {
+            System.out.println("Oh no, reservation is not ok");
+            System.out.println(e);
+        }
+    }
+    
     private static boolean login(java.lang.String arg0, java.lang.String arg1) {
         artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
         artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
@@ -166,11 +212,20 @@ public class MainApp {
         return port.getRoomType();
     }
 
-    private static Long createReservation(java.lang.String arg0, java.lang.String arg1, java.lang.Long arg2, java.lang.Long arg3, java.util.List<java.lang.String> arg4) throws ReservationNotFoundException_Exception {
+    private static Long createReservation(java.lang.String arg0, java.lang.String arg1, java.lang.Long arg2, java.lang.Long arg3, artifacts.CreateReservation.Arg4 arg4) throws ReservationNotFoundException_Exception {
         artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
         artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
         return port.createReservation(arg0, arg1, arg2, arg3, arg4);
     }
+
+    private static Long createReservation2(java.lang.String arg0, java.lang.String arg1, java.lang.Long arg2, java.lang.Long arg3, java.util.List<java.lang.String> arg4, java.util.List<java.lang.Integer> arg5) throws ReservationNotFoundException_Exception {
+        artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
+        artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
+        return port.createReservation2(arg0, arg1, arg2, arg3, arg4, arg5);
+    }
+
+
+
 
 
 

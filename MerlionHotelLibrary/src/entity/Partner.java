@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -56,7 +57,8 @@ public class Partner implements Serializable {
     public void setUsername(String username) {
         this.username = username;
     }
-
+    
+    //@XmlTransient
     public List<Reservation> getReservations() {
         return reservations;
     }

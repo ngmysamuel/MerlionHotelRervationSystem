@@ -29,15 +29,25 @@ public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Column(nullable = false, unique = true)
     private Integer number;
+    
     @Column(nullable = false)
     private String status;
+    
     @ManyToOne
     @JoinColumn(nullable = false)
     private RoomType type;
+    
     @ManyToMany(mappedBy = "allocatedRooms")
     private List<ReservationLineItem> reservationLineItems;
+
+    public Room(Integer number, String status, RoomType type) {
+        this.number = number;
+        this.status = status;
+        this.type = type;
+    }
 
     public Room() {
     }

@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -23,29 +24,22 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ReservationLineItem implements Serializable {
 
-    public List<Room> getAllocatedRooms() {
-        return allocatedRooms;
-    }
-
-    public void setAllocatedRooms(List<Room> allocatedRooms) {
-        this.allocatedRooms = allocatedRooms;
-    }
-
-
-
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable=false)
+
+    @Column(nullable = false)
     private Integer numberOfRooms;
-    @JoinColumn(nullable=false)
+
+    @JoinColumn(nullable = false)
     @ManyToOne
     private RoomType roomType;
-    
-    @JoinColumn(nullable=false)
+
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Reservation reservation;
+
     @ManyToMany
     private List<Room> allocatedRooms;
 
@@ -73,6 +67,7 @@ public class ReservationLineItem implements Serializable {
         this.roomType = roomType;
     }
 
+    @XmlTransient
     public Reservation getReservation() {
         return reservation;
     }
@@ -87,6 +82,14 @@ public class ReservationLineItem implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<Room> getAllocatedRooms() {
+        return allocatedRooms;
+    }
+
+    public void setAllocatedRooms(List<Room> allocatedRooms) {
+        this.allocatedRooms = allocatedRooms;
     }
 
     @Override
@@ -113,5 +116,5 @@ public class ReservationLineItem implements Serializable {
     public String toString() {
         return "entity.ReservationLineItem[ id=" + id + " ]";
     }
-    
+
 }
