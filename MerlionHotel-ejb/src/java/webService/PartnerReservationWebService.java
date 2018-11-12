@@ -92,6 +92,9 @@ public class PartnerReservationWebService {
         List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
         List<String> ls2 = new ArrayList<>();
         for (RoomType rt : ls) {
+            if (rt.getInitialRoomAvailability() == null) {
+                continue;
+            }
             ls2.add(rt.getName());
         }
         return ls2;

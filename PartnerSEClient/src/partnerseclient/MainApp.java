@@ -106,14 +106,20 @@ public class MainApp {
         Long guestId = sc.nextLong();
         System.out.println("What is partner id?");
         Long partnerId = sc.nextLong();
+        List<String> ls = getRoomType();
+        String rt = "";
         while (true) {
             System.out.println("What room type?");
-            List<String> ls = getRoomType();
-            for (int i = 1; i <= ls.size(); i++) {
-                System.out.println(i + ". " + ls.get(i - 1));
+            if (ls.size() > 0) {
+                for (int i = 1; i <= ls.size(); i++) {
+                    System.out.println(i + ". " + ls.get(i - 1));
+                }
+                int j = sc.nextInt();
+                rt = ls.get(j - 1);
+            } else {
+                System.out.println("There are no room types initiated yet. Please look for the staff to create some rooms for some room types. So sorry.");
+                return;
             }
-            int j = sc.nextInt();
-            String rt = ls.get(j - 1);
             System.out.println("How many rooms?");
             Integer k = sc.nextInt();
             Entry e = new Entry();
@@ -148,14 +154,20 @@ System.out.println("ls2 size is "+arg.getEntry().size());
         Long partnerId = sc.nextLong();
         List<String> lsString = new ArrayList<>();
         List<Integer> lsInteger = new ArrayList<>();
+        List<String> ls = getRoomType();
+        String rt = "";
         while (true) {
             System.out.println("What room type?");
-            List<String> ls = getRoomType();
-            for (int i = 1; i <= ls.size(); i++) {
-                System.out.println(i + ". " + ls.get(i - 1));
+            if (ls.size() > 0) {
+                for (int i = 1; i <= ls.size(); i++) {
+                    System.out.println(i + ". " + ls.get(i - 1));
+                }
+                int j = sc.nextInt();
+                rt = ls.get(j - 1);
+            } else {
+                System.out.println("There are no room types initiated yet. Please look for the staff to create some rooms for some room types. So sorry.");
+                return;
             }
-            int j = sc.nextInt();
-            String rt = ls.get(j - 1);
             System.out.println("How many rooms?");
             Integer k = sc.nextInt();
             lsString.add(rt);

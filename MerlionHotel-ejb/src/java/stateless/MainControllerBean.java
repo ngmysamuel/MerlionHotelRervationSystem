@@ -16,7 +16,6 @@ import entity.RoomInventory;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -29,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.RoomInventoryNotFound;
+import util.exception.StillInUseException;
 
 /**
  *
@@ -38,6 +38,12 @@ import util.exception.RoomInventoryNotFound;
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
 
     @EJB
+    private RoomControllerSessionBeanLocal roomControllerSessionBean;
+
+    @EJB
+    private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
+
+    @EJB
     private RoomInventorySessionBeanLocal roomInventorySessionBean;
 
     @EJB
@@ -45,6 +51,8 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
 
     @EJB
     private EmployeeControllerBeanLocal employeeControllerBean;
+    
+    
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
@@ -83,7 +91,6 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     }
 
     public Partner createPartner(String emp, String manager, String username) {
-        System.out.println("main controller bean is called");
         return partnerControllerBean.create(emp, manager, username);
     }
 
@@ -96,6 +103,69 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         q.setParameter("date", date);
         return (ExceptionReport) q.getSingleResult();
     }
+    
+    public void createRoomType(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {
+        roomTypeControllerSessionBean.create(bed, name, amenities, capacity, description, grade, roomSize);
+    }
+    
+    public List<RoomType> viewAllRoomTypes() {
+        return roomTypeControllerSessionBean.getRoomTypes();
+    }
+    
+    public RoomType viewSpecificRoomType(String name) {
+        Query q = em.createQuery("select rt from RoomType rt where rt.name = :name");
+        q.setParameter("name", name);
+        return (RoomType) q.getSingleResult();
+    }
+    
+    public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId) {
+        roomTypeControllerSessionBean.update(bed, name, amenities, capacity, description, grade, roomSize, initialRoomAvail, roomTypeId);
+    }
+    
+    public void updateRomType(int num, Long id) {
+        RoomType rt = em.find(RoomType.class, id);
+        if (rt.getInitialRoomAvailability() != null) {
+            num += rt.getInitialRoomAvailability();
+        }
+        String bed = "";
+        String name = "";
+        String amenities = "";
+        String capacity = "";
+        String descriptio = "";
+        String grade = "";
+        String roomSize = "";
+        roomTypeControllerSessionBean.update(bed, name, amenities, capacity, descriptio, grade, roomSize, num, id);
+    }
+    
+    public void deleteRoomType(Long id) throws StillInUseException {
+        try {
+            roomTypeControllerSessionBean.delete(id);
+        } catch (StillInUseException ex) {
+            throw ex;
+        }
+    }
+    
+    public void createRoom(Integer roomNum, String status, Long roomTypeId) {
+        roomControllerSessionBean.create(roomNum, status, roomTypeId);
+    }
+    
+    public void updateRoom(Long roomNum, String status, Long roomTypeId) {
+        roomControllerSessionBean.update(roomNum, status, roomTypeId);
+    }
+    
+    public List<Room> viewRooms() {
+        return roomControllerSessionBean.viewAllRooms();
+    }
+    
+    public void deleteRoom(Long roomNum) throws StillInUseException {
+        try {
+            roomControllerSessionBean.deleteRoom(roomNum);
+        } catch (StillInUseException ex) {
+            throw ex;
+        }
+    }
+    
+    
     
     public void persistEr() {
         ExceptionReport er = new ExceptionReport();
@@ -128,7 +198,7 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
                     RoomType rt = rli.getRoomType();
                     Integer numOfRooms = rli.getNumberOfRooms();
                     if (rli.getRoomType().getGrade() == sortedListOfRT.get(i).getGrade()) {
-                        Boolean b1 = allocateRooms(rt, numOfRooms, dateStart, dateEnd, rli.getId());
+                        Boolean b1 = allocateRooms(rt, numOfRooms, dateStart, dateEnd, rli.getId()); //allocating across the whole duration
                         if (b1) {
                             continue; //continue on to the next rli
                         } else {
@@ -159,13 +229,11 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
                 System.out.println("\n\n\nOops No such reservation found for that date\n\n\n");
                 return false;
             }
-            if (ri.getRoomCountForAllocation() < numOfRooms) {
+            if (!setRoomsAllocated(id, ri)) {
             //if (0 < numOfRooms) {    
-                eJBContext.setRollbackOnly();
+               eJBContext.setRollbackOnly();
                 return false;
-            } else {
-                setRoomsAllocated(id, ri);
-            }
+            } 
             dateStart = dateStart.plusDays(1);
         }
         return true;
@@ -188,19 +256,28 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         return false;
     }
 
-    private void setRoomsAllocated(Long id, RoomInventory ri) {
+    private boolean setRoomsAllocated(Long id, RoomInventory ri) {
         ReservationLineItem rli = em.find(ReservationLineItem.class, id);
         int numOfRooms = rli.getNumberOfRooms();
-        ri.setRoomCountForAllocation(ri.getRoomCountForAllocation() - numOfRooms);
+//        ri.setRoomCountForAllocation(ri.getRoomCountForAllocation() - numOfRooms);
         Query q = em.createQuery("SELECT r FROM Room r WHERE r.status = :status");
         q.setParameter("status", "Available");
         List<Room> ls = q.getResultList();
-        for (int i = 0; i < numOfRooms; i++) {
-            List<Room> ls2 = rli.getAllocatedRooms();
-            ls2.add(ls.get(i));
-            rli.setAllocatedRooms(ls2);
-            ls.get(i).setStatus("Occupied");
+        if (ls.size() < numOfRooms) {
+            return false;
+        } else {
+            for (int i = 0; i < numOfRooms; i++) {
+                Room r = ls.get(i);
+                List<Room> ls2 = rli.getAllocatedRooms();
+                ls2.add(r);
+                rli.setAllocatedRooms(ls2);
+                r.setStatus("Occupied");
+                List<ReservationLineItem> ls3 = r.getReservationLineItems();
+                ls3.add(rli);
+                r.setReservationLineItems(ls3);
+            }
         }
+        return true;
     }
 
     private List<RoomType> sortRoomTypeAsc() {
@@ -219,4 +296,6 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         }
         return lis;
     }
+    
+    
 }

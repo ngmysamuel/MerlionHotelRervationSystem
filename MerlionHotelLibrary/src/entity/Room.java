@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -41,7 +41,7 @@ public class Room implements Serializable {
     private RoomType type;
     
     @ManyToMany(mappedBy = "allocatedRooms")
-    private List<ReservationLineItem> reservationLineItems;
+    private List<ReservationLineItem> reservationLineItems = new ArrayList<>();
 
     public Room(Integer number, String status, RoomType type) {
         this.number = number;
@@ -51,7 +51,9 @@ public class Room implements Serializable {
 
     public Room() {
     }
-
+    
+    
+    
     public Integer getNumber() {
         return number;
     }

@@ -129,8 +129,6 @@ System.out.println("XVI id is "+ri.getId());
         ri.setRoomAvail(123);
         em.persist(ri);
         em.flush();
-System.out.println("XV id is "+ri.getId());
-
         int i = 0;
         LocalDate dateStartTemp = dateStart;
         List<Boolean> bo = new ArrayList<>();

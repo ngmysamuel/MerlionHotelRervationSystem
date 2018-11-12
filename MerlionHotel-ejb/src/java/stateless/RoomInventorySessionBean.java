@@ -41,9 +41,6 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
 //        ri.setRoomAvail(543);
 //        em.persist(ri);
 //        em.flush();
-//System.out.println("MX id is "+ri.getId());
-        System.out.println("roomType grade is " + roomType.getGrade());
-        System.out.println("date passed in is " + date);
         Query q = em.createQuery("SELECT ri.roomAvail FROM RoomInventory ri WHERE ri.date = :date AND ri.rt.grade = :roomType");
         q.setParameter("date", date);
         q.setParameter("roomType", roomType.getGrade());
@@ -80,7 +77,6 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
         List<RoomInventory> ls2 = roomType.getRoomInventory();
         ls2.add(ri2);
         roomType.setRoomInventory(ls2);
-        System.out.println("ri2.getId() is " + ri2.getId() + " ri2.getRt() is " + ri2.getRt() + " and date is " + ri2.getDate());
     }
 
     public RoomInventory retrieveRoomInventory(LocalDate date, RoomType rt) throws RoomInventoryNotFound {

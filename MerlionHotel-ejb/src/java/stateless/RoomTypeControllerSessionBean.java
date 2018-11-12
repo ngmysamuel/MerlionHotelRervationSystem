@@ -5,6 +5,7 @@
  */
 package stateless;
 
+import entity.Room;
 import entity.RoomInventory;
 import entity.RoomType;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
+import util.exception.StillInUseException;
 
 /**
  *
@@ -26,7 +28,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
-    
+
     @Resource
     private EJBContext eJBContext;
 
@@ -45,7 +47,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
                 eJBContext.setRollbackOnly();
                 throw new ReservationNotFoundException();
             } else {
-                ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
+                ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
                 em.persist(ri);
                 return true;
             }
@@ -55,17 +57,71 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
                 eJBContext.setRollbackOnly();
                 throw new ReservationNotFoundException();
             }
-            ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
+            ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
             return true;
         }
     }
-    
+
     public List<RoomType> getRoomTypes() {
         Query q = em.createQuery("SELECT rt FROM RoomType rt");
         return q.getResultList();
     }
-    
+
     public void persist(Object object) {
         em.persist(object);
+    }
+
+    public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {
+        RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade);
+        newrt.setIsEnabled(true);
+        manageGrade(grade);
+        em.persist(newrt);
+    }
+
+    public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId) {
+        RoomType rt = em.find(RoomType.class, roomTypeId);
+        if (bed.length() != 0) {
+            rt.setBed(bed);
+        }
+        if (name.length() != 0) {
+            rt.setName(name);
+        }
+        if (capacity.length() != 0) {
+            rt.setCapacity(Integer.valueOf(capacity));
+        }
+        if (description.length() != 0) {
+            rt.setDescription(description);
+        }
+        if (grade.length() != 0) {
+            manageGrade(Integer.valueOf(grade));
+            rt.setGrade(Integer.valueOf(grade));
+        }
+        if (roomSize.length() != 0) {
+            rt.setRoomSize(Integer.valueOf(roomSize));
+        }
+        if (initialRoomAvail != -1) {
+            rt.setInitialRoomAvailability(initialRoomAvail);
+        }
+    }
+
+    private void manageGrade(Integer grade) {
+        Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :grade");
+        q.setParameter("grade", grade);
+        List<RoomType> ls = q.getResultList();
+        for (RoomType rt : ls) {
+            rt.setGrade(rt.getGrade()+1);
+        }
+        em.flush();
+    }
+    
+    public void delete(Long id) throws StillInUseException {
+        RoomType rt = em.find(RoomType.class, id);
+        List<Room> ls = rt.getRooms();
+        if (ls.isEmpty()) {
+            em.remove(rt);
+        } else {
+            rt.setIsEnabled(false);
+            throw new StillInUseException();
+        }
     }
 }
