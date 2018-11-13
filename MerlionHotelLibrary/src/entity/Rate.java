@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -28,6 +29,8 @@ public class Rate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
+    private String name;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RateTypeEnum type;
@@ -37,8 +40,36 @@ public class Rate implements Serializable {
     private LocalDate dateStart;
     @Column
     private LocalDate dateEnd;
+    @Column(nullable = false, length = 8)
+    private String status;
+    @ManyToOne
+    private RoomType roomType;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Rate() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     // Normal and Published rate
