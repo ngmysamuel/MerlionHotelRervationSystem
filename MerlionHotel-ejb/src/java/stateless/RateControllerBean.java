@@ -123,7 +123,7 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
             em.flush();
         } catch(RateNotFoundException ex){
         }
-        Rate rate = new Rate(rateType, price);
+        Rate rate = new Rate(rateType, name, price);
         em.persist(rate);
         em.flush();
         return rate;
@@ -137,7 +137,7 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
             em.flush();
         } catch(RateNotFoundException ex){
         }
-        Rate rate = new Rate(rateType, price);
+        Rate rate = new Rate(rateType, name, price, dateStart, dateEnd);
         em.persist(rate);
         em.flush();
         return rate;
@@ -181,15 +181,16 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     
     @Override
     public List<Rate> retrieveAllRates() throws RateNotFoundException{
-        Query q = em.createQuery("SELECT r FROM Rate r WHERE r.status <> 'disabled'");
-        List<Rate> rates =  q.getResultList();
-        if(rates.get(0) == null){
-            throw new RateNotFoundException("There is no rates available");
+        try{
+            Query q = em.createQuery("SELECT r FROM Rate r WHERE r.status <> 'disabled'");
+            List<Rate> rates =  q.getResultList();
+            for(Rate r: rates){
+                r.getId();
+                r.getRoomType().getName();
+            }
+            return rates;
+        } catch(NullPointerException ex){
+            throw new RateNotFoundException("No rates found!");
         }
-        for(Rate r: rates){
-            r.getId();
-            r.getRoomType().getName();
-        }
-        return rates;
     }
 }
