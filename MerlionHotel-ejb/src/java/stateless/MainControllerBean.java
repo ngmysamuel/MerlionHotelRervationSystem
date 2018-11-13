@@ -6,14 +6,17 @@
 package stateless;
 
 import Enum.EmployeeTypeEnum;
+import Enum.RateTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Partner;
+import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.Room;
 import entity.RoomInventory;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,7 +30,10 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.RateNameNotUniqueException;
+import util.exception.RateNotFoundException;
 import util.exception.RoomInventoryNotFound;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -36,6 +42,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
+
+    @EJB
+    private RateControllerBeanLocal rateControllerBean;
 
     @EJB
     private RoomControllerSessionBeanLocal roomControllerSessionBean;
@@ -297,5 +306,46 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         return lis;
     }
     
+    @Override
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException{
+        Rate rate = rateControllerBean.createRate(name, rateType, price);
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        roomType.getRates().add(rate);
+        return rate;
+    }
     
+    @Override
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        Rate rate = rateControllerBean.createRate(name, rateType, price, dateStart, dateEnd);
+        roomType.getRates().add(rate);
+        return rate;
+    }
+    
+    @Override
+    public Rate viewRate(String roomTypeName) throws RateNotFoundException{
+        return rateControllerBean.retrieveRate(roomTypeName);
+    }
+    
+    @Override
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RateNameNotUniqueException, RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        rateControllerBean.updateRate(rateId, rateName, rateType, price, dateStart, dateEnd, roomType);
+    }
+    
+    @Override
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        rateControllerBean.updateRate(rateId, rateName, rateType, price, roomType);
+    }
+    
+    @Override
+    public void deleteRate(Long rateId){
+        rateControllerBean.deleteRate(rateId);
+    }
+    
+    @Override
+    public List<Rate> viewAllRates() throws RateNotFoundException{
+        return rateControllerBean.retrieveAllRates();
+    }
 }

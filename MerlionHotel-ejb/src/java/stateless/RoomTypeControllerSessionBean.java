@@ -14,9 +14,12 @@ import javax.annotation.Resource;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -122,6 +125,16 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
         } else {
             rt.setIsEnabled(false);
             throw new StillInUseException();
+        }
+    }
+    
+    public RoomType retrieveRoomType(String name) throws RoomTypeNotFoundException{
+        Query q = em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :inName");
+        q.setParameter("inName", name);
+        try{
+            return (RoomType) q.getSingleResult();
+        } catch(NoResultException | NonUniqueResultException ex){
+            throw new RoomTypeNotFoundException("Room type " + name + " not available!");
         }
     }
 }

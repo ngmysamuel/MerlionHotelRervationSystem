@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.ReservationNotFoundException;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -23,4 +24,6 @@ public interface RoomTypeControllerSessionBeanLocal {
     public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize);
     public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId);
     public void delete(Long id) throws StillInUseException;
+
+    public RoomType retrieveRoomType(String name) throws RoomTypeNotFoundException;
 }
