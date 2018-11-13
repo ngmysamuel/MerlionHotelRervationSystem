@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -28,6 +29,8 @@ public class Rate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
+    private String name;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RateTypeEnum type;
@@ -37,22 +40,54 @@ public class Rate implements Serializable {
     private LocalDate dateStart;
     @Column
     private LocalDate dateEnd;
+    @Column(nullable = false, length = 8)
+    private String status;
+    @ManyToOne
+    private RoomType roomType;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Rate() {
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     // Normal and Published rate
-    public Rate(RateTypeEnum type, BigDecimal price) {
+    public Rate(RateTypeEnum type, String name, BigDecimal price) {
         this.type = type;
         this.price = price;
+        this.name = name;
+        this.status = "active";
     }
 
     // Peak and Promotion rate
-    public Rate(RateTypeEnum type, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) {
+    public Rate(RateTypeEnum type, String name, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) {
         this.type = type;
         this.price = price;
+        this.name = name;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
+        this.status = "active";
     }
     
     
