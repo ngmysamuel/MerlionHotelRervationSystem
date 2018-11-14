@@ -424,20 +424,20 @@ System.out.println("I am back in client");
         System.out.println("***Update Rate***");
         try {
             Long rateId = viewRate();
-            System.out.println("***Enter Updated Rate (If no changes, click enter)***");
-            System.out.println("Name>");
+            System.out.println("***Enter Updated Rate***");
+            System.out.print("Name>");
             String name = sc.nextLine();
-            System.out.println("Room Type>");
+            System.out.print("Room Type>");
             String roomType = sc.nextLine();
-            System.out.println("Rate Type>");
-            String rt = sc.next();
-            RateTypeEnum rateType = RateTypeEnum.valueOf(rt);
-            System.out.println("Price>");
+            System.out.print("Rate Type (1.Published, 2.Normal, 3.Peak, 4.Promo)>");
+            int rt = sc.nextInt();
+            RateTypeEnum rateType = RateTypeEnum.values()[rt-1];
+            System.out.print("Price>");
             BigDecimal price = sc.nextBigDecimal();
-            if(rt.equals("Promotion") || rt.equals("Peak")){
-                System.out.println("Start of validity (YYYY-MM-DD)>");
+            if(rateType.toString().equals("Promotion") || rateType.toString().equals("Peak")){
+                System.out.print("Start of validity (YYYY-MM-DD)>");
                 String start = sc.next();
-                System.out.println("End of validity (YYYY-MM-DD)>");
+                System.out.print("End of validity (YYYY-MM-DD)>");
                 String end = sc.next();
                 LocalDate dateStart = LocalDate.parse(start);
                 LocalDate dateEnd = LocalDate.parse(end);
