@@ -51,7 +51,7 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
         }
 
         q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled' AND r.roomType = :inRoom");
-        q.setParameter("inDate", date);
+        
         q.setParameter("inType", "Promotion");
         q.setParameter("inRoom", roomType);
         List<Rate> promoRates;
