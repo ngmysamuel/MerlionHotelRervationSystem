@@ -14,9 +14,12 @@ import javax.annotation.Resource;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -43,6 +46,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             ri.setRt(rt);
             ri.setRoomAvail(rt.getInitialRoomAvailability());
             ri.setRoomCountForAllocation(rt.getInitialRoomAvailability());
+System.out.println("RoomInventory and so, roomType room avail is: "+ri.getRoomAvail()+" num of rooms is "+numOfRooms);
             if (ri.getRoomAvail() < numOfRooms) {
                 System.out.println("not enough rooms\n");
                 throw new ReservationNotFoundException("not enough rooms");
@@ -53,7 +57,12 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             }
         } else {
             RoomInventory ri = (RoomInventory) q.getResultList().get(0);
-            if (ri.getRoomAvail() < numOfRooms) {
+            int roomsAvail;
+            Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
+            q1.setParameter("status", "Available");
+            q1.setParameter("type", ri.getRt());
+            roomsAvail = q1.getResultList().size();
+            if (roomsAvail < numOfRooms) {
                 System.out.println("not enough rooms\n");
                 throw new ReservationNotFoundException("not enough rooms");
             }
@@ -137,6 +146,16 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
         } else {
             rt.setIsEnabled(false);
             throw new StillInUseException();
+        }
+    }
+    
+    public RoomType retrieveRoomType(String name) throws RoomTypeNotFoundException{
+        Query q = em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :inName");
+        q.setParameter("inName", name);
+        try{
+            return (RoomType) q.getSingleResult();
+        } catch(NoResultException | NonUniqueResultException ex){
+            throw new RoomTypeNotFoundException("Room type " + name + " not available!");
         }
     }
 }

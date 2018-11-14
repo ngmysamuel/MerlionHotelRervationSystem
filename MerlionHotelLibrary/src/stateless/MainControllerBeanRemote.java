@@ -7,13 +7,19 @@ package stateless;
 
 import entity.Employee;
 import Enum.EmployeeTypeEnum;
+import Enum.RateTypeEnum;
 import entity.ExceptionReport;
 import entity.Partner;
+import entity.Rate;
 import entity.Room;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.RateNameNotUniqueException;
+import util.exception.RateNotFoundException;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -42,4 +48,18 @@ public interface MainControllerBeanRemote {
     public void deleteRoom(Long roomNum) throws StillInUseException;
     public List<Room> viewRooms();
     public List<RoomType> sortRoomTypeAsc();
+
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException;
+
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException;
+
+    public Rate viewRate(String roomTypeName) throws RateNotFoundException;
+
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RateNameNotUniqueException, RoomTypeNotFoundException;
+
+    public List<Rate> viewAllRates() throws RateNotFoundException;
+
+    public void deleteRate(Long rateId);
+
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException;
 }

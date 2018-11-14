@@ -127,9 +127,11 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             em.flush();
         }
         List<ReservationLineItem> lsRli = newReservation.getReservationLineItems();
-        lsRli.addAll(lsRli);
+        lsRli.addAll(rooms);
+System.out.println("RservationControllerBean lsRli is "+lsRli);
         newReservation.setReservationLineItems(lsRli);
         em.flush();
+System.out.println("RservationControllerBean RLIs: "+newReservation.getReservationLineItems());        
         return newReservation;
     }
 

@@ -6,15 +6,20 @@
 package merlionhotelclient;
 
 import Enum.EmployeeTypeEnum;
-import com.sun.xml.ws.rx.rm.policy.wsrm200502.Rm10Assertion;
+import Enum.RateTypeEnum;
 import entity.ExceptionReport;
+import entity.Rate;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import stateless.MainControllerBeanRemote;
+import util.exception.RateNameNotUniqueException;
+import util.exception.RateNotFoundException;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -231,7 +236,47 @@ public class MainApp {
     }
 
     public void loggedInSalesManager(String username) {
-
+        while(true){
+            System.out.println("***You are logged in as a Sales Manager***");
+            System.out.println("Please select what you want to do");
+            System.out.println("1: Create new room rate");
+            System.out.println("2: View all room rates");
+            System.out.println("3: View a particular room rate");
+            System.out.println("4: Update a room rate");
+            System.out.println("5: Delete room rate");
+            System.out.println("6: Logout");
+            int i = sc.nextInt();
+            sc.nextLine();
+            switch(i){
+                case 1:
+                    createRate();
+                    break;
+                case 2:
+                    viewAllRates();
+                    System.out.println("Enter any key to continue");
+                    sc.nextLine();
+                    break;
+                case 3:
+            {
+                try {
+                    viewRate();
+                    System.out.println("Enter any key to continue");
+                    sc.nextLine();
+                } catch (RateNotFoundException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+                    break;
+                case 4:
+                    updateRate();
+                    break;
+                case 5:
+                    deleteRate();
+                    break;
+                case 6:
+                    return;
+            }
+        }      
     }
 
     public void loggedInSysAdmin(String username) {
@@ -262,6 +307,7 @@ public class MainApp {
                 } else if (choice == 4) {
                     System.out.println(mainControllerBeanRemote.viewPartners());
                 } else if (choice == 5) {
+System.out.println("I am about to call timer()");
                     mainControllerBeanRemote.timer();
                 } else if (choice == 6) {
                     break;
@@ -340,5 +386,128 @@ System.out.println("I am back in client");
 
     private void updateRoomType(int num, Long id) {
         mainControllerBeanRemote.updateRomType(num, id);
+    }
+    
+    private void createRate(){
+        System.out.print("Room Type>");
+        String roomType = sc.nextLine();
+        System.out.print("Rate Name>");
+        String name = sc.nextLine();
+        System.out.print("Rate Type (1.Published, 2.Normal, 3.Peak, 4.Promo)>");
+        int rt = sc.nextInt();
+        RateTypeEnum rateType = RateTypeEnum.values()[rt-1];
+        System.out.print("Price>");
+        BigDecimal price = sc.nextBigDecimal();
+        if(rateType.toString().equals("Promotion") || rateType.toString().equals("Peak")){
+            System.out.println("Start of validity (YYYY-MM-DD)>");
+            String start = sc.next();
+            System.out.println("End of validity (YYYY-MM-DD)>");
+            String end = sc.next();
+            LocalDate dateStart = LocalDate.parse(start);
+            LocalDate dateEnd = LocalDate.parse(end);
+            try {
+                mainControllerBeanRemote.createRate(roomType, name, rateType, price, dateStart, dateEnd);
+                System.out.println("New room rate created");
+            } catch (RoomTypeNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            try {
+                mainControllerBeanRemote.createRate(roomType, name, rateType, price);
+                System.out.println("New room rate created");
+            } catch (RoomTypeNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+    
+    private void viewAllRates(){
+        try {
+            List<Rate> rates = mainControllerBeanRemote.viewAllRates();
+            System.out.printf("%24s %32s %10s %5S %10S %10S \n", "ROOM TYPE", "NAME", "TYPE", "PRICE", "DATE START", "DATE END");
+            for(Rate rate: rates){
+                if(rate.getType().toString().equals("Published") ||rate.getType().toString().equals("Peak")){
+                    System.out.printf("%24s %32s %10s %5s %10s %10s \n", rate.getRoomType().getName(), rate.getName(),
+                            rate.getType().toString(), rate.getPrice().toString(), rate.getDateStart().toString(), rate.getDateEnd().toString());
+                } else{
+                    System.out.printf("%24s %32s %10s %5s \n", rate.getRoomType().getName(), rate.getName(),
+                            rate.getType().toString(), rate.getPrice().toString());
+                }
+            }
+        } catch (RateNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
+    private Long viewRate() throws RateNotFoundException{
+        System.out.println("Room Rate Name>");
+        String name = sc.nextLine();
+            Rate rate = mainControllerBeanRemote.viewRate(name);
+            System.out.println("Name: "+rate.getName());
+            System.out.println("Type: "+rate.getType());
+            System.out.println("Room Type: "+rate.getRoomType().getName());
+            System.out.println("Price: " + rate.getPrice());
+            if(rate.getType().toString().equals("Published") || rate.getType().toString().equals("Peak")){
+                System.out.println("Start of validity: "+rate.getDateStart());
+                System.out.println("End of validity: "+rate.getDateEnd());
+            }
+        return rate.getId();
+    }
+    
+    private void updateRate(){
+        System.out.println("***Update Rate***");
+        try {
+            Long rateId = viewRate();
+            System.out.println("***Enter Updated Rate***");
+            System.out.print("Name>");
+            String name = sc.nextLine();
+            System.out.print("Room Type>");
+            String roomType = sc.nextLine();
+            System.out.print("Rate Type (1.Published, 2.Normal, 3.Peak, 4.Promo)>");
+            int rt = sc.nextInt();
+            RateTypeEnum rateType = RateTypeEnum.values()[rt-1];
+            System.out.print("Price>");
+            BigDecimal price = sc.nextBigDecimal();
+            if(rateType.toString().equals("Promotion") || rateType.toString().equals("Peak")){
+                System.out.print("Start of validity (YYYY-MM-DD)>");
+                String start = sc.next();
+                System.out.print("End of validity (YYYY-MM-DD)>");
+                String end = sc.next();
+                LocalDate dateStart = LocalDate.parse(start);
+                LocalDate dateEnd = LocalDate.parse(end);
+                try{
+                    mainControllerBeanRemote.updateRate(rateId, name, roomType, rateType, price, dateStart, dateEnd);
+                    System.out.println("Rate "+ name +" has been updated!");
+                } catch (RateNameNotUniqueException | RoomTypeNotFoundException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            } else {
+                try{
+                    mainControllerBeanRemote.updateRate(rateId, name, roomType, rateType, price);
+                    System.out.println("Rate "+ name +" has been updated!");
+                } catch (RateNameNotUniqueException | RoomTypeNotFoundException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            } 
+        } catch (RateNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+    }
+    
+    private void deleteRate(){
+        System.out.println("***Delete Rate***");
+        try {
+            Long rateId = viewRate();
+            System.out.println("1: Delete");
+            System.out.println("Any key to Cancel");
+            if(sc.nextInt() == 1){
+                sc.nextLine();
+                mainControllerBeanRemote.deleteRate(rateId);
+                System.out.println("Rate deleted!");
+            }
+        } catch (RateNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

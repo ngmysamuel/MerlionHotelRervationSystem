@@ -71,6 +71,7 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
     }
 
     public List<Reservation> viewAllReservations() {
+System.out.println("I am in PartnerControllerBean");        
         Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.type = :partner");
         q.setParameter("partner", ReservationTypeEnum.Partner);
         return q.getResultList();
@@ -83,11 +84,11 @@ System.out.println("I am in PartnerControllerBean");
         Reservation r = new Reservation();
         r = (Reservation) q.getSingleResult();
         r.getReservationLineItems().size();
-System.out.println("the reservation is "+r);
-System.out.println("the reservation line items is "+r.getReservationLineItems());
+System.out.println("PartnerControllerBean the reservation is "+r);
+System.out.println("PartnerControllerBean the reservation line items is "+r.getReservationLineItems());
         for (ReservationLineItem rli : r.getReservationLineItems()) {
             rli.getAllocatedRooms().size();
-System.out.println("the allocated rooms is "+rli.getAllocatedRooms());
+System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAllocatedRooms());
             rli.getReservation();
             rli.getRoomType();
         }

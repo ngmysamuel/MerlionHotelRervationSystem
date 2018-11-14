@@ -6,13 +6,16 @@
 package stateless;
 
 import Enum.EmployeeTypeEnum;
+import Enum.RateTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Partner;
+import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.Room;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +28,10 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.RateNameNotUniqueException;
+import util.exception.RateNotFoundException;
+import util.exception.RoomInventoryNotFound;
+import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
 /**
@@ -33,6 +40,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
+
+    @EJB
+    private RateControllerBeanLocal rateControllerBean;
 
     @EJB
     private RoomControllerSessionBeanLocal roomControllerSessionBean;
@@ -188,17 +198,19 @@ System.out.println("I have called timer()");
         Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.dateStart = :date");
         q.setParameter("date", date);
         List<Reservation> todayCheckInList = q.getResultList();
-        for (int i = 0; i < sortedListOfRT.size(); i++) { //for each type of roomType
+        for (RoomType rtMaster : sortedListOfRT) { //for each type of roomType
+System.out.println("today checkin list is "+todayCheckInList);
             for (Reservation r : todayCheckInList) { //for each reservation checking in today
                 em.refresh(r);
                 r.getReservationLineItems().size();
                 List<ReservationLineItem> listOfReservationLineItems = r.getReservationLineItems();
                 LocalDate dateEnd = r.getDateEnd();
                 LocalDate dateStart = r.getDateStart();
+System.out.println("List of reservation line items is "+listOfReservationLineItems);                
                 for (ReservationLineItem rli : listOfReservationLineItems) { //for each line item in the reservation
                     RoomType rt = rli.getRoomType();
                     Integer numOfRooms = rli.getNumberOfRooms();
-                    if (rli.getRoomType().getGrade() == sortedListOfRT.get(i).getGrade()) {
+                    if (rtMaster.getGrade() == rt.getGrade()) {
                         Boolean b1 = roomControllerSessionBean.allocateRooms(rt, numOfRooms, dateStart, dateEnd, rli.getId()); //allocating across the whole duration
                         if (b1) {
                             continue; //continue on to the next rli
@@ -289,6 +301,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
 //    }
 
     public List<RoomType> sortRoomTypeAsc() {
+System.out.println("sortRoomTypeAsc() is called ");
         Query que = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> lis = que.getResultList();
         for (int i = 0; i < lis.size(); i++) {
@@ -300,9 +313,48 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
                 }
             }
         }
-System.out.println("list in implementation is "+lis);
+System.out.println("list at end of sortRoomAsc() is "+lis);
         return lis;
     }
     
+    @Override
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        Rate rate = rateControllerBean.createRate(name, roomType, rateType, price);
+        return rate;
+    }
     
+    @Override
+    public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        Rate rate = rateControllerBean.createRate(name, roomType, rateType, price, dateStart, dateEnd);
+        return rate;
+    }
+    
+    @Override
+    public Rate viewRate(String roomTypeName) throws RateNotFoundException{
+        return rateControllerBean.retrieveRate(roomTypeName);
+    }
+    
+    @Override
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RateNameNotUniqueException, RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        rateControllerBean.updateRate(rateId, rateName, rateType, price, dateStart, dateEnd, roomType);
+    }
+    
+    @Override
+    public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException{
+        RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
+        rateControllerBean.updateRate(rateId, rateName, rateType, price, roomType);
+    }
+    
+    @Override
+    public void deleteRate(Long rateId){
+        rateControllerBean.deleteRate(rateId);
+    }
+    
+    @Override
+    public List<Rate> viewAllRates() throws RateNotFoundException{
+        return rateControllerBean.retrieveAllRates();
+    }
 }

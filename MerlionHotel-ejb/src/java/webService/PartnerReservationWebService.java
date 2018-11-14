@@ -48,9 +48,9 @@ public class PartnerReservationWebService {
 
     public List<Reservation> viewAllReservations() {
         List<Reservation> ls = partnerControllerBean.viewAllReservations();
+System.out.println("I am back from PartnerControllerBean");
         for (Reservation r : ls) {
             em.detach(r);
-            em.flush();
             Partner p = r.getPartner();
 System.out.println("partner is "+p);
             p.setReservations(null);
@@ -58,13 +58,17 @@ System.out.println("partner is "+p);
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
             for (ReservationLineItem rli : ls2) {
+                em.detach(rli);
                 RoomType rt = rli.getRoomType();
+                em.detach(rt);
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                rt.setRates(null);
                 List<Room> ls3 = rli.getAllocatedRooms();
 System.out.println(ls3);
                 for (Room room : ls3) { //for each room
+                    em.detach(room);
                     room.setReservationLineItems(null);
                 }
             }
@@ -77,6 +81,7 @@ System.out.println(ls3);
         try {
 System.out.println("I am in the Partner Web Service");
             Reservation r = partnerControllerBean.viewReservationDetails(id);
+//            em.refresh(r);
             em.detach(r);
             em.flush();
             Partner p = r.getPartner();
@@ -85,13 +90,19 @@ System.out.println("I am in the Partner Web Service");
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
             for (ReservationLineItem rli : ls2) { //for each reservation line item
+                em.detach(rli);
                 RoomType rt = rli.getRoomType();
+                em.detach(rt);
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                rt.setRates(null);
+                rt.setRoomInventory(null);
+                rli.getAllocatedRooms().size();
                 List<Room> ls3 = rli.getAllocatedRooms();
 System.out.println("the allocated rooms for each rli is "+ls3);
                 for (Room room : ls3) { //for each room
+                    em.detach(room);
 System.out.println("The first time-> the reservation line items for each room is "+room.getReservationLineItems());
                     room.getReservationLineItems().size();
                 }
