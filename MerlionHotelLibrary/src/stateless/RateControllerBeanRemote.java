@@ -6,6 +6,7 @@
 package stateless;
 
 import entity.Rate;
+import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import javax.ejb.Remote;
@@ -17,9 +18,9 @@ import javax.ejb.Remote;
 @Remote
 public interface RateControllerBeanRemote {
 
-    Rate retrieveRate(LocalDate date);
+    Rate retrieveRate(LocalDate date, RoomType roomType);
 
-    BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd);
+    BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd, RoomType roomType);
 
 
     

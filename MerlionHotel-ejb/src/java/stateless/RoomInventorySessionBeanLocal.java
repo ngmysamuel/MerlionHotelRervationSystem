@@ -19,4 +19,6 @@ import util.exception.RoomInventoryNotFound;
 public interface RoomInventorySessionBeanLocal {
     public RoomInventory retrieveRoomInventory(LocalDate date, RoomType rt) throws RoomInventoryNotFound;
     public boolean isItFull(LocalDate date, RoomType roomType);
+
+    public RoomInventory retrieveLeastRoomInventory(LocalDate dateStart, LocalDate dateEnd, RoomType rt) throws RoomInventoryNotFound;
 }

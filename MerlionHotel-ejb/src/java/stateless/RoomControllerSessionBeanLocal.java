@@ -24,5 +24,5 @@ public interface RoomControllerSessionBeanLocal {
     public List<Room> viewAllRooms();
     public void deleteRoom(Long id) throws StillInUseException;
     public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id);
-    public boolean setRoomsAllocated(Long id, RoomInventory ri);
+    public boolean setRoomsAllocated(Long id, RoomType rt);
 }

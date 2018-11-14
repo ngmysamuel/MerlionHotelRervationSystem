@@ -10,6 +10,7 @@ import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
+import entity.RoomInventory;
 import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,7 +63,10 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     @Override
     public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        BigDecimal price = rateControllerBeanLocal.countRate(dateStart, dateEnd);
+        BigDecimal price = new BigDecimal(0); 
+        for(int i = 0; i < rooms.size(); i++){
+            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType()));
+        }
         Guest guest = em.find(Guest.class, guestId);
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, rooms, guest, price);
         em.persist(newReservation);
@@ -98,7 +102,12 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         if (dateStart.isAfter(oneYearOnDateTime)) {
             throw new ReservationNotFoundException("Date reserved is too far ahead");
         }
-        BigDecimal price = new BigDecimal(1);
+        BigDecimal price = new BigDecimal(0);
+        for (ReservationLineItem rli : rooms) {
+System.out.println("price to be added is "+rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
+            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
+System.out.println("price is "+price);
+        }
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
         
@@ -116,6 +125,11 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             while (!dateStartTemp.isAfter(dateEnd)) { //for each day booked
                 try {
                 roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
+                Query q = em.createQuery("select ri from RoomInventory ri where ri.date = :date and ri.rt = :rt");
+                q.setParameter("date", dateStartTemp);
+                q.setParameter("rt", rt);
+                RoomInventory ri = (RoomInventory) q.getSingleResult();
+                ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
                 } catch (ReservationNotFoundException e) {
                     throw e;
                 }
@@ -141,6 +155,11 @@ System.out.println("RservationControllerBean RLIs: "+newReservation.getReservati
         List<Reservation> reservations = guest.getReservations();
         for(Reservation reservation: reservations){
             reservation.getId();
+            List<ReservationLineItem> rlis = reservation.getReservationLineItems();
+            for(ReservationLineItem rli: rlis){
+                RoomType roomType = rli.getRoomType();
+                roomType.getName();
+            }
         }
         return reservations;
     }

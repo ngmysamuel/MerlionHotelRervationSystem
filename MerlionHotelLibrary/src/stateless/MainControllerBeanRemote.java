@@ -11,12 +11,16 @@ import Enum.RateTypeEnum;
 import entity.ExceptionReport;
 import entity.Partner;
 import entity.Rate;
+import entity.ReservationLineItem;
 import entity.Room;
+import entity.RoomInventory;
 import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import javafx.util.Pair;
 import javax.ejb.Remote;
+import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
 import util.exception.RoomTypeNotFoundException;
@@ -62,4 +66,8 @@ public interface MainControllerBeanRemote {
     public void deleteRate(Long rateId);
 
     public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException;
+
+    public List<Pair<RoomInventory, BigDecimal>> searchRooms(LocalDate dateStart, LocalDate dateEnd) throws NoAvailableRoomsException;
+
+    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms);
 }

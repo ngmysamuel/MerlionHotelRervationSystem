@@ -7,6 +7,7 @@ package stateless;
 
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
+import Enum.ReservationTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Partner;
@@ -14,22 +15,26 @@ import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.Room;
+import entity.RoomInventory;
 import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.util.Pair;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
+import util.exception.ReservationNotFoundException;
 import util.exception.RoomInventoryNotFound;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
@@ -40,6 +45,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
+
+    @EJB
+    private ReservationControllerBeanLocal reservationControllerBean;
 
     @EJB
     private RateControllerBeanLocal rateControllerBean;
@@ -189,6 +197,7 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     
     public void timer() {
 System.out.println("I have called timer()");
+        reconcileRoomAvailability();
         ExceptionReport er = new ExceptionReport();
         er.setDate(LocalDate.now());
         em.persist(er);
@@ -231,31 +240,41 @@ System.out.println("List of reservation line items is "+listOfReservationLineIte
                 }
             }
         }    
+        reconcileRoomAvailability();
     }
-//    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-//    private Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {
-//        while (!dateStart.isAfter(dateEnd)) {
-//System.out.println(!dateStart.isAfter(dateEnd));
-//            RoomInventory ri = new RoomInventory();
-//            try {
-//System.out.println(dateStart);
-//System.out.println(rt);
-//                ri = roomInventorySessionBean.retrieveRoomInventory(dateStart, rt);
-//            } catch (RoomInventoryNotFound e) {
-//                System.out.println("\n\n\nOops No such reservation found for that date\n\n\n");
-//                return false;
-//            }
-//            if (!setRoomsAllocated(id, ri)) {
-//            //if (0 < numOfRooms) {    
-//               //eJBContext.setRollbackOnly();
-//System.out.println("after rolling back");
-//                return false;
-//            } 
-//            dateStart = dateStart.plusDays(1);
-//        }
-//        return true;
-//    }
-
+    
+    private void reconcileRoomAvailability() {
+        List<RoomType> l = roomTypeControllerSessionBean.getRoomTypes();
+        Query q = em.createQuery("select ri from RoomInventory ri where ri.date = :date");
+        q.setParameter("date", LocalDate.now());
+        List<RoomInventory> ls = q.getResultList();
+        int i;
+        for (RoomInventory ri : ls) {
+            q = em.createQuery("select r from Room r where r.type = :type and r.status = :status");
+            q.setParameter("status", "Available");
+            q.setParameter("type", ri.getRt());
+            i = q.getResultList().size();
+            ri.setRoomAvail(i);
+            RoomType rt = ri.getRt();
+            l.remove(rt);
+        }
+        if (!l.isEmpty()) { //if l is not empty, 
+            for (RoomType roomType : l) {
+                RoomInventory ri = new RoomInventory();
+                ri.setRt(roomType); //REMEBER TO SET THE OTHER SIDE
+                ri.setDate(LocalDate.now());
+                q.setParameter("type", roomType);
+                i = q.getResultList().size();
+                ri.setRoomAvail(i);
+                List<RoomInventory> ls1 = roomType.getRoomInventory();
+                ls1.add(ri);
+                roomType.setRoomInventory(ls1);
+                em.persist(ri);
+                em.flush();
+            }
+        }
+    }
+    
     private boolean scanForUpgrades(LocalDate dateStart, LocalDate dateEnd, RoomType rt, Integer numOfRooms, List<RoomType> sortedListOfRT, Long id) { //return true if the room can be upgraded
 //        for (int i = rt.getGrade(); i > 1; i--) {
 //            Query q = em.createQuery("select rt from RoomType rt where rt.grade = :grade");
@@ -356,5 +375,26 @@ System.out.println("list at end of sortRoomAsc() is "+lis);
     @Override
     public List<Rate> viewAllRates() throws RateNotFoundException{
         return rateControllerBean.retrieveAllRates();
+    }
+    
+    
+    public List<Pair<RoomInventory, BigDecimal>> searchRooms(LocalDate dateStart, LocalDate dateEnd) throws NoAvailableRoomsException{
+        List<RoomType> roomTypes = roomTypeControllerSessionBean.getRoomTypes();
+        List<Pair<RoomInventory, BigDecimal>> values = null;
+        for(RoomType rt: roomTypes){
+            try{
+                values.add(new Pair(roomInventorySessionBean.retrieveLeastRoomInventory(dateStart, dateEnd, rt), rateControllerBean.countRate(dateStart, dateEnd, rt)));
+            } catch (RoomInventoryNotFound ex){
+            }
+        }
+        if(values == null){
+            throw new NoAvailableRoomsException();
+        }
+        return values;
+    }
+    
+    @Override
+    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms){
+        reservationControllerBean.createGuestReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guestId, rooms);
     }
 }

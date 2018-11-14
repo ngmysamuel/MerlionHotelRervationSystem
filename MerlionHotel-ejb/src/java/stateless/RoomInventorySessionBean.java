@@ -80,14 +80,29 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
     }
 
     public RoomInventory retrieveRoomInventory(LocalDate date, RoomType rt) throws RoomInventoryNotFound {
-        System.out.println(date + " "+rt);
+System.out.println("stateless.RoomInventorySessionBean.retrieveRoomInventory()");
         Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt.grade = :roomType");
         q.setParameter("date", date);
         q.setParameter("roomType", rt.getGrade());
         try {
             return (RoomInventory) q.getSingleResult();
         } catch (NoResultException e) {
+System.out.println("Thrown from retreiveROomIneentory()");
             throw new RoomInventoryNotFound();
         }
+    }
+    
+    @Override
+    public RoomInventory retrieveLeastRoomInventory(LocalDate dateStart, LocalDate dateEnd, RoomType rt) throws RoomInventoryNotFound{
+        RoomInventory leastRoomInventory = retrieveRoomInventory(dateStart, rt);
+        dateStart = dateStart.plusDays(1);
+        while(dateStart.compareTo(dateEnd) == -1){
+            if(retrieveRoomInventory(dateStart, rt).getRoomAvail() < leastRoomInventory.getRoomAvail()){
+                leastRoomInventory = leastRoomInventory;
+            }
+            dateStart = dateStart.plusDays(1);
+        }
+        leastRoomInventory.getRt().getName();
+        return leastRoomInventory;
     }
 }

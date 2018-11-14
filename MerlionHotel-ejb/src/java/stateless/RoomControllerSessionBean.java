@@ -102,18 +102,15 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
     public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {
         while (!dateStart.isAfter(dateEnd)) {
             RoomInventory ri = new RoomInventory();
-            try {
                 try {
-                    roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStart, numOfRooms);
+                    roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
+System.out.println("I am back from tiemrChecker()");
                 } catch (ReservationNotFoundException ex) {
+System.out.println("TimerCheecler() is false with room type as "+rt);
                     return false;
                 }
-                ri = roomInventorySessionBean.retrieveRoomInventory(dateStart, rt);
-System.out.println("In allocateRooms() where roomInventory date is "+ri.getDate()+" roomType is "+ri.getRt().getName());
-            } catch (RoomInventoryNotFound e) {
-                return false;
-            }
-            boolean b = setRoomsAllocated(id, ri);
+            boolean b = setRoomsAllocated(id, rt);
+System.out.println("setRoomsAllocated() returns "+b);
             if (!b) {
             //if (0 < numOfRooms) {    
                //eJBContext.setRollbackOnly();
@@ -125,13 +122,12 @@ System.out.println("after rolling back");
         return true;
     }
     
-    public boolean setRoomsAllocated(Long id, RoomInventory ri) {
+    public boolean setRoomsAllocated(Long id, RoomType rt) {
 System.out.println("I am in setRoomsAllocated()");
         ReservationLineItem rli = em.find(ReservationLineItem.class, id);
         rli.getAllocatedRooms().size();
 System.out.println("after just em.find: the allocated rooms for rli is "+rli.getAllocatedRooms());
         int numOfRooms = rli.getNumberOfRooms();
-        RoomType rt = ri.getRt();
 //        ri.setRoomCountForAllocation(ri.getRoomCountForAllocation() - numOfRooms);
         Query q = em.createQuery("SELECT r FROM Room r WHERE r.status = :status and r.type = :roomType");
         q.setParameter("status", "Available");

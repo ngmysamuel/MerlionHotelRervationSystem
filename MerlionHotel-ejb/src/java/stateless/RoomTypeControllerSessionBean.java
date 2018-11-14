@@ -35,7 +35,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     @Resource
     private EJBContext eJBContext;
 
-    @Override
+    @Override //for creaation of reservations
     public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
         Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt= :rt");
         q.setParameter("date", date);
@@ -51,24 +51,36 @@ System.out.println("RoomInventory and so, roomType room avail is: "+ri.getRoomAv
                 System.out.println("not enough rooms\n");
                 throw new ReservationNotFoundException("not enough rooms");
             } else {
-                ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
+//                ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
                 em.persist(ri);
                 return true;
             }
         } else {
             RoomInventory ri = (RoomInventory) q.getResultList().get(0);
-            int roomsAvail;
-            Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
-            q1.setParameter("status", "Available");
-            q1.setParameter("type", ri.getRt());
-            roomsAvail = q1.getResultList().size();
-            if (roomsAvail < numOfRooms) {
+            if (ri.getRoomAvail()<numOfRooms) {
                 System.out.println("not enough rooms\n");
                 throw new ReservationNotFoundException("not enough rooms");
             }
-            ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
+//            ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
             return true;
         }
+    }
+    
+    //for timer to check
+    public boolean timerChecker(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
+        int roomsAvail;
+        Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
+        q1.setParameter("status", "Available");
+        q1.setParameter("type", rt);
+        roomsAvail = q1.getResultList().size();
+System.out.println("timerChecker() rooms avail in the timer checker is "+roomsAvail);     
+System.out.println("timerChecker() roomType is "+rt);
+System.out.println("timerChecker() is reutrning "+(!(roomsAvail < numOfRooms)));        
+        if (roomsAvail < numOfRooms ) {
+            throw new ReservationNotFoundException("not enough rooms");
+        }
+
+        return true;
     }
 
     public List<RoomType> getRoomTypes() {
