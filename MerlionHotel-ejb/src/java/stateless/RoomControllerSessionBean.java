@@ -41,13 +41,12 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
-    
+
     @Resource
     EJBContext eJBContext;
 
     public RoomControllerSessionBean() {
     }
-   
 
     public void create(Integer roomNum, String status, Long roomTypeId) {
         RoomType type = em.find(RoomType.class, roomTypeId);
@@ -63,24 +62,24 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         r.setStatus(status);
-        if (roomTypeId.equals(new Long ("-1"))) {
-            
+        if (roomTypeId.equals(new Long("-1"))) {
+
         } else {
             RoomType rt = em.find(RoomType.class, roomTypeId);
             r.setType(rt);
         }
     }
-    
+
     public List<Room> viewAllRooms() {
         return em.createQuery("select r from room r").getResultList();
     }
-    
+
     public void deleteRoom(Long roomNum) throws StillInUseException {
         Query q = em.createQuery("select r from Room r where r.number = :roomNum");
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         Long id = r.getId();
-        
+
         if (!r.getReservationLineItems().isEmpty()) {
             r.setStatus("Unavailable");
             throw new StillInUseException();
@@ -97,27 +96,25 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
             em.remove(r);
         }
     }
-    
-    
+
     public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {
-        while (!dateStart.isAfter(dateEnd)) {
-            RoomInventory ri = new RoomInventory();
-                try {
-                    roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
-                } catch (ReservationNotFoundException ex) {
-                    return false;
-                }
-            boolean b = setRoomsAllocated(id, rt);
-            if (!b) {
-            //if (0 < numOfRooms) {    
-               //eJBContext.setRollbackOnly();
-                return false;
-            } 
-            dateStart = dateStart.plusDays(1);
+        RoomInventory ri = new RoomInventory();
+        try {
+            roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
+        } catch (ReservationNotFoundException ex) {
+            return false;
         }
+        boolean b = setRoomsAllocated(id, rt);
+        if (!b) {
+            //if (0 < numOfRooms) {    
+            //eJBContext.setRollbackOnly();
+            return false;
+        }
+        dateStart = dateStart.plusDays(1);
+
         return true;
     }
-    
+
     public boolean setRoomsAllocated(Long id, RoomType rt) {
         ReservationLineItem rli = em.find(ReservationLineItem.class, id);
         rli.getAllocatedRooms().size();
@@ -141,8 +138,8 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
                 r.setReservationLineItems(ls3);
                 em.flush();
             }
-        } 
+        }
         return true;
     }
-    
+
 }
