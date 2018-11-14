@@ -96,6 +96,20 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
         q.setParameter("inName", name);
         try{
             Rate r = (Rate) q.getSingleResult();
+            if("disabled".equals(r.getStatus())){
+                throw new RateNotFoundException(name + " rate doesn't exist");
+            }
+            return r;
+        } catch(NoResultException ex){
+            throw new RateNotFoundException(name + " rate doesn't exist");
+        }
+    }
+    
+    public Rate retrieveDisabledRate(String name) throws RateNotFoundException{
+        Query q = em.createQuery("SELECT r FROM Rate r WHERE r.name = :inName");
+        q.setParameter("inName", name);
+        try{
+            Rate r = (Rate) q.getSingleResult();
             if(!"disabled".equals(r.getStatus())){
                 throw new RateNotFoundException(name + " rate doesn't exist");
             }
@@ -116,31 +130,43 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     }
 
     @Override
-    public Rate createRate(String name, RateTypeEnum rateType, BigDecimal price){
+    public Rate createRate(String name, RoomType roomType, RateTypeEnum rateType, BigDecimal price){
         try{
-            Rate r = retrieveRate(name);
-            em.detach(r);
+            Rate r = retrieveDisabledRate(name);
+            r.setRoomType(roomType);
+            r.setType(rateType);
+            r.setPrice(price);
+            r.setStatus("active");
             em.flush();
+            return r;
         } catch(RateNotFoundException ex){
-        }
-        Rate rate = new Rate(rateType, name, price);
-        em.persist(rate);
-        em.flush();
-        return rate;
+            Rate rate = new Rate(rateType, roomType, name, price);
+            roomType.getRates().add(rate);
+            em.persist(rate);
+            em.flush();
+            return rate;
+        }      
     }
     
     @Override
-    public Rate createRate(String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd){
+    public Rate createRate(String name, RoomType roomType, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd){
         try{
-            Rate r = retrieveRate(name);
-            em.detach(r);
+            Rate r = retrieveDisabledRate(name);
+            r.setRoomType(roomType);
+            r.setType(rateType);
+            r.setPrice(price);
+            r.setDateStart(dateStart);
+            r.setDateEnd(dateEnd);
+            r.setStatus("active");
             em.flush();
+            return r;
         } catch(RateNotFoundException ex){
+            Rate rate = new Rate(rateType, roomType, name, price, dateStart, dateEnd);
+            roomType.getRates().add(rate);
+            em.persist(rate);
+            em.flush();
+            return rate;
         }
-        Rate rate = new Rate(rateType, name, price, dateStart, dateEnd);
-        em.persist(rate);
-        em.flush();
-        return rate;
     }
 
     @Override

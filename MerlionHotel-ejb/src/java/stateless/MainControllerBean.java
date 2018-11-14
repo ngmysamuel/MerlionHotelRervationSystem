@@ -308,17 +308,15 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     
     @Override
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException{
-        Rate rate = rateControllerBean.createRate(name, rateType, price);
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
-        roomType.getRates().add(rate);
+        Rate rate = rateControllerBean.createRate(name, roomType, rateType, price);
         return rate;
     }
     
     @Override
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
-        Rate rate = rateControllerBean.createRate(name, rateType, price, dateStart, dateEnd);
-        roomType.getRates().add(rate);
+        Rate rate = rateControllerBean.createRate(name, roomType, rateType, price, dateStart, dateEnd);
         return rate;
     }
     

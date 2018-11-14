@@ -249,8 +249,8 @@ public class MainApp {
             {
                 try {
                     viewRate();
-                    sc.nextLine();
                     System.out.println("Enter any key to continue");
+                    sc.nextLine();
                 } catch (RateNotFoundException ex) {
                     System.out.println(ex.getMessage());
                 }
@@ -359,9 +359,9 @@ System.out.println("I am back in client");
         String roomType = sc.nextLine();
         System.out.print("Rate Name>");
         String name = sc.nextLine();
-        System.out.print("Rate Type (1.Normal, 2.Published, 3.Promotion, 4.Peak)>");
+        System.out.print("Rate Type (1.Published, 2.Normal, 3.Peak, 4.Promo)>");
         int rt = sc.nextInt();
-        RateTypeEnum rateType = RateTypeEnum.values()[rt];
+        RateTypeEnum rateType = RateTypeEnum.values()[rt-1];
         System.out.print("Price>");
         BigDecimal price = sc.nextBigDecimal();
         if(rateType.toString().equals("Promotion") || rateType.toString().equals("Peak")){
@@ -390,14 +390,14 @@ System.out.println("I am back in client");
     private void viewAllRates(){
         try {
             List<Rate> rates = mainControllerBeanRemote.viewAllRates();
-            System.out.printf("%24s %32s %10s %5S %10S %10S", "ROOM TYPE", "NAME", "TYPE", "PRICE", "DATE START", "DATE END");
+            System.out.printf("%24s %32s %10s %5S %10S %10S \n", "ROOM TYPE", "NAME", "TYPE", "PRICE", "DATE START", "DATE END");
             for(Rate rate: rates){
                 if(rate.getType().toString().equals("Published") ||rate.getType().toString().equals("Peak")){
-                    System.out.printf("%24s %32s %10s %5d %10s %10s", rate.getRoomType().getName(), rate.getName(),
-                            rate.getType().toString(), rate.getPrice(), rate.getDateStart().toString(), rate.getDateEnd().toString());
+                    System.out.printf("%24s %32s %10s %5s %10s %10s \n", rate.getRoomType().getName(), rate.getName(),
+                            rate.getType().toString(), rate.getPrice().toString(), rate.getDateStart().toString(), rate.getDateEnd().toString());
                 } else{
-                    System.out.printf("%24s %32s %10s %5d", rate.getRoomType().getName(), rate.getName(),
-                            rate.getType().toString(), rate.getPrice());
+                    System.out.printf("%24s %32s %10s %5s \n", rate.getRoomType().getName(), rate.getName(),
+                            rate.getType().toString(), rate.getPrice().toString());
                 }
             }
         } catch (RateNotFoundException ex) {
@@ -443,12 +443,14 @@ System.out.println("I am back in client");
                 LocalDate dateEnd = LocalDate.parse(end);
                 try{
                     mainControllerBeanRemote.updateRate(rateId, name, roomType, rateType, price, dateStart, dateEnd);
+                    System.out.println("Rate "+ name +" has been updated!");
                 } catch (RateNameNotUniqueException | RoomTypeNotFoundException ex) {
                     System.out.println(ex.getMessage());
                 }
             } else {
                 try{
                     mainControllerBeanRemote.updateRate(rateId, name, roomType, rateType, price);
+                    System.out.println("Rate "+ name +" has been updated!");
                 } catch (RateNameNotUniqueException | RoomTypeNotFoundException ex) {
                     System.out.println(ex.getMessage());
                 }
@@ -463,8 +465,13 @@ System.out.println("I am back in client");
         System.out.println("***Delete Rate***");
         try {
             Long rateId = viewRate();
-            mainControllerBeanRemote.deleteRate(rateId);
-            System.out.println("Rate deleted!");
+            System.out.println("1: Delete");
+            System.out.println("Any key to Cancel");
+            if(sc.nextInt() == 1){
+                sc.nextLine();
+                mainControllerBeanRemote.deleteRate(rateId);
+                System.out.println("Rate deleted!");
+            }
         } catch (RateNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
