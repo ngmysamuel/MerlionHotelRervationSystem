@@ -62,7 +62,10 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     @Override
     public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        BigDecimal price = rateControllerBeanLocal.countRate(dateStart, dateEnd);
+        BigDecimal price = new BigDecimal(0); 
+        for(int i = 0; i < rooms.size(); i++){
+            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType()));
+        }
         Guest guest = em.find(Guest.class, guestId);
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, rooms, guest, price);
         em.persist(newReservation);
@@ -131,6 +134,11 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         List<Reservation> reservations = guest.getReservations();
         for(Reservation reservation: reservations){
             reservation.getId();
+            List<ReservationLineItem> rlis = reservation.getReservationLineItems();
+            for(ReservationLineItem rli: rlis){
+                RoomType roomType = rli.getRoomType();
+                roomType.getName();
+            }
         }
         return reservations;
     }

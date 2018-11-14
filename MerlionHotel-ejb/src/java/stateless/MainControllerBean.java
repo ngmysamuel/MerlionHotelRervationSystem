@@ -7,6 +7,7 @@ package stateless;
 
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
+import Enum.ReservationTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Partner;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.util.Pair;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBContext;
@@ -30,6 +32,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
 import util.exception.RoomInventoryNotFound;
@@ -42,6 +45,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
+
+    @EJB
+    private ReservationControllerBeanLocal reservationControllerBean;
 
     @EJB
     private RateControllerBeanLocal rateControllerBean;
@@ -345,5 +351,26 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     @Override
     public List<Rate> viewAllRates() throws RateNotFoundException{
         return rateControllerBean.retrieveAllRates();
+    }
+    
+    @Override
+    public List<Pair<RoomInventory, BigDecimal>> searchRooms(LocalDate dateStart, LocalDate dateEnd) throws NoAvailableRoomsException{
+        List<RoomType> roomTypes = roomTypeControllerSessionBean.getRoomTypes();
+        List<Pair<RoomInventory, BigDecimal>> values = null;
+        for(RoomType rt: roomTypes){
+            try{
+                values.add(new Pair(roomInventorySessionBean.retrieveLeastRoomInventory(dateStart, dateEnd, rt), rateControllerBean.countRate(dateStart, dateEnd, rt)));
+            } catch (RoomInventoryNotFound ex){
+            }
+        }
+        if(values == null){
+            throw new NoAvailableRoomsException();
+        }
+        return values;
+    }
+    
+    @Override
+    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms){
+        reservationControllerBean.createGuestReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guestId, rooms);
     }
 }
