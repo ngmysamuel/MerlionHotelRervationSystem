@@ -122,7 +122,6 @@ System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAlloca
         ri.setRoomAvail(789);
         em.persist(ri);
         em.flush();
-System.out.println("XVI id is "+ri.getId());
 //        Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date");
 //        q.setParameter("date", LocalDate.now());
 //        //q.setParameter("roomType", 2);

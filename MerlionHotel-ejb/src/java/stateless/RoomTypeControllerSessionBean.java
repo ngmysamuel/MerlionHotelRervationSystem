@@ -46,7 +46,6 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             ri.setRt(rt);
             ri.setRoomAvail(rt.getInitialRoomAvailability());
             ri.setRoomCountForAllocation(rt.getInitialRoomAvailability());
-System.out.println("RoomInventory and so, roomType room avail is: "+ri.getRoomAvail()+" num of rooms is "+numOfRooms);
             if (ri.getRoomAvail() < numOfRooms) {
                 System.out.println("not enough rooms\n");
                 throw new ReservationNotFoundException("not enough rooms");
@@ -72,10 +71,7 @@ System.out.println("RoomInventory and so, roomType room avail is: "+ri.getRoomAv
         Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
         q1.setParameter("status", "Available");
         q1.setParameter("type", rt);
-        roomsAvail = q1.getResultList().size();
-System.out.println("timerChecker() rooms avail in the timer checker is "+roomsAvail);     
-System.out.println("timerChecker() roomType is "+rt);
-System.out.println("timerChecker() is reutrning "+(!(roomsAvail < numOfRooms)));        
+        roomsAvail = q1.getResultList().size();   
         if (roomsAvail < numOfRooms ) {
             throw new ReservationNotFoundException("not enough rooms");
         }

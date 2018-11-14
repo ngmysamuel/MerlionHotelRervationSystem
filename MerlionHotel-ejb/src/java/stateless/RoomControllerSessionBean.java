@@ -104,17 +104,13 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
             RoomInventory ri = new RoomInventory();
                 try {
                     roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
-System.out.println("I am back from tiemrChecker()");
                 } catch (ReservationNotFoundException ex) {
-System.out.println("TimerCheecler() is false with room type as "+rt);
                     return false;
                 }
             boolean b = setRoomsAllocated(id, rt);
-System.out.println("setRoomsAllocated() returns "+b);
             if (!b) {
             //if (0 < numOfRooms) {    
                //eJBContext.setRollbackOnly();
-System.out.println("after rolling back");
                 return false;
             } 
             dateStart = dateStart.plusDays(1);
@@ -123,10 +119,8 @@ System.out.println("after rolling back");
     }
     
     public boolean setRoomsAllocated(Long id, RoomType rt) {
-System.out.println("I am in setRoomsAllocated()");
         ReservationLineItem rli = em.find(ReservationLineItem.class, id);
         rli.getAllocatedRooms().size();
-System.out.println("after just em.find: the allocated rooms for rli is "+rli.getAllocatedRooms());
         int numOfRooms = rli.getNumberOfRooms();
 //        ri.setRoomCountForAllocation(ri.getRoomCountForAllocation() - numOfRooms);
         Query q = em.createQuery("SELECT r FROM Room r WHERE r.status = :status and r.type = :roomType");
@@ -134,27 +128,20 @@ System.out.println("after just em.find: the allocated rooms for rli is "+rli.get
         q.setParameter("roomType", rt);
         List<Room> ls = q.getResultList();
         if (ls.size() < numOfRooms) {
-System.out.println("There is lesser available rooms where \n"+ls+"\n than there is the num of rooms we need for the RLI: "+numOfRooms);
             return false;
         } else {
-System.out.println("There is enough available rooms where \n"+ls+"\n The num of rooms we need for the RLI: "+numOfRooms);
             for (int i = 0; i < numOfRooms; i++) {
-System.out.println("i = "+i);
                 Room r = ls.get(i);
                 List<Room> ls2 = rli.getAllocatedRooms();
                 ls2.add(r);
-System.out.println("ls2, after .add(r) is "+ls2);
                 rli.setAllocatedRooms(ls2);
-System.out.println("within the for loop of setRoomsAllocated: the allocated rooms for rli is "+rli.getAllocatedRooms());
                 r.setStatus("Occupied");
                 List<ReservationLineItem> ls3 = r.getReservationLineItems();
                 ls3.add(rli);
                 r.setReservationLineItems(ls3);
                 em.flush();
             }
-        } //rt: roomType||rli: reservationlineitem||ls: list of available rooms of the roomtype||ls2: rli's list of allocated rooms
-          //r: a room that i randomly get from the list of avail rooms.||ls3: r's rli-s 
-System.out.println("rli allocated rooms is "+rli.getAllocatedRooms());
+        } 
         return true;
     }
     

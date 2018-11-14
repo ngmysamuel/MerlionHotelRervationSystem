@@ -38,42 +38,50 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     @Override
     public Rate retrieveRate(LocalDate date, RoomType roomType){
         Query q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.status <> 'disabled' AND r.roomType = :inRoom");
-        q.setParameter("inDate", date);
-        q.setParameter("inType", "Normal");
+        q.setParameter("inType", RateTypeEnum.Normal);
         q.setParameter("inRoom", roomType);
         List<Rate> normalRates;
         normalRates = q.getResultList();
-        Rate normal = normalRates.get(0);
-        for(Rate rate: normalRates){
-            if(normal != null && -1 == rate.getPrice().compareTo(normal.getPrice())){
-                normal = rate;
+        Rate normal = null;
+        if(!normalRates.isEmpty() && normalRates.get(0) != null){
+            normal = normalRates.get(0);
+            for(Rate rate: normalRates){
+                if(normal != null && -1 == rate.getPrice().compareTo(normal.getPrice())){
+                    normal = rate;
+                }
             }
         }
 
         q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled' AND r.roomType = :inRoom");
-        
-        q.setParameter("inType", "Promotion");
+        q.setParameter("inDate", date);
+        q.setParameter("inType", RateTypeEnum.Promotion);
         q.setParameter("inRoom", roomType);
         List<Rate> promoRates;
         promoRates = q.getResultList();
-        Rate promo = promoRates.get(0);
-        for(Rate rate: promoRates){
-            if(promo != null && -1 == rate.getPrice().compareTo(promo.getPrice())){
-                promo = rate;
+        Rate promo = null;
+        if(!promoRates.isEmpty() && promoRates.get(0) != null){
+            promo = promoRates.get(0);
+            for(Rate rate: promoRates){
+                if(promo != null && -1 == rate.getPrice().compareTo(promo.getPrice())){
+                    promo = rate;
+                }
             }
         }
         
         
         q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled' AND r.roomType = :inRoom");
         q.setParameter("inDate", date);
-        q.setParameter("inType", "Peak");
+        q.setParameter("inType",RateTypeEnum.Peak);
         q.setParameter("inRoom", roomType);
         List<Rate> peakRates;
         peakRates = q.getResultList();
-        Rate peak = peakRates.get(0);
-        for(Rate rate: peakRates){
-            if(peak != null && rate.getPrice().compareTo(peak.getPrice()) == -1){
-                peak = rate;
+        Rate peak = null;
+        if(!peakRates.isEmpty() && peakRates.get(0) != null){
+            peak = peakRates.get(0);
+            for(Rate rate: peakRates){
+                if(peak != null && rate.getPrice().compareTo(peak.getPrice()) == -1){
+                    peak = rate;
+                }
             }
         }
         
@@ -127,7 +135,7 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
         BigDecimal total = new BigDecimal(0);
         while(dateStart.isBefore(dateEnd)){
             total.add(retrieveRate(dateStart, roomType).getPrice());
-            dateStart.plusDays(1);
+            dateStart = dateStart.plusDays(1);
         }
         return total;
     }

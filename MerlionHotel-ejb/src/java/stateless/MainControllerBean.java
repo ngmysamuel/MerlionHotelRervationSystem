@@ -208,14 +208,12 @@ System.out.println("I have called timer()");
         q.setParameter("date", date);
         List<Reservation> todayCheckInList = q.getResultList();
         for (RoomType rtMaster : sortedListOfRT) { //for each type of roomType
-System.out.println("today checkin list is "+todayCheckInList);
             for (Reservation r : todayCheckInList) { //for each reservation checking in today
                 em.refresh(r);
                 r.getReservationLineItems().size();
                 List<ReservationLineItem> listOfReservationLineItems = r.getReservationLineItems();
                 LocalDate dateEnd = r.getDateEnd();
-                LocalDate dateStart = r.getDateStart();
-System.out.println("List of reservation line items is "+listOfReservationLineItems);                
+                LocalDate dateStart = r.getDateStart();             
                 for (ReservationLineItem rli : listOfReservationLineItems) { //for each line item in the reservation
                     RoomType rt = rli.getRoomType();
                     Integer numOfRooms = rli.getNumberOfRooms();
@@ -320,7 +318,6 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
 //    }
 
     public List<RoomType> sortRoomTypeAsc() {
-System.out.println("sortRoomTypeAsc() is called ");
         Query que = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> lis = que.getResultList();
         for (int i = 0; i < lis.size(); i++) {
@@ -332,7 +329,6 @@ System.out.println("sortRoomTypeAsc() is called ");
                 }
             }
         }
-System.out.println("list at end of sortRoomAsc() is "+lis);
         return lis;
     }
     

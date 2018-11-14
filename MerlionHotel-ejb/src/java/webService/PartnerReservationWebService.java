@@ -48,11 +48,9 @@ public class PartnerReservationWebService {
 
     public List<Reservation> viewAllReservations() {
         List<Reservation> ls = partnerControllerBean.viewAllReservations();
-System.out.println("I am back from PartnerControllerBean");
         for (Reservation r : ls) {
             em.detach(r);
             Partner p = r.getPartner();
-System.out.println("partner is "+p);
             p.setReservations(null);
             Guest g = r.getGuest();
             g.setReservations(null);
@@ -66,7 +64,6 @@ System.out.println("partner is "+p);
                 rt.setReservationLineItems(null);
                 rt.setRates(null);
                 List<Room> ls3 = rli.getAllocatedRooms();
-System.out.println(ls3);
                 for (Room room : ls3) { //for each room
                     em.detach(room);
                     room.setReservationLineItems(null);
@@ -79,9 +76,7 @@ System.out.println(ls3);
 
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException {
         try {
-System.out.println("I am in the Partner Web Service");
             Reservation r = partnerControllerBean.viewReservationDetails(id);
-//            em.refresh(r);
             em.detach(r);
             em.flush();
             Partner p = r.getPartner();
@@ -100,14 +95,11 @@ System.out.println("I am in the Partner Web Service");
                 rt.setRoomInventory(null);
                 rli.getAllocatedRooms().size();
                 List<Room> ls3 = rli.getAllocatedRooms();
-System.out.println("the allocated rooms for each rli is "+ls3);
                 for (Room room : ls3) { //for each room
                     em.detach(room);
-System.out.println("The first time-> the reservation line items for each room is "+room.getReservationLineItems());
                     room.getReservationLineItems().size();
                 }
                 for (Room room : ls3) {
-System.out.println("The second time-> the reservation line items for each room is "+room.getReservationLineItems());
                     room.setReservationLineItems(null);
                 }
             }
@@ -123,7 +115,6 @@ System.out.println("The second time-> the reservation line items for each room i
 
     public List<String> getRoomType() {
         List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
-System.out.println("sorted list of roomtypes is "+ls);
         List<String> ls2 = new ArrayList<>();
         for (RoomType rt : ls) {
             if (rt.getInitialRoomAvailability() == null) {

@@ -80,14 +80,12 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
     }
 
     public RoomInventory retrieveRoomInventory(LocalDate date, RoomType rt) throws RoomInventoryNotFound {
-System.out.println("stateless.RoomInventorySessionBean.retrieveRoomInventory()");
         Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt.grade = :roomType");
         q.setParameter("date", date);
         q.setParameter("roomType", rt.getGrade());
         try {
             return (RoomInventory) q.getSingleResult();
         } catch (NoResultException e) {
-System.out.println("Thrown from retreiveROomIneentory()");
             throw new RoomInventoryNotFound();
         }
     }

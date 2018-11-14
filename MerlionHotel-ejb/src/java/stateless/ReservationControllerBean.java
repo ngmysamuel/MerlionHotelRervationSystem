@@ -103,11 +103,9 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             throw new ReservationNotFoundException("Date reserved is too far ahead");
         }
         BigDecimal price = new BigDecimal(0);
-        for (ReservationLineItem rli : rooms) {
-System.out.println("price to be added is "+rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
-            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
-System.out.println("price is "+price);
-        }
+//        for (ReservationLineItem rli : rooms) {
+//            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
+//        }
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
         
@@ -142,10 +140,8 @@ System.out.println("price is "+price);
         }
         List<ReservationLineItem> lsRli = newReservation.getReservationLineItems();
         lsRli.addAll(rooms);
-System.out.println("RservationControllerBean lsRli is "+lsRli);
         newReservation.setReservationLineItems(lsRli);
         em.flush();
-System.out.println("RservationControllerBean RLIs: "+newReservation.getReservationLineItems());        
         return newReservation;
     }
 
