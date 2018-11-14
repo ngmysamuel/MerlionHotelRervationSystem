@@ -89,4 +89,18 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
             throw new RoomInventoryNotFound();
         }
     }
+    
+    @Override
+    public RoomInventory retrieveLeastRoomInventory(LocalDate dateStart, LocalDate dateEnd, RoomType rt) throws RoomInventoryNotFound{
+        RoomInventory leastRoomInventory = retrieveRoomInventory(dateStart, rt);
+        dateStart = dateStart.plusDays(1);
+        while(dateStart.compareTo(dateEnd) == -1){
+            if(retrieveRoomInventory(dateStart, rt).getRoomAvail() < leastRoomInventory.getRoomAvail()){
+                leastRoomInventory = leastRoomInventory;
+            }
+            dateStart = dateStart.plusDays(1);
+        }
+        leastRoomInventory.getRt().getName();
+        return leastRoomInventory;
+    }
 }

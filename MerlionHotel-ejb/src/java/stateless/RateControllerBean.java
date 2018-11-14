@@ -36,10 +36,11 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     }
 
     @Override
-    public Rate retrieveRate(LocalDate date) {
-        Query q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.status <> 'disabled'");
+    public Rate retrieveRate(LocalDate date, RoomType roomType){
+        Query q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.status <> 'disabled' AND r.roomType = :inRoom");
         q.setParameter("inDate", date);
         q.setParameter("inType", "Normal");
+        q.setParameter("inRoom", roomType);
         List<Rate> normalRates;
         normalRates = q.getResultList();
         Rate normal = normalRates.get(0);
@@ -49,9 +50,10 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
             }
         }
 
-        q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled'");
+        q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled' AND r.roomType = :inRoom");
         q.setParameter("inDate", date);
         q.setParameter("inType", "Promotion");
+        q.setParameter("inRoom", roomType);
         List<Rate> promoRates;
         promoRates = q.getResultList();
         Rate promo = promoRates.get(0);
@@ -62,9 +64,10 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
         }
         
         
-        q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled'");
+        q = em.createQuery("SELECT r FROM Rate r WHERE r.type = :inType AND r.dateStart <= :inDate AND r.dateEnd > :inDate AND r.status <> 'disabled' AND r.roomType = :inRoom");
         q.setParameter("inDate", date);
         q.setParameter("inType", "Peak");
+        q.setParameter("inRoom", roomType);
         List<Rate> peakRates;
         peakRates = q.getResultList();
         Rate peak = peakRates.get(0);
@@ -120,10 +123,10 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     }
     
     @Override
-    public BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd) {
+    public BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd, RoomType roomType) {
         BigDecimal total = new BigDecimal(0);
         while(dateStart.isBefore(dateEnd)){
-            total.add(retrieveRate(dateStart).getPrice());
+            total.add(retrieveRate(dateStart, roomType).getPrice());
             dateStart.plusDays(1);
         }
         return total;

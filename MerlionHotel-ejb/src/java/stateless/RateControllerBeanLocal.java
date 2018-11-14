@@ -22,9 +22,9 @@ import util.exception.RateNotFoundException;
 @Local
 public interface RateControllerBeanLocal {
 
-    Rate retrieveRate(LocalDate date);
+    Rate retrieveRate(LocalDate date, RoomType roomType);
 
-    BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd);
+    BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd, RoomType roomType);
 
     public Rate createRate(String name, RoomType roomType, RateTypeEnum rateType, BigDecimal price);
 
