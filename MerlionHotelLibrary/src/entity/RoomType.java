@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,7 +54,7 @@ public class RoomType implements Serializable {
     //@JoinColumn(nullable = false)
     private List<Rate> rates;
 
-    @OneToMany(mappedBy = "roomType")
+    @OneToMany(mappedBy = "roomType", cascade=CascadeType.ALL, orphanRemoval=true)
     private List<ReservationLineItem> reservationLineItems;
 
     public List<ReservationLineItem> getReservationLineItems() {

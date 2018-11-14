@@ -26,9 +26,9 @@ public interface RateControllerBeanLocal {
 
     BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd);
 
-    public Rate createRate(String name, RateTypeEnum rateType, BigDecimal price);
+    public Rate createRate(String name, RoomType roomType, RateTypeEnum rateType, BigDecimal price);
 
-    public Rate createRate(String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd);
+    public Rate createRate(String name, RoomType roomType, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd);
 
     public Rate retrieveRate(String name) throws RateNotFoundException;
 

@@ -73,21 +73,23 @@ public class Rate implements Serializable {
     }
 
     // Normal and Published rate
-    public Rate(RateTypeEnum type, String name, BigDecimal price) {
+    public Rate(RateTypeEnum type, RoomType roomType, String name, BigDecimal price) {
         this.type = type;
         this.price = price;
         this.name = name;
         this.status = "active";
+        this.roomType = roomType;
     }
 
     // Peak and Promotion rate
-    public Rate(RateTypeEnum type, String name, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) {
+    public Rate(RateTypeEnum type, RoomType roomType, String name, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) {
         this.type = type;
         this.price = price;
         this.name = name;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
         this.status = "active";
+        this.roomType = roomType;
     }
     
     
