@@ -4,6 +4,7 @@ import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
+import entity.Room;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,7 @@ import javax.jws.WebService;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import stateless.MainControllerBeanLocal;
 import stateless.PartnerControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
 import util.exception.ReservationNotFoundException;
@@ -24,6 +26,9 @@ import util.exception.ReservationNotFoundException;
 @WebService(serviceName = "PartnerReservationWebService")
 @Stateless
 public class PartnerReservationWebService {
+
+    @EJB
+    private MainControllerBeanLocal mainControllerBean;
 
     @EJB
     private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
@@ -47,6 +52,7 @@ public class PartnerReservationWebService {
             em.detach(r);
             em.flush();
             Partner p = r.getPartner();
+System.out.println("partner is "+p);
             p.setReservations(null);
             Guest g = r.getGuest();
             g.setReservations(null);
@@ -56,6 +62,11 @@ public class PartnerReservationWebService {
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                List<Room> ls3 = rli.getAllocatedRooms();
+System.out.println(ls3);
+                for (Room room : ls3) { //for each room
+                    room.setReservationLineItems(null);
+                }
             }
         }
 
@@ -64,6 +75,7 @@ public class PartnerReservationWebService {
 
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException {
         try {
+System.out.println("I am in the Partner Web Service");
             Reservation r = partnerControllerBean.viewReservationDetails(id);
             em.detach(r);
             em.flush();
@@ -72,11 +84,21 @@ public class PartnerReservationWebService {
             Guest g = r.getGuest();
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
-            for (ReservationLineItem rli : ls2) {
+            for (ReservationLineItem rli : ls2) { //for each reservation line item
                 RoomType rt = rli.getRoomType();
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                List<Room> ls3 = rli.getAllocatedRooms();
+System.out.println("the allocated rooms for each rli is "+ls3);
+                for (Room room : ls3) { //for each room
+System.out.println("The first time-> the reservation line items for each room is "+room.getReservationLineItems());
+                    room.getReservationLineItems().size();
+                }
+                for (Room room : ls3) {
+System.out.println("The second time-> the reservation line items for each room is "+room.getReservationLineItems());
+                    room.setReservationLineItems(null);
+                }
             }
             return r;
         } catch (ReservationNotFoundException e) {
@@ -89,7 +111,8 @@ public class PartnerReservationWebService {
     }
 
     public List<String> getRoomType() {
-        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+        List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
+System.out.println("sorted list of roomtypes is "+ls);
         List<String> ls2 = new ArrayList<>();
         for (RoomType rt : ls) {
             if (rt.getInitialRoomAvailability() == null) {
@@ -165,7 +188,13 @@ public class PartnerReservationWebService {
         return partnerControllerBean.search(dateStart, dateEnd);
     }
 
-    public void persist(Object object) {
-        em.persist(object);
+    public List<String> getStartAndEndDate(Long id) {
+        List<String> ls = new ArrayList<>();
+        Reservation reservation = em.find(Reservation.class, id);
+        String startDate = reservation.getDateStart().toString();
+        String endDate = reservation.getDateEnd().toString();
+        ls.add(startDate);
+        ls.add(endDate);
+        return ls;
     }
 }

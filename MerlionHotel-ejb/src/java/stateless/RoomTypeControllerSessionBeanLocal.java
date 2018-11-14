@@ -21,6 +21,6 @@ public interface RoomTypeControllerSessionBeanLocal {
     public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException;
     public List<RoomType> getRoomTypes();
     public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize);
-    public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId);
+    public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b);
     public void delete(Long id) throws StillInUseException;
 }

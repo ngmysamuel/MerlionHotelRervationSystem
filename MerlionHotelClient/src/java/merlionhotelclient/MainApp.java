@@ -75,8 +75,19 @@ public class MainApp {
                     String description = sc.nextLine();
                     System.out.println("What is the capacity?");
                     Integer capacity = sc.nextInt();
+                    
+                    List<RoomType> listOfRoomTypes = mainControllerBeanRemote.sortRoomTypeAsc();
+                    int highest = listOfRoomTypes.get(listOfRoomTypes.size()-1).getGrade();
+                    ++highest;
+                    
                     System.out.println("What are the grade? If there is a clash of grades, the grades lower on the ladder will be pushed down automatically");
+                    System.out.println("Please select a number from 1 to "+highest);
                     Integer grade = sc.nextInt();
+                    if ((grade < 1) || (grade > highest)) {
+                    System.out.println("You have made a wrong choice.");
+                    break;
+                    }
+                    
                     System.out.println("What are the room size?");
                     Integer roomSize = sc.nextInt();
                     mainControllerBeanRemote.createRoomType(bed, name, amenities, capacity, description, grade, roomSize);
@@ -85,7 +96,7 @@ public class MainApp {
                 case 2:
                     System.out.println("What is the room type you want to update for?");
                     int count = 0;
-                    List<RoomType> ls = mainControllerBeanRemote.viewAllRoomTypes();
+                    List<RoomType> ls = mainControllerBeanRemote.sortRoomTypeAsc();
                     for (RoomType rt : ls) {
                         System.out.println(count+". " + rt.getName());
                         count++;
@@ -104,7 +115,7 @@ public class MainApp {
                 case 4:
                     System.out.println("What is the room type you want to delete for?");
                     int cCase4 = 0;
-                    List<RoomType> lsCase4 = mainControllerBeanRemote.viewAllRoomTypes();
+                    List<RoomType> lsCase4 = mainControllerBeanRemote.sortRoomTypeAsc();
                     for (RoomType rtCase4 : lsCase4) {
                         System.out.println(cCase4 +". " + rtCase4.getName());
                         cCase4++;
@@ -120,7 +131,7 @@ public class MainApp {
             }
                     break;
                 case 5:
-                    List<RoomType> lsCase5 = mainControllerBeanRemote.viewAllRoomTypes();
+                    List<RoomType> lsCase5 = mainControllerBeanRemote.sortRoomTypeAsc();
                     for (RoomType rtCase5 : lsCase5) {
                         System.out.println("The roomtype with name: "+rtCase5.getName());
                         System.out.println(rtCase5.getAmenities()+"\n"+rtCase5.getGrade());
@@ -129,7 +140,7 @@ public class MainApp {
                 case 6:
                     System.out.println("What is the room type you want to create for?");
                     int c = 0;
-                    List<RoomType> ls2 = mainControllerBeanRemote.viewAllRoomTypes();
+                    List<RoomType> ls2 = mainControllerBeanRemote.sortRoomTypeAsc();
                     for (RoomType rt : ls2) {
                         System.out.println(c +". " + rt.getName());
                         c++;
@@ -297,11 +308,33 @@ public class MainApp {
         String description = sc.nextLine();
         System.out.println("What is the capacity?");
         String capacity = sc.nextLine();
+        
+        List<RoomType> listOfRoomTypes = mainControllerBeanRemote.sortRoomTypeAsc();
+        int highest = listOfRoomTypes.get(listOfRoomTypes.size()-1).getGrade();
+        
         System.out.println("What are the grade? If there is a clash of grades, the grades lower on the ladder will be pushed down automatically");
+        System.out.println("Please enter a number from 1 to "+highest);
         String grade = sc.nextLine();
+        if (grade.length() != 0) {
+            int gra = Integer.valueOf(grade);
+            if ((gra < 1) || (gra > highest)) {
+                System.out.println("You have made a wrong choice.");
+                return;
+            }
+        }
         System.out.println("What are the room size?");
         String roomSize = sc.nextLine();
-        mainControllerBeanRemote.updateRoomType(bed, name, amenities, capacity, description, grade, roomSize, availNum, roomTypeId);
+        System.out.println("Do you want it 1.Disabled 2.Enabled 3.Skip");
+        int selection = sc.nextInt();
+        String b = "";
+        if(selection == 1) {
+            b = "false";
+        } else if (selection == 2) {
+            b = "true";
+        } else {
+            b = "";
+        }
+        mainControllerBeanRemote.updateRoomType(bed, name, amenities, capacity, description, grade, roomSize, availNum, roomTypeId, b);
 System.out.println("I am back in client");
     }
 

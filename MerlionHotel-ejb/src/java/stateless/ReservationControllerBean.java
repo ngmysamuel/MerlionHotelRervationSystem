@@ -102,6 +102,10 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
         
+        if (guest == null || partner == null) {
+            throw new ReservationNotFoundException("There is no such guest or partner.");
+        }
+        
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);
         em.persist(newReservation);
         
@@ -120,8 +124,12 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             dateStartTemp = dateStart;//the next room line item
             rli.setReservation(newReservation);
             em.persist(rli);
+            em.flush();
         }
-        newReservation.setReservationLineItems(rooms);
+        List<ReservationLineItem> lsRli = newReservation.getReservationLineItems();
+        lsRli.addAll(lsRli);
+        newReservation.setReservationLineItems(lsRli);
+        em.flush();
         return newReservation;
     }
 

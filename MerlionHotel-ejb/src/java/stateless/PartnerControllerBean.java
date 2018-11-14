@@ -17,6 +17,7 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
@@ -27,6 +28,9 @@ import util.exception.ReservationNotFoundException;
  */
 @Stateless
 public class PartnerControllerBean implements PartnerControllerBeanRemote, PartnerControllerBeanLocal {
+
+    @EJB
+    private MainControllerBeanLocal mainControllerBean;
 
     @EJB
     private RoomInventorySessionBeanLocal roomInventorySessionBean;
@@ -73,13 +77,21 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
     }
 
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException {
+System.out.println("I am in PartnerControllerBean");
         Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.id = :id");
         q.setParameter("id", id);
-        List<Reservation> ls = q.getResultList();
-        if (ls.isEmpty()) {
-            throw new ReservationNotFoundException();
+        Reservation r = new Reservation();
+        r = (Reservation) q.getSingleResult();
+        r.getReservationLineItems().size();
+System.out.println("the reservation is "+r);
+System.out.println("the reservation line items is "+r.getReservationLineItems());
+        for (ReservationLineItem rli : r.getReservationLineItems()) {
+            rli.getAllocatedRooms().size();
+System.out.println("the allocated rooms is "+rli.getAllocatedRooms());
+            rli.getReservation();
+            rli.getRoomType();
         }
-        return ls.get(0);
+        return r;
     }
 
     public Reservation viewReservationDetails(Long partner, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException {
@@ -169,7 +181,7 @@ System.out.println("XVI id is "+ri.getId());
         int i = 0;
         LocalDate dateStartTemp = dateStart;
         List<Boolean> bo = new ArrayList<>();
-        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+        List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         boolean full = true;
         for (RoomType rt : ls) {
             while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given

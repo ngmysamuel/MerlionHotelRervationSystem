@@ -14,13 +14,13 @@
 
 <xs:element name="getRoomTypeResponse" type="tns:getRoomTypeResponse"/>
 
+<xs:element name="getStartAndEndDate" type="tns:getStartAndEndDate"/>
+
+<xs:element name="getStartAndEndDateResponse" type="tns:getStartAndEndDateResponse"/>
+
 <xs:element name="login" type="tns:login"/>
 
 <xs:element name="loginResponse" type="tns:loginResponse"/>
-
-<xs:element name="persist" type="tns:persist"/>
-
-<xs:element name="persistResponse" type="tns:persistResponse"/>
 
 <xs:element name="printRoomType" type="tns:printRoomType"/>
 
@@ -132,6 +132,7 @@
 <xs:element name="grade" type="xs:int" minOccurs="0"/>
 <xs:element name="id" type="xs:long" minOccurs="0"/>
 <xs:element name="initialRoomAvailability" type="xs:int" minOccurs="0"/>
+<xs:element name="isEnabled" type="xs:boolean"/>
 <xs:element name="name" type="xs:string" minOccurs="0"/>
 <xs:element name="rates" type="tns:rate" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 <xs:element name="reservationLineItems" type="tns:reservationLineItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
@@ -197,16 +198,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="persist">
-<xs:sequence>
-<xs:element name="arg0" type="xs:anyType" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="persistResponse">
-<xs:sequence/>
-</xs:complexType>
-
 <xs:complexType name="viewReservationDetails">
 <xs:sequence>
 <xs:element name="arg0" type="xs:long" minOccurs="0"/>
@@ -258,6 +249,18 @@
 <xs:complexType name="searchRoomResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:boolean" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getStartAndEndDate">
+<xs:sequence>
+<xs:element name="arg0" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getStartAndEndDateResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
 
