@@ -67,7 +67,11 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
 
     public List<RoomType> getRoomTypes() {
         Query q = em.createQuery("SELECT rt FROM RoomType rt");
-        return q.getResultList();
+        List<RoomType> rts = q.getResultList();
+        for(RoomType rt: rts){
+            rt.getId();
+        }
+        return rts;
     }
 
     public void persist(Object object) {
@@ -75,7 +79,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     }
 
     public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {
-        RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade);
+        RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade, null);
         newrt.setIsEnabled(true);
         manageGrade(grade);
         em.persist(newrt);

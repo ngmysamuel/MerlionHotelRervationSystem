@@ -22,7 +22,7 @@ public interface ReservationControllerBeanLocal {
 
     Reservation retrieveGuestReservationDetails(Long guestId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
 
-    Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms);
+    Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
 
     List<Reservation> retrieveAllReservationsForToday(LocalDate currentDate);
 
@@ -31,5 +31,7 @@ public interface ReservationControllerBeanLocal {
     Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
 
     List<Reservation> retrieveAllGuestReservations(long guestId);
+
+    public Reservation retrieveCheckInReservation(long guestId) throws ReservationNotFoundException;
     
 }

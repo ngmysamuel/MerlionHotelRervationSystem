@@ -9,6 +9,7 @@ import entity.Employee;
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
 import entity.ExceptionReport;
+import entity.Guest;
 import entity.Partner;
 import entity.Rate;
 import entity.ReservationLineItem;
@@ -20,9 +21,12 @@ import java.time.LocalDate;
 import java.util.List;
 import javafx.util.Pair;
 import javax.ejb.Remote;
+import util.exception.GuestNotFoundException;
 import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
+import util.exception.ReservationNotFoundException;
+import util.exception.RoomNotAllocatedException;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
@@ -68,5 +72,13 @@ public interface MainControllerBeanRemote {
 
     public List<Pair<RoomInventory, BigDecimal>> searchRooms(LocalDate dateStart, LocalDate dateEnd) throws NoAvailableRoomsException;
 
-    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms);
+    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
+
+    public List<RoomType> retrieveRoomTypes();
+
+    public List<Integer> retrieveAllocatedRooms(String passport) throws GuestNotFoundException, ReservationNotFoundException, RoomNotAllocatedException;
+
+    public void checkOut(String passport) throws GuestNotFoundException;
+
+    public void reserveGuestRooms(Guest guest, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
 }

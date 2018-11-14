@@ -82,4 +82,18 @@ public class GuestControllerBean implements GuestControllerBeanRemote, GuestCont
         }
     }
     
+    @Override
+    public Guest retrieveGuestByPassport(String passport) throws GuestNotFoundException {
+        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.passportNumber = :inPassport");
+        query.setParameter("inPassport", passport);
+        
+        try
+        {
+            return (Guest)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new GuestNotFoundException("Guest Passport " + passport + " does not exist!");
+        }
+    }
 }

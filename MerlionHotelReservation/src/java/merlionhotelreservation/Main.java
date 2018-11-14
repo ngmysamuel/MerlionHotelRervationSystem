@@ -7,13 +7,26 @@ package merlionhotelreservation;
 
 import javax.ejb.EJB;
 import stateless.GuestControllerBeanRemote;
+import stateless.MainControllerBeanRemote;
+import stateless.PartnerControllerBeanRemote;
+import stateless.RateControllerBeanRemote;
 import stateless.ReservationControllerBeanRemote;
+import stateless.RoomInventorySessionBeanRemote;
+import stateless.RoomTypeControllerSessionBeanRemote;
 
 /**
  *
  * @author Asus
  */
 public class Main {
+
+    @EJB(name = "PartnerControllerBeanRemote")
+    private static PartnerControllerBeanRemote partnerControllerBeanRemote;
+
+    @EJB(name = "MainControllerBeanRemote")
+    private static MainControllerBeanRemote mainControllerBeanRemote;
+
+    
 
     @EJB(name = "ReservationControllerBeanRemote")
     private static ReservationControllerBeanRemote reservationControllerBeanRemote;
@@ -25,7 +38,7 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         System.out.println(guestControllerBeanRemote);
-        MainApp main = new MainApp(guestControllerBeanRemote, reservationControllerBeanRemote);
+        MainApp main = new MainApp(guestControllerBeanRemote, reservationControllerBeanRemote, mainControllerBeanRemote, partnerControllerBeanRemote);
         main.runApp();
     }
     

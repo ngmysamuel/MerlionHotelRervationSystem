@@ -63,12 +63,11 @@ public class Reservation implements Serializable {
     }
 
     //For Walk-in or Online Reservation
-    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, List<ReservationLineItem> reservationLineItems, Guest guest, BigDecimal price) {
+    public Reservation(LocalDateTime reservationDateTime, LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, Guest guest, BigDecimal price) {
         this.reservationDateTime = reservationDateTime;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
         this.type = type;
-        this.reservationLineItems = reservationLineItems;
         this.guest = guest;
         this.price = price;
     }
