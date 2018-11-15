@@ -24,10 +24,29 @@ public class MainApp {
     Scanner sc = new Scanner(System.in);
 
     public void run() {
-        System.out.println("username: password password: name");
-        System.out.println("Login status is: " + login("1", "1"));
+        
+        while (true) {
+             System.out.println("Press 1 for login. Press any other key to exit.");
+            int sel = sc.nextInt();
+            if (sel != 1) {
+                return;
+            }
+            
+            System.out.println("What is you username?");
+            String username = sc.next();
+            System.out.println("What is your password?");
+            String password = sc.next();
+            if (!login(username, password)) {
+                System.out.println("Wrong details.");
+                continue;
+            } else {
+                break;
+            }
+        }
 
         while (true) {
+            
+            
             System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Wrong Search\n8. Wrong reservation");
             int selection = sc.nextInt();
             if (selection == 1) {

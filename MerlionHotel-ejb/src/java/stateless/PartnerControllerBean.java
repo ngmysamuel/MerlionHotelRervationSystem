@@ -133,6 +133,7 @@ System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAlloca
 //        System.out.println(ri.getRt());
     }
 
+    @Override
     public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd) {
         RoomType roomType = em.find(RoomType.class, (long) 1);
         
@@ -147,24 +148,24 @@ System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAlloca
         LocalDate dateStartTemp = dateStart;
         List<Boolean> bo = new ArrayList<>();
         List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
-//        for (RoomType rt : ls) {
-//System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
-//            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
-//                ++i;
-//                boolean full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
-//                if (!full) { //this evaluates to true but is then negated to false
-//                    bo.add(false);
-//                    break;
-//                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
-//                    bo.add(true);
-//                }
-//                dateStartTemp = dateStartTemp.plusDays(1);
-//            }
-//            dateStartTemp = dateStart;
-//        }
+        for (RoomType rt : ls) {
+System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
+            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
+                ++i;
+                boolean full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
+                if (!full) { //this evaluates to true but is then negated to false
+                    bo.add(false);
+                    break;
+                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
+                    bo.add(true);
+                }
+                dateStartTemp = dateStartTemp.plusDays(1);
+            }
+            dateStartTemp = dateStart;
+        }
 //        
-        bo.add(Boolean.TRUE);
-        bo.add(Boolean.TRUE);
+//        bo.add(Boolean.TRUE);
+//        bo.add(Boolean.TRUE);
         return bo;
     }
     

@@ -45,6 +45,7 @@ public class RoomType implements Serializable {
     @Column(nullable = false)
     private boolean isEnabled;
 
+    @Column(nullable = false)
     private Integer initialRoomAvailability;
 
     @OneToMany(mappedBy = "type")
@@ -77,7 +78,7 @@ public class RoomType implements Serializable {
         this.initialRoomAvailability = initialRoomAvailability;
     }
 
-    public RoomType(String name, String description, Integer roomSize, String bed, Integer capacity, String amenities, Integer grade) {
+    public RoomType(String name, String description, Integer roomSize, String bed, Integer capacity, String amenities, Integer grade, Integer initialAvailability) {
         this.name = name;
         this.description = description;
         this.roomSize = roomSize;
@@ -85,6 +86,7 @@ public class RoomType implements Serializable {
         this.capacity = capacity;
         this.amenities = amenities;
         this.grade = grade;
+        this.initialRoomAvailability = initialAvailability;
     }
 
 

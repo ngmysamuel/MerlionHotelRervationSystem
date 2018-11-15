@@ -45,7 +45,7 @@ public class RoomInventorySessionBean implements RoomInventorySessionBeanRemote,
         q.setParameter("date", date);
         q.setParameter("roomType", roomType.getGrade());
         List<Integer> ls = q.getResultList();
-        if (ls.isEmpty()) {
+        if (ls.isEmpty() || ls.get(0) == null) {
             RoomInventory ri = new RoomInventory();
             ri.setDate(date);
             ri.setRt(roomType);

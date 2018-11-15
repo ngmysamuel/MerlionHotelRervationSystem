@@ -27,5 +27,7 @@ public interface GuestControllerBeanLocal {
     Guest guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
     Guest retrieveGuestByEmail(String email) throws GuestNotFoundException;
+
+    public Guest retrieveGuestByPassport(String passport) throws GuestNotFoundException;
     
 }

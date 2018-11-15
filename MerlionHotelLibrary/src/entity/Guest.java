@@ -48,6 +48,8 @@ public class Guest implements Serializable {
         this.passportNumber = passportNumber;
         this.status = "idle";
     }
+    
+    
 
     public Long getId() {
         return id;
