@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import stateless.MainControllerBeanRemote;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
@@ -27,8 +28,9 @@ import util.exception.StillInUseException;
  * @author samue
  */
 public class MainApp {
-
+    
     private MainControllerBeanRemote mainControllerBeanRemote;
+    
     private Scanner sc = new Scanner(System.in);
 
     public void run(MainControllerBeanRemote mainControllerBean) {

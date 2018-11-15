@@ -332,43 +332,43 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         return lis;
     }
     
-    @Override
+    
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         Rate rate = rateControllerBean.createRate(name, roomType, rateType, price);
         return rate;
     }
     
-    @Override
+    
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         Rate rate = rateControllerBean.createRate(name, roomType, rateType, price, dateStart, dateEnd);
         return rate;
     }
     
-    @Override
+    
     public Rate viewRate(String roomTypeName) throws RateNotFoundException{
         return rateControllerBean.retrieveRate(roomTypeName);
     }
     
-    @Override
+    
     public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RateNameNotUniqueException, RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         rateControllerBean.updateRate(rateId, rateName, rateType, price, dateStart, dateEnd, roomType);
     }
     
-    @Override
+    
     public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         rateControllerBean.updateRate(rateId, rateName, rateType, price, roomType);
     }
     
-    @Override
+    
     public void deleteRate(Long rateId){
         rateControllerBean.deleteRate(rateId);
     }
     
-    @Override
+    
     public List<Rate> viewAllRates() throws RateNotFoundException{
         return rateControllerBean.retrieveAllRates();
     }
@@ -389,7 +389,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         return values;
     }
     
-    @Override
+    
     public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms){
         reservationControllerBean.createGuestReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guestId, rooms);
     }

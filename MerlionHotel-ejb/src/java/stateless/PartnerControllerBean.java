@@ -64,11 +64,13 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
         if (!ls.isEmpty()) {
             p = ls.get(0);
         }
+
         if (p.getPassword().equals(password)) {
             return true;
         }
         return false;
     }
+
 
     public List<Reservation> viewAllReservations() {
 System.out.println("I am in PartnerControllerBean");        
