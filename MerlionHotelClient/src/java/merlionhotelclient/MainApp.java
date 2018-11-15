@@ -8,17 +8,25 @@ package merlionhotelclient;
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
 import entity.ExceptionReport;
+import entity.Guest;
 import entity.Rate;
+import entity.ReservationLineItem;
 import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import stateless.MainControllerBeanRemote;
+import stateless.PartnerControllerBeanRemote;
+import util.exception.GuestNotFoundException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
+import util.exception.ReservationNotFoundException;
+import util.exception.RoomNotAllocatedException;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
@@ -27,12 +35,16 @@ import util.exception.StillInUseException;
  * @author samue
  */
 public class MainApp {
-
+    
     private MainControllerBeanRemote mainControllerBeanRemote;
+
+    private PartnerControllerBeanRemote partnerControllerBeanRemote;
+
     private Scanner sc = new Scanner(System.in);
 
-    public void run(MainControllerBeanRemote mainControllerBean) {
+    public void run(MainControllerBeanRemote mainControllerBean, PartnerControllerBeanRemote partnerControllerBeanRemote) {
         this.mainControllerBeanRemote = mainControllerBean;
+        this.partnerControllerBeanRemote = partnerControllerBeanRemote;
         System.out.println("\n\n" + mainControllerBeanRemote + "\n\n");
         while (true) {
             System.out.println("Welcome you!\n1. Login\n2. Exit");
@@ -232,7 +244,33 @@ public class MainApp {
     }
 
     public void loggedInGuestRelations(String username) {
-
+        while(true){
+            System.out.println("***You are logged in as a Guest Relations Officer***");
+            System.out.println("Please select what you want to do");
+            System.out.println("1: Check-in");
+            System.out.println("2: Check-out");
+            System.out.println("3: Search Rooms");
+            System.out.println("4: Reserve Rooms");
+            System.out.println("5: Logout");
+            int i = sc.nextInt();
+            sc.nextLine();
+            switch(i){
+                case 1:
+                    checkIn();
+                    break;
+                case 2:
+                    checkOut();
+                    break;
+                case 3:
+                    searchRooms();
+                    break;
+                case 4:
+                    reserveRooms();
+                    break;
+                case 5:
+                    return;
+            }
+        }
     }
 
     public void loggedInSalesManager(String username) {
@@ -426,7 +464,7 @@ System.out.println("I am back in client");
             List<Rate> rates = mainControllerBeanRemote.viewAllRates();
             System.out.printf("%24s %32s %10s %5S %10S %10S \n", "ROOM TYPE", "NAME", "TYPE", "PRICE", "DATE START", "DATE END");
             for(Rate rate: rates){
-                if(rate.getType().toString().equals("Published") ||rate.getType().toString().equals("Peak")){
+                if(rate.getType().toString().equals("Promotion") ||rate.getType().toString().equals("Peak")){
                     System.out.printf("%24s %32s %10s %5s %10s %10s \n", rate.getRoomType().getName(), rate.getName(),
                             rate.getType().toString(), rate.getPrice().toString(), rate.getDateStart().toString(), rate.getDateEnd().toString());
                 } else{
@@ -447,7 +485,7 @@ System.out.println("I am back in client");
             System.out.println("Type: "+rate.getType());
             System.out.println("Room Type: "+rate.getRoomType().getName());
             System.out.println("Price: " + rate.getPrice());
-            if(rate.getType().toString().equals("Published") || rate.getType().toString().equals("Peak")){
+            if(rate.getType().toString().equals("Promotion") || rate.getType().toString().equals("Peak")){
                 System.out.println("Start of validity: "+rate.getDateStart());
                 System.out.println("End of validity: "+rate.getDateEnd());
             }
@@ -508,6 +546,90 @@ System.out.println("I am back in client");
             }
         } catch (RateNotFoundException ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+    
+    private void checkIn(){
+        System.out.println("***Check-in***");
+        System.out.print("Enter guest passport number>");
+        String passport = sc.nextLine();
+        try {
+            List<Integer> rooms = this.mainControllerBeanRemote.retrieveAllocatedRooms(passport);
+            int i = 1;
+            System.out.println("Rooms Allocated");
+            for(Integer room: rooms){
+                System.out.println(i+". Room "+ room);
+                i++;
+            }
+        } catch (GuestNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ReservationNotFoundException ex) {
+            System.out.println("Guest hasn't reserved any rooms.");
+        } catch (RoomNotAllocatedException ex) {
+            System.out.println("Rooms are full, guest didn't get allocated.");
+        }
+        
+    }
+    
+    private void checkOut(){
+        System.out.println("***Check-out***");
+        System.out.print("Enter guest passport number>");
+        String passport = sc.nextLine();
+        try {
+            this.mainControllerBeanRemote.checkOut(passport);
+            System.out.println("Guest checked-out!");
+        } catch (GuestNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
+    private void searchRooms(){
+        System.out.print("Check-out Date(YYYY-MM-DD)>");
+        String end = sc.next();
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.parse(end);
+        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate);
+        List<RoomType> ls2 = this.mainControllerBeanRemote.sortRoomTypeAsc();
+        System.out.println("Result of Room Search with the dates given: \n");
+        int i = 0;
+        for (RoomType rt : ls2) {
+            System.out.println("Room Type: " + rt.getName() + "-> " + ls1.get(i));
+            ++i;
+        }
+        System.out.println("");
+    }
+    
+    private void reserveRooms(){
+        System.out.println("***Reserve Rooms***");
+        searchRooms();
+        List<RoomType> roomTypes = this.mainControllerBeanRemote.sortRoomTypeAsc();
+
+        System.out.println("Enter number of rooms booked for each type");
+        List<ReservationLineItem> rlis = new ArrayList<>();
+        for(RoomType room: roomTypes){
+            System.out.print(room.getName() + "> ");
+            int n = sc.nextInt();
+            rlis.add(new ReservationLineItem(new Integer(n) , room));
+        }
+        System.out.println("Re-confirm stay dates");
+        System.out.print("Check-out Date(YYYY-MM-DD)>");
+        String end = sc.next();
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.parse(end);
+        System.out.print("Guest Email> ");
+        String email = sc.next();
+        System.out.print("Guest Telephone> ");
+        String telephone = sc.next();
+        sc.nextLine();
+        System.out.print("Guest Passport> ");
+        String passport = sc.nextLine();   
+        
+        Guest guest = new Guest(email, telephone, passport);
+        try {
+            mainControllerBeanRemote.reserveGuestRooms(guest, startDate, endDate, rlis);
+            System.out.println("Reservation has been made.");
+        } catch (ReservationNotFoundException ex) {
+            System.out.println("Reservation failed!");
         }
     }
 }

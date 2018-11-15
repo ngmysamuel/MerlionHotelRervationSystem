@@ -7,12 +7,15 @@ package singleton;
 
 import entity.Employee;
 import Enum.EmployeeTypeEnum;
+import Enum.RateTypeEnum;
 import entity.Guest;
 import entity.Partner;
-import entity.Reservation;
+import java.util.ArrayList;
+import entity.Rate;
+import entity.RegisteredGuest;
 import entity.Room;
 import entity.RoomType;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -26,6 +29,8 @@ import javax.persistence.Query;
  *
  * @author samue
  */
+
+
 @Singleton
 @LocalBean
 @Startup
@@ -51,58 +56,154 @@ public class DataInitBean {
     }
 
     public void initApplication() {
-        EmployeeTypeEnum type1 = EmployeeTypeEnum.SystemAdministrator;
-        EmployeeTypeEnum type2 = EmployeeTypeEnum.OperationManager;
-        Employee e1 = new Employee("1", "1", type1, "name");
-        Employee e2 = new Employee("2", "2", type2, "john");
-        Partner p = new Partner("1", "1");
-        Guest g = new Guest("blabla", "02020", "DDJD");
-        RoomType rt1 = new RoomType("Super", "Bath with big bed", 234, "Big Bed", 5, "Bath", 1);
-        rt1.setInitialRoomAvailability(4);
-        rt1.setIsEnabled(true);
-        RoomType rt2 = new RoomType("Max", "Shower with med bed", 123, "Med", 4, "Shower", 2);
-        rt2.setInitialRoomAvailability(2);
-        rt2.setIsEnabled(true);
-        RoomType rt3 = new RoomType("Deluxe", "Bath tub with super bed", 345, "super", 6, "Bath tub", 3);
-        rt3.setInitialRoomAvailability(2);
-        rt3.setIsEnabled(true);
-        Room r1 = new Room(21, "Available", rt1);
-        Room r2 = new Room(22, "Available", rt1);
-        Room r3 = new Room(23, "Available", rt1);
-        Room r4 = new Room(24, "Available", rt1);
-        Room r5 = new Room(31, "Available", rt2);
-        Room r6 = new Room(32, "Available", rt2);
-        Room r7 = new Room(41, "Available", rt3);
-        Room r8 = new Room(42, "Available", rt3);
+
+        EmployeeTypeEnum type = EmployeeTypeEnum.SystemAdministrator;
+        Employee e = new Employee("sys", "pass", type, "name");
+        Partner p = new Partner("partner", "pass");
+        Guest g = new Guest("guest", "02020", "DDJD");
+        RegisteredGuest rg = new RegisteredGuest("registered", "pass", "0811", "passport");
+        Employee om = new Employee("om", "pass", EmployeeTypeEnum.OperationManager, "om");
+        Employee sales = new Employee("sales", "pass", EmployeeTypeEnum.SalesManager, "sales");
+        Employee gr = new Employee("gr", "pass", EmployeeTypeEnum.GuestRelationOfficer, "gr");
+
+        RoomType deluxe = new RoomType("Deluxe Room", "The standard room for everyone", 32, "Queen", 2, "Shower, AC, Wi-Fi", 5, 5);
+        deluxe.setIsEnabled(true);
+        RoomType premiere = new RoomType("Premiere Room", "For business travellers", 32, "King", 2, "Shower, AC, Wi-Fi", 4, 5);
+        premiere.setIsEnabled(true);
+        RoomType family = new RoomType("Family Room", "For families with kids", 60, "1 Queen 2 Twins", 4, "Shower, AC, Wi-Fi", 3, 5);
+        family.setIsEnabled(true);
+        RoomType junior = new RoomType("Junior Suite", "Larger room", 75, "1 King 1 Queen", 4, "Shower, AC, Wi-Fi", 2, 5);
+        junior.setIsEnabled(true);
+        RoomType grand = new RoomType("Grand Suite", "Larger room", 100, "1 King 1 Queen", 4, "Shower, AC, Wi-Fi", 1, 5);
+        grand.setIsEnabled(true);
+
+        Room r1 = new Room(100, "Available", deluxe);
+        Room r2 = new Room(101, "Available", deluxe);
+        Room r3 = new Room(102, "Available", deluxe);
+        Room r5 = new Room(5, "Available", deluxe);
+        Room r6 = new Room(6, "Available", deluxe);
+
+        Room r7 = new Room(7, "Available", premiere);
+        Room r8 = new Room(8, "Available", premiere);
+        Room r9 = new Room(9, "Available", premiere);
+        Room r10 = new Room(10, "Available", premiere);
+        Room r11 = new Room(11, "Available", premiere);
+
+        Room r12 = new Room(12, "Available", family);
+        Room r13 = new Room(13, "Available", family);
+        Room r14 = new Room(14, "Available", family);
+        Room r15 = new Room(15, "Available", family);
+        Room r16 = new Room(16, "Available", family);
+
+        Room r17 = new Room(17, "Available", junior);
+        Room r18 = new Room(18, "Available", junior);
+        Room r19 = new Room(19, "Available", junior);
+        Room r20 = new Room(20, "Available", junior);
+        Room r21 = new Room(21, "Available", junior);
+
+        Room r22 = new Room(22, "Available", grand);
+        Room r23 = new Room(23, "Available", grand);
+        Room r24 = new Room(24, "Available", grand);
+        Room r25 = new Room(25, "Available", grand);
+        Room r26 = new Room(26, "Available", grand);
+
         List<Room> ls1 = new ArrayList<>();
         ls1.add(r1);
         ls1.add(r2);
         ls1.add(r3);
-        ls1.add(r4);
-        rt1.setRooms(ls1);
-        ls1.clear();
         ls1.add(r5);
         ls1.add(r6);
-        rt2.setRooms(ls1);
+        deluxe.setRooms(ls1);
         ls1.clear();
         ls1.add(r7);
         ls1.add(r8);
-        rt3.setRooms(ls1);
-        em.persist(e1);
-        em.persist(e2);
+        ls1.add(r9);
+        ls1.add(r10);
+        ls1.add(r11);
+        premiere.setRooms(ls1);
+        ls1.clear();
+        ls1.add(r12);
+        ls1.add(r13);
+        ls1.add(r14);
+        ls1.add(r15);
+        ls1.add(r16);
+        family.setRooms(ls1);
+        ls1.clear();
+        ls1.add(r17);
+        ls1.add(r18);
+        ls1.add(r19);
+        ls1.add(r20);
+        ls1.add(r21);
+        junior.setRooms(ls1);
+        ls1.clear();
+        ls1.add(r22);
+        ls1.add(r23);
+        ls1.add(r24);
+        ls1.add(r25);
+        ls1.add(r26);
+        grand.setRooms(ls1);
+
+        em.persist(e);
         em.persist(p);
         em.persist(g);
-        em.persist(rt1);
-        em.persist(rt2);
-        em.persist(rt3);
+        em.persist(rg);
+        em.persist(om);
+        em.persist(sales);
+        em.persist(gr);
+
+        em.persist(deluxe);
+        em.persist(premiere);
+        em.persist(family);
+        em.persist(junior);
+        em.persist(grand);
+
         em.persist(r1);
         em.persist(r2);
         em.persist(r3);
-        em.persist(r4);
         em.persist(r5);
         em.persist(r6);
         em.persist(r7);
         em.persist(r8);
+        em.persist(r9);
+        em.persist(r10);
+        em.persist(r11);
+        em.persist(r12);
+        em.persist(r13);
+        em.persist(r14);
+        em.persist(r15);
+        em.persist(r16);
+        em.persist(r17);
+        em.persist(r18);
+        em.persist(r19);
+        em.persist(r20);
+        em.persist(r21);
+        em.persist(r22);
+        em.persist(r23);
+        em.persist(r24);
+        em.persist(r25);
+        em.persist(r26);
+        
+        Rate dn = new Rate(RateTypeEnum.Normal, deluxe, "Deluxe Normal", new BigDecimal(50));
+        Rate dp = new Rate(RateTypeEnum.Published, deluxe, "Deluxe Published", new BigDecimal(65));
+        Rate pn = new Rate(RateTypeEnum.Normal, premiere, "Premiere Normal", new BigDecimal(70));
+        Rate pp = new Rate(RateTypeEnum.Published, premiere, "Premiere Published", new BigDecimal(90));
+        Rate fn = new Rate(RateTypeEnum.Normal, family, "Family Normal", new BigDecimal(110));
+        Rate fp = new Rate(RateTypeEnum.Published, family, "Family Published", new BigDecimal(135));
+        Rate jn = new Rate(RateTypeEnum.Normal, junior, "Junior Normal", new BigDecimal(150));
+        Rate jp = new Rate(RateTypeEnum.Published, junior, "Junior Published", new BigDecimal(180));
+        Rate gn = new Rate(RateTypeEnum.Normal, grand, "Grand Normal", new BigDecimal(200));
+        Rate gp = new Rate(RateTypeEnum.Published, grand, "Grand Published", new BigDecimal(250));
+        em.persist(dn);
+        em.persist(dp);
+        em.persist(pn);
+        em.persist(pp);
+        em.persist(fn);
+        em.persist(fp);
+        em.persist(jn);
+        em.persist(jp);
+        em.persist(gn);
+        em.persist(gp);
+
         em.flush();
     }
 

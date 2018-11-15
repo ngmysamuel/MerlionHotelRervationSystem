@@ -5,6 +5,8 @@
  */
 package stateless;
 
+import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -13,5 +15,6 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface PartnerControllerBeanRemote {
-    
+    public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd);
+    List<Boolean> search (LocalDate dateStart, LocalDate dateEnd);
 }

@@ -7,6 +7,7 @@ package merlionhotelclient;
 
 import javax.ejb.EJB;
 import stateless.MainControllerBeanRemote;
+import stateless.PartnerControllerBeanRemote;
 
 /**
  *
@@ -17,10 +18,15 @@ public class Main {
     @EJB
     private static MainControllerBeanRemote mainControllerBean;
 
+    @EJB
+    private static PartnerControllerBeanRemote partnerControllerBeanRemote;
+
+
     public static void main(String[] args) {
         MainApp mainApp = new MainApp();
         System.out.println(mainControllerBean);
-        mainApp.run(mainControllerBean);
+        System.out.println(partnerControllerBeanRemote);
+        mainApp.run(mainControllerBean, partnerControllerBeanRemote);
     }
     
 }

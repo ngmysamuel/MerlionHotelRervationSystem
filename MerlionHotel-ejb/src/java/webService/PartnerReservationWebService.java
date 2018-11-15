@@ -23,6 +23,7 @@ import stateless.PartnerControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
 import util.exception.ReservationNotFoundException;
 
+
 @WebService(serviceName = "PartnerReservationWebService")
 @Stateless
 public class PartnerReservationWebService {
@@ -199,4 +200,5 @@ public class PartnerReservationWebService {
         ls.add(endDate);
         return ls;
     }
+
 }

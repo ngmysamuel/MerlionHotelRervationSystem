@@ -10,6 +10,7 @@ import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
+import entity.Guest;
 import entity.Partner;
 import entity.Rate;
 import entity.Reservation;
@@ -20,6 +21,7 @@ import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,11 +33,13 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.GuestNotFoundException;
 import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
 import util.exception.RateNotFoundException;
 import util.exception.ReservationNotFoundException;
 import util.exception.RoomInventoryNotFound;
+import util.exception.RoomNotAllocatedException;
 import util.exception.RoomTypeNotFoundException;
 import util.exception.StillInUseException;
 
@@ -45,6 +49,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class MainControllerBean implements MainControllerBeanRemote, MainControllerBeanLocal {
+
+    @EJB
+    private GuestControllerBeanLocal guestControllerBean;
 
     @EJB
     private ReservationControllerBeanLocal reservationControllerBean;
@@ -153,6 +160,10 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         roomTypeControllerSessionBean.update(bed, name, amenities, capacity, descriptio, grade, roomSize, num, id, b);
     }
     
+    public List<RoomType> retrieveRoomTypes(){
+        return this.roomTypeControllerSessionBean.getRoomTypes();
+    }
+    
     public void deleteRoomType(Long id) throws StillInUseException {
         try {
             roomTypeControllerSessionBean.delete(id);
@@ -197,6 +208,7 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     
     public void timer() {
 System.out.println("I have called timer()");
+        guestCheckout();
         reconcileRoomAvailability();
         ExceptionReport er = new ExceptionReport();
         er.setDate(LocalDate.now());
@@ -239,6 +251,21 @@ System.out.println("I have called timer()");
             }
         }    
         reconcileRoomAvailability();
+    }
+    
+    private void guestCheckout() {
+        Query q = em.createQuery("select r from Reservation r where r.dateEnd = :date");
+        q.setParameter("date", LocalDate.now());
+        List<Reservation> ls = q.getResultList();
+        for (Reservation r : ls) {
+            List<ReservationLineItem> ls2 = r.getReservationLineItems();
+            for (ReservationLineItem rli : ls2) {
+                List<Room> ls3 = rli.getAllocatedRooms();
+                for (Room rm : ls3) {
+                    rm.setStatus("Available");
+                }
+            }
+        }
     }
     
     private void reconcileRoomAvailability() {
@@ -321,7 +348,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         Query que = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> lis = que.getResultList();
         for (int i = 0; i < lis.size(); i++) {
-            for (int j = i; j < lis.size(); j++) {
+            for (int j = i+1; j < lis.size(); j++) {
                 RoomType rt = lis.get(i);
                 RoomType rt2 = lis.get(j);
                 if (rt.getGrade() > rt2.getGrade()) {
@@ -332,43 +359,43 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         return lis;
     }
     
-    @Override
+    
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price) throws RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         Rate rate = rateControllerBean.createRate(name, roomType, rateType, price);
         return rate;
     }
     
-    @Override
+    
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         Rate rate = rateControllerBean.createRate(name, roomType, rateType, price, dateStart, dateEnd);
         return rate;
     }
     
-    @Override
+    
     public Rate viewRate(String roomTypeName) throws RateNotFoundException{
         return rateControllerBean.retrieveRate(roomTypeName);
     }
     
-    @Override
+    
     public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RateNameNotUniqueException, RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         rateControllerBean.updateRate(rateId, rateName, rateType, price, dateStart, dateEnd, roomType);
     }
     
-    @Override
+    
     public void updateRate(Long rateId, String rateName, String roomTypeName, RateTypeEnum rateType, BigDecimal price) throws RateNameNotUniqueException, RoomTypeNotFoundException{
         RoomType roomType = roomTypeControllerSessionBean.retrieveRoomType(roomTypeName);
         rateControllerBean.updateRate(rateId, rateName, rateType, price, roomType);
     }
     
-    @Override
+    
     public void deleteRate(Long rateId){
         rateControllerBean.deleteRate(rateId);
     }
     
-    @Override
+    
     public List<Rate> viewAllRates() throws RateNotFoundException{
         return rateControllerBean.retrieveAllRates();
     }
@@ -378,9 +405,18 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         List<RoomType> roomTypes = roomTypeControllerSessionBean.getRoomTypes();
         List<Pair<RoomInventory, BigDecimal>> values = null;
         for(RoomType rt: roomTypes){
-            try{
-                values.add(new Pair(roomInventorySessionBean.retrieveLeastRoomInventory(dateStart, dateEnd, rt), rateControllerBean.countRate(dateStart, dateEnd, rt)));
-            } catch (RoomInventoryNotFound ex){
+            boolean full = false;
+            LocalDate date = dateStart;
+            while(date.compareTo(dateEnd) == -1){
+                full = !this.roomInventorySessionBean.isItFull(dateStart, rt);
+                date = date.plusDays(1);
+            }
+            if(!full){
+                try {
+                    values.add(new Pair(this.roomInventorySessionBean.retrieveRoomInventory(dateStart, rt), this.rateControllerBean.countRate(dateStart, dateEnd, rt)));
+                } catch (RoomInventoryNotFound ex) {
+                    Logger.getLogger(MainControllerBean.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         if(values == null){
@@ -389,8 +425,47 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         return values;
     }
     
+
     @Override
-    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms){
+    public void reserveGuestRooms(Long guestId, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms) throws ReservationNotFoundException{
+
         reservationControllerBean.createGuestReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guestId, rooms);
+    }
+    
+    @Override
+    public void reserveGuestRooms(Guest guest, LocalDate dateStart, LocalDate dateEnd, List<ReservationLineItem> rooms) throws ReservationNotFoundException{
+        try{
+            guestControllerBean.retrieveGuestByPassport(guest.getPassportNumber());
+            guest = guestControllerBean.retrieveGuestByEmail(guest.getEmail());
+        } catch(GuestNotFoundException ex){
+            em.persist(guest);
+            em.flush();
+        }
+        reservationControllerBean.createWalkinReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guest.getId(), rooms);
+    }
+    
+    public List<Integer> retrieveAllocatedRooms(String passport) throws GuestNotFoundException, ReservationNotFoundException, RoomNotAllocatedException{
+        Guest guest = this.guestControllerBean.retrieveGuestByPassport(passport);
+        Reservation reservation = reservationControllerBean.retrieveCheckInReservation(guest.getId());
+        List<Integer> roomNums = new ArrayList<>();
+        List<ReservationLineItem> rlis = reservation.getReservationLineItems();
+        for(ReservationLineItem rli: rlis){
+            List<Room> rooms= rli.getAllocatedRooms();
+            try{
+                for(Room room: rooms){
+                    roomNums.add(room.getNumber());
+                }
+            } catch(NullPointerException ex) {
+                throw new RoomNotAllocatedException();
+            }
+        }
+        guest.setStatus("Checked In");
+        return roomNums;
+    }
+    
+    @Override
+    public void checkOut(String passport) throws GuestNotFoundException{
+        Guest guest = this.guestControllerBean.retrieveGuestByPassport(passport);
+        guest.setStatus("idle");
     }
 }

@@ -5,9 +5,11 @@
  */
 package stateless;
 
+import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
 import entity.Guest;
 import entity.Partner;
+import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.RoomInventory;
@@ -54,22 +56,114 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         q.setParameter("inDateEnd", dateEnd);
         
         try{
-            return (Reservation) q.getSingleResult();
-        } catch (NoResultException | NonUniqueResultException ex){
+            Reservation r = (Reservation) q.getSingleResult();
+            List<ReservationLineItem> rlis = r.getReservationLineItems();
+            for(ReservationLineItem rli: rlis){
+                rli.getRoomType().getId();
+            }
+            return r;
+        } catch (NoResultException ex){
             throw new ReservationNotFoundException("Reservation of " + guestId + " for " + dateStart + " to " + dateEnd + " not found.");
+        } catch(NonUniqueResultException ex){
+            List<Reservation> reservations = q.getResultList();
+            List<ReservationLineItem> rlis = reservations.get(0).getReservationLineItems();
+            for(ReservationLineItem rli: rlis){
+                rli.getRoomType().getId();
+            }
+            return reservations.get(0);
         }
     }
 
-    @Override
-    public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) {
+    
+    public Reservation createGuestReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
         LocalDateTime currentDateTime = LocalDateTime.now();
         BigDecimal price = new BigDecimal(0); 
         for(int i = 0; i < rooms.size(); i++){
-            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType()));
+            BigDecimal nOfRooms = new BigDecimal(rooms.get(i).getNumberOfRooms());
+            BigDecimal rr = rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType());
+            BigDecimal temp = rr.multiply(nOfRooms);
+            price = price.add(temp);
         }
         Guest guest = em.find(Guest.class, guestId);
-        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, rooms, guest, price);
+        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, guest, price);
+
+        LocalDate dateStartTemp = dateStart;
+        for (ReservationLineItem rli : rooms) { //for each room line item
+            RoomType rt = rli.getRoomType();
+            Integer numOfRooms = rli.getNumberOfRooms();
+            while (dateStartTemp.compareTo(dateEnd) < 0) { //for each day booked
+                try {
+                roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
+                Query q = em.createQuery("select ri from RoomInventory ri where ri.date = :date and ri.rt = :rt");
+                q.setParameter("date", dateStartTemp);
+                q.setParameter("rt", rt);
+                RoomInventory ri = (RoomInventory) q.getSingleResult();
+                ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
+                } catch (ReservationNotFoundException e) {
+                    throw e;
+                }
+                dateStartTemp = dateStartTemp.plusDays(1);//the next day
+            }
+            dateStartTemp = dateStart;//the next room line item
+        }
+        newReservation.setReservationLineItems(rooms);
         em.persist(newReservation);
+        for (ReservationLineItem rli : rooms) {
+            rli.setReservation(newReservation);
+            em.persist(rli);
+        }
+        guest.getReservations().add(newReservation);
+        em.flush();
+        return newReservation;
+    }
+    
+    @Override
+    public Reservation createWalkinReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        BigDecimal price = new BigDecimal(0); 
+        for(int i = 0; i < rooms.size(); i++){
+            Query q = em.createQuery("SELECT r.price FROM Rate r WHERE r.type = :inType AND r.status <> 'disabled' AND r.roomType.name = :inRoom");
+            q.setParameter("inType", RateTypeEnum.Published);
+            q.setParameter("inRoom", rooms.get(i).getRoomType().getName());
+            BigDecimal rate = (BigDecimal) q.getSingleResult();
+            LocalDate date = dateStart;
+            while(date.compareTo(dateEnd) < 0){
+                BigDecimal nOfRoom = new BigDecimal(rooms.get(i).getNumberOfRooms());
+                BigDecimal temp = rate.multiply(nOfRoom);
+                price = price.add(temp);
+                date = date.plusDays(1);
+            }
+        }
+            
+        Guest guest = em.find(Guest.class, guestId);
+        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, guest, price);
+
+        LocalDate dateStartTemp = dateStart;
+        for (ReservationLineItem rli : rooms) { //for each room line item
+            RoomType rt = rli.getRoomType();
+            Integer numOfRooms = rli.getNumberOfRooms();
+            while (dateStartTemp.compareTo(dateEnd) < 0) { //for each day booked
+                try {
+                roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
+                Query q = em.createQuery("select ri from RoomInventory ri where ri.date = :date and ri.rt = :rt");
+                q.setParameter("date", dateStartTemp);
+                q.setParameter("rt", rt);
+                RoomInventory ri = (RoomInventory) q.getSingleResult();
+                ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
+                } catch (ReservationNotFoundException e) {
+                    throw e;
+                }
+                dateStartTemp = dateStartTemp.plusDays(1);//the next day
+            }
+            dateStartTemp = dateStart;//the next room line item
+        }
+        newReservation.setReservationLineItems(rooms);
+        em.persist(newReservation);
+        for (ReservationLineItem rli : rooms) {
+            rli.setReservation(newReservation);
+            em.persist(rli);
+        }
+        guest.getReservations().add(newReservation);
         em.flush();
         return newReservation;
     }
@@ -103,9 +197,12 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             throw new ReservationNotFoundException("Date reserved is too far ahead");
         }
         BigDecimal price = new BigDecimal(0);
-//        for (ReservationLineItem rli : rooms) {
-//            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
-//        }
+        for (ReservationLineItem rli : rooms) {
+            BigDecimal nOfRooms = new BigDecimal(rli.getNumberOfRooms());
+            BigDecimal rr = rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType());
+            BigDecimal temp = rr.multiply(nOfRooms);
+            price = price.add(temp);
+        }
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
         
@@ -114,13 +211,12 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         }
         
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);
-        em.persist(newReservation);
         
         LocalDate dateStartTemp = dateStart;
         for (ReservationLineItem rli : rooms) { //for each room line item
             RoomType rt = rli.getRoomType();
             Integer numOfRooms = rli.getNumberOfRooms();
-            while (!dateStartTemp.isAfter(dateEnd)) { //for each day booked
+            while (dateStartTemp.compareTo(dateEnd) < 0) { //for each day booked
                 try {
                 roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
                 Query q = em.createQuery("select ri from RoomInventory ri where ri.date = :date and ri.rt = :rt");
@@ -134,13 +230,19 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
                 dateStartTemp = dateStartTemp.plusDays(1);//the next day
             }
             dateStartTemp = dateStart;//the next room line item
-            rli.setReservation(newReservation);
-            em.persist(rli);
-            em.flush();
         }
         List<ReservationLineItem> lsRli = newReservation.getReservationLineItems();
         lsRli.addAll(rooms);
         newReservation.setReservationLineItems(lsRli);
+        newReservation.setReservationLineItems(rooms);
+        em.persist(newReservation);
+        for (ReservationLineItem rli : rooms) {
+            rli.setReservation(newReservation);
+            em.persist(rli);
+        }
+        guest.getReservations().add(newReservation);
+        
+
         em.flush();
         return newReservation;
     }
@@ -160,4 +262,15 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         return reservations;
     }
     
+    @Override
+    public Reservation retrieveCheckInReservation(long guestId) throws ReservationNotFoundException{
+        Guest guest = em.find(Guest.class, guestId);
+        List<Reservation> reservations = guest.getReservations();
+        for(Reservation reservation: reservations){
+            if(reservation.getDateStart().compareTo(LocalDate.now()) == 0){
+                return reservation;
+            }
+        }
+        throw new ReservationNotFoundException();
+    }
 }
