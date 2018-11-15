@@ -6,6 +6,9 @@
 package stateless;
 
 import entity.Room;
+import entity.RoomInventory;
+import entity.RoomType;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.StillInUseException;
@@ -20,4 +23,6 @@ public interface RoomControllerSessionBeanLocal {
     public void update(Long roomNum, String status, Long roomTypeId);
     public List<Room> viewAllRooms();
     public void deleteRoom(Long id) throws StillInUseException;
+    public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id);
+    public boolean setRoomsAllocated(Long id, RoomType rt);
 }

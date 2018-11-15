@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -42,7 +43,7 @@ public class ReservationLineItem implements Serializable {
     private Reservation reservation;
 
     @ManyToMany
-    private List<Room> allocatedRooms;
+    private List<Room> allocatedRooms = new ArrayList<>();
 
     public ReservationLineItem() {
     }

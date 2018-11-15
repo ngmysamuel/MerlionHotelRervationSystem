@@ -5,6 +5,8 @@
  */
 package stateless;
 
+import entity.RoomType;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +15,5 @@ import javax.ejb.Local;
  */
 @Local
 public interface MainControllerBeanLocal {
-    
+    public List<RoomType> sortRoomTypeAsc();
 }

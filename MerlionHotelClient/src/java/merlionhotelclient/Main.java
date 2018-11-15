@@ -15,15 +15,17 @@ import stateless.PartnerControllerBeanRemote;
  */
 public class Main {
 
-    @EJB(name = "PartnerControllerBeanRemote")
-    private static PartnerControllerBeanRemote partnerControllerBeanRemote;
-
     @EJB
     private static MainControllerBeanRemote mainControllerBean;
+
+    @EJB
+    private static PartnerControllerBeanRemote partnerControllerBeanRemote;
+
 
     public static void main(String[] args) {
         MainApp mainApp = new MainApp();
         System.out.println(mainControllerBean);
+        System.out.println(partnerControllerBeanRemote);
         mainApp.run(mainControllerBean, partnerControllerBeanRemote);
     }
     

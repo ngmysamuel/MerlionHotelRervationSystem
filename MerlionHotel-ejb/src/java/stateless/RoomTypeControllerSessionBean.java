@@ -35,7 +35,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     @Resource
     private EJBContext eJBContext;
 
-    @Override
+    @Override //for creaation of reservations
     public Boolean editAndCreateRoomInventoryIfNecessary(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
         Query q = em.createQuery("SELECT ri FROM RoomInventory ri WHERE ri.date = :date AND ri.rt= :rt");
         q.setParameter("date", date);
@@ -47,22 +47,36 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             ri.setRoomAvail(rt.getInitialRoomAvailability());
             ri.setRoomCountForAllocation(rt.getInitialRoomAvailability());
             if (ri.getRoomAvail() < numOfRooms) {
-                eJBContext.setRollbackOnly();
-                throw new ReservationNotFoundException();
+                System.out.println("not enough rooms\n");
+                throw new ReservationNotFoundException("not enough rooms");
             } else {
-                ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
+//                ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
                 em.persist(ri);
                 return true;
             }
         } else {
             RoomInventory ri = (RoomInventory) q.getResultList().get(0);
-            if (ri.getRoomAvail() < numOfRooms) {
-                eJBContext.setRollbackOnly();
-                throw new ReservationNotFoundException();
+            if (ri.getRoomAvail()<numOfRooms) {
+                System.out.println("not enough rooms\n");
+                throw new ReservationNotFoundException("not enough rooms");
             }
-            ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
+//            ri.setRoomAvail(ri.getRoomAvail() - numOfRooms);
             return true;
         }
+    }
+    
+    //for timer to check
+    public boolean timerChecker(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
+        int roomsAvail;
+        Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
+        q1.setParameter("status", "Available");
+        q1.setParameter("type", rt);
+        roomsAvail = q1.getResultList().size();   
+        if (roomsAvail < numOfRooms ) {
+            throw new ReservationNotFoundException("not enough rooms");
+        }
+
+        return true;
     }
 
     public List<RoomType> getRoomTypes() {
@@ -81,11 +95,11 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {
         RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade, null);
         newrt.setIsEnabled(true);
-        manageGrade(grade);
+        manageGrade(grade, grade);
         em.persist(newrt);
     }
 
-    public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId) {
+    public void update(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b) {
         RoomType rt = em.find(RoomType.class, roomTypeId);
         if (bed.length() != 0) {
             rt.setBed(bed);
@@ -100,7 +114,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
             rt.setDescription(description);
         }
         if (grade.length() != 0) {
-            manageGrade(Integer.valueOf(grade));
+            manageGrade(Integer.valueOf(grade), rt.getGrade());
             rt.setGrade(Integer.valueOf(grade));
         }
         if (roomSize.length() != 0) {
@@ -109,18 +123,33 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
         if (initialRoomAvail != -1) {
             rt.setInitialRoomAvailability(initialRoomAvail);
         }
+        if (b.length() != 0) {
+            rt.setIsEnabled(Boolean.valueOf(b));
+        }
     }
 
-    private void manageGrade(Integer grade) {
-        Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :grade");
-        q.setParameter("grade", grade);
-        List<RoomType> ls = q.getResultList();
-        for (RoomType rt : ls) {
-            rt.setGrade(rt.getGrade()+1);
-        }
-        em.flush();
+    private void manageGrade(Integer newGrade, Integer oldGrade) { //is called from update() and create()
+        if (newGrade <= oldGrade) { //new grade is 1 and old grade is 3. 1 2 3 -> 2 3 4 -> 2 3 1 || From 2 to nonexistant 1, it cannot work if I didn't have a prior grade. Because I will be selecting >= 1, I will be getting a null value
+            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :newGrade");
+            q.setParameter("newGrade", newGrade);
+            List<RoomType> ls = q.getResultList();
+            for (RoomType rt : ls) {
+                rt.setGrade(rt.getGrade() + 1);
+                em.flush();
+            }
+        } else if (newGrade > oldGrade) { //new grade is 3 and old grade 1. 1 2 3 -> 0 1 2  -> 3 1 2 
+            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :oldGrade");
+            q.setParameter("oldGrade", oldGrade);
+            List<RoomType> ls = q.getResultList();
+            for (RoomType rt : ls) {
+                rt.setGrade(rt.getGrade() - 1);
+                em.flush();
+            }
+        } else {
+            
+            }
     }
-    
+
     public void delete(Long id) throws StillInUseException {
         RoomType rt = em.find(RoomType.class, id);
         List<Room> ls = rt.getRooms();

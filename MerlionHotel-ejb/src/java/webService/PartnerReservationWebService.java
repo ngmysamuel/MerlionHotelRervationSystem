@@ -4,6 +4,7 @@ import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
+import entity.Room;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,13 +18,18 @@ import javax.jws.WebService;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import stateless.MainControllerBeanLocal;
 import stateless.PartnerControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
 import util.exception.ReservationNotFoundException;
 
+
 @WebService(serviceName = "PartnerReservationWebService")
 @Stateless
 public class PartnerReservationWebService {
+
+    @EJB
+    private MainControllerBeanLocal mainControllerBean;
 
     @EJB
     private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
@@ -45,17 +51,24 @@ public class PartnerReservationWebService {
         List<Reservation> ls = partnerControllerBean.viewAllReservations();
         for (Reservation r : ls) {
             em.detach(r);
-            em.flush();
             Partner p = r.getPartner();
             p.setReservations(null);
             Guest g = r.getGuest();
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
             for (ReservationLineItem rli : ls2) {
+                em.detach(rli);
                 RoomType rt = rli.getRoomType();
+                em.detach(rt);
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                rt.setRates(null);
+                List<Room> ls3 = rli.getAllocatedRooms();
+                for (Room room : ls3) { //for each room
+                    em.detach(room);
+                    room.setReservationLineItems(null);
+                }
             }
         }
 
@@ -72,11 +85,24 @@ public class PartnerReservationWebService {
             Guest g = r.getGuest();
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
-            for (ReservationLineItem rli : ls2) {
+            for (ReservationLineItem rli : ls2) { //for each reservation line item
+                em.detach(rli);
                 RoomType rt = rli.getRoomType();
+                em.detach(rt);
                 rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
+                rt.setRates(null);
+                rt.setRoomInventory(null);
+                rli.getAllocatedRooms().size();
+                List<Room> ls3 = rli.getAllocatedRooms();
+                for (Room room : ls3) { //for each room
+                    em.detach(room);
+                    room.getReservationLineItems().size();
+                }
+                for (Room room : ls3) {
+                    room.setReservationLineItems(null);
+                }
             }
             return r;
         } catch (ReservationNotFoundException e) {
@@ -89,7 +115,7 @@ public class PartnerReservationWebService {
     }
 
     public List<String> getRoomType() {
-        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+        List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         List<String> ls2 = new ArrayList<>();
         for (RoomType rt : ls) {
             if (rt.getInitialRoomAvailability() == null) {
@@ -165,7 +191,14 @@ public class PartnerReservationWebService {
         return partnerControllerBean.search(dateStart, dateEnd);
     }
 
-    public void persist(Object object) {
-        em.persist(object);
+    public List<String> getStartAndEndDate(Long id) {
+        List<String> ls = new ArrayList<>();
+        Reservation reservation = em.find(Reservation.class, id);
+        String startDate = reservation.getDateStart().toString();
+        String endDate = reservation.getDateEnd().toString();
+        ls.add(startDate);
+        ls.add(endDate);
+        return ls;
     }
+
 }

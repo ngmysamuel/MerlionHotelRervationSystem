@@ -34,4 +34,6 @@ public interface ReservationControllerBeanLocal {
 
     public Reservation retrieveCheckInReservation(long guestId) throws ReservationNotFoundException;
     
+   
+    
 }

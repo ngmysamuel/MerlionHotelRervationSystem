@@ -5,13 +5,25 @@
  */
 package stateless;
 
+import entity.ReservationLineItem;
 import entity.Room;
+import entity.RoomInventory;
 import entity.RoomType;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.ReservationNotFoundException;
+import util.exception.RoomInventoryNotFound;
 import util.exception.StillInUseException;
 
 /**
@@ -21,8 +33,20 @@ import util.exception.StillInUseException;
 @Stateless
 public class RoomControllerSessionBean implements RoomControllerSessionBeanRemote, RoomControllerSessionBeanLocal {
 
+    @EJB
+    private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
+
+    @EJB
+    private RoomInventorySessionBeanLocal roomInventorySessionBean;
+
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
+
+    @Resource
+    EJBContext eJBContext;
+
+    public RoomControllerSessionBean() {
+    }
 
     public void create(Integer roomNum, String status, Long roomTypeId) {
         RoomType type = em.find(RoomType.class, roomTypeId);
@@ -38,24 +62,24 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         r.setStatus(status);
-        if (roomTypeId.equals(new Long ("-1"))) {
-            
+        if (roomTypeId.equals(new Long("-1"))) {
+
         } else {
             RoomType rt = em.find(RoomType.class, roomTypeId);
             r.setType(rt);
         }
     }
-    
+
     public List<Room> viewAllRooms() {
         return em.createQuery("select r from room r").getResultList();
     }
-    
+
     public void deleteRoom(Long roomNum) throws StillInUseException {
         Query q = em.createQuery("select r from Room r where r.number = :roomNum");
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         Long id = r.getId();
-        
+
         if (!r.getReservationLineItems().isEmpty()) {
             r.setStatus("Unavailable");
             throw new StillInUseException();
@@ -72,5 +96,50 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
             em.remove(r);
         }
     }
-    
+
+    public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {
+        RoomInventory ri = new RoomInventory();
+        try {
+            roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
+        } catch (ReservationNotFoundException ex) {
+            return false;
+        }
+        boolean b = setRoomsAllocated(id, rt);
+        if (!b) {
+            //if (0 < numOfRooms) {    
+            //eJBContext.setRollbackOnly();
+            return false;
+        }
+        dateStart = dateStart.plusDays(1);
+
+        return true;
+    }
+
+    public boolean setRoomsAllocated(Long id, RoomType rt) {
+        ReservationLineItem rli = em.find(ReservationLineItem.class, id);
+        rli.getAllocatedRooms().size();
+        int numOfRooms = rli.getNumberOfRooms();
+//        ri.setRoomCountForAllocation(ri.getRoomCountForAllocation() - numOfRooms);
+        Query q = em.createQuery("SELECT r FROM Room r WHERE r.status = :status and r.type = :roomType");
+        q.setParameter("status", "Available");
+        q.setParameter("roomType", rt);
+        List<Room> ls = q.getResultList();
+        if (ls.size() < numOfRooms) {
+            return false;
+        } else {
+            for (int i = 0; i < numOfRooms; i++) {
+                Room r = ls.get(i);
+                List<Room> ls2 = rli.getAllocatedRooms();
+                ls2.add(r);
+                rli.setAllocatedRooms(ls2);
+                r.setStatus("Occupied");
+                List<ReservationLineItem> ls3 = r.getReservationLineItems();
+                ls3.add(rli);
+                r.setReservationLineItems(ls3);
+                em.flush();
+            }
+        }
+        return true;
+    }
+
 }

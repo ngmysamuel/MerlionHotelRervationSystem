@@ -48,13 +48,14 @@ public interface MainControllerBeanRemote {
     public List<RoomType> viewAllRoomTypes();
     public RoomType viewSpecificRoomType(String name);
     public void createRoomType(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize);
-    public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId);
+    public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b);
     public void updateRomType(int num, Long id);
     public void deleteRoomType(Long id) throws StillInUseException ;
     public void createRoom(Integer roomNum, String status, Long roomTypeId);
     public void updateRoom(Long roomNum, String status, Long roomTypeId);
     public void deleteRoom(Long roomNum) throws StillInUseException;
     public List<Room> viewRooms();
+    public List<RoomType> sortRoomTypeAsc();
 
     public Rate createRate(String roomTypeName, String name, RateTypeEnum rateType, BigDecimal price, LocalDate dateStart, LocalDate dateEnd) throws RoomTypeNotFoundException;
 

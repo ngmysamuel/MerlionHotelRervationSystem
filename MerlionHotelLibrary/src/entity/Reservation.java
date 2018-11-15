@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import javafx.util.Pair;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,7 +20,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -39,8 +38,12 @@ public class Reservation implements Serializable {
     private Long id;
     @Column(nullable=false)
     private LocalDateTime reservationDateTime;
+    
+    
     @Column(nullable=false)
     private LocalDate dateStart;
+    
+    
     @Column(nullable=false)
     private LocalDate dateEnd;
     
@@ -50,7 +53,7 @@ public class Reservation implements Serializable {
     
     @JoinColumn(nullable = false)
     @OneToMany(mappedBy = "reservation")
-    private List<ReservationLineItem> reservationLineItems;
+    private List<ReservationLineItem> reservationLineItems = new ArrayList<>();
     
     @ManyToOne
     private Guest guest;

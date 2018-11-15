@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Scanner;
 import artifacts.CreateReservation.Arg4;
 import artifacts.CreateReservation.Arg4.Entry;
+import artifacts.ReservationLineItem;
+import artifacts.Room;
 
 /**
  *
@@ -22,11 +24,30 @@ public class MainApp {
     Scanner sc = new Scanner(System.in);
 
     public void run() {
-        System.out.println("username: password password: name");
-        System.out.println("Login status is: " + login("1", "1"));
+        
+        while (true) {
+             System.out.println("Press 1 for login. Press any other key to exit.");
+            int sel = sc.nextInt();
+            if (sel != 1) {
+                return;
+            }
+            
+            System.out.println("What is you username?");
+            String username = sc.next();
+            System.out.println("What is your password?");
+            String password = sc.next();
+            if (!login(username, password)) {
+                System.out.println("Wrong details.");
+                continue;
+            } else {
+                break;
+            }
+        }
 
         while (true) {
-            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Search\n8. Wrong reservation");
+            
+            
+            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Wrong Search\n8. Wrong reservation");
             int selection = sc.nextInt();
             if (selection == 1) {
                 makeReservation2();
@@ -61,7 +82,12 @@ public class MainApp {
     public void viewAllReservations() {
         List<Reservation> ls = new ArrayList<>();
         ls = viewAllReservations_1();
-        System.out.println(ls);
+        for (Reservation r : ls) {
+            List<String> lsString = getStartAndEndDate(r.getId());
+            System.out.print("Start date is "+lsString.get(0));
+            System.out.print("    End date is "+lsString.get(1));
+            System.out.println("     Reservation ID "+r.getId()+": ");
+        }
     }
     
     public void viewAParticularReservation() {
@@ -74,10 +100,23 @@ public class MainApp {
             System.out.println("Oops");
             return;
         }
-        System.out.println(r.getPrice());
-        System.out.println(r.getDateEnd());
-        System.out.println(r.getDateStart());
-        System.out.println(r.getReservationLineItems());
+        List<String> lsString = getStartAndEndDate(r.getId());
+        System.out.print("Start date is "+lsString.get(0));
+        System.out.print("    End date is "+lsString.get(1));
+        System.out.println("     Reservation ID: "+r.getId());
+        List<ReservationLineItem> ls = r.getReservationLineItems();
+System.out.println("ReservationLineItems ls is "+ls);        
+        for (ReservationLineItem rli : ls) {
+            System.out.print("RoomType booked is "+rli.getRoomType().getName());
+            System.out.println();
+            List<Room> ls2 = rli.getAllocatedRooms();
+            for (Room rm : ls2) {
+                System.out.print("Allocated Room is "+rm.getNumber()+" and roomType is "+rm.getType().getName());
+                System.out.print("      ");
+            }
+            System.out.println("\n\n");
+        }
+        System.out.println("");
     }
     
     private void searchRooms() {
@@ -138,7 +177,7 @@ System.out.println("ls2 size is "+arg.getEntry().size());
             System.out.println("STOTTTOTO");
         } catch (ReservationNotFoundException_Exception e) {
             System.out.println("Oh no, reservation is not ok");
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -235,6 +274,20 @@ System.out.println("ls2 size is "+arg.getEntry().size());
         artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
         return port.createReservation2(arg0, arg1, arg2, arg3, arg4, arg5);
     }
+
+    private static java.util.List<java.lang.String> getStartAndEndDate(java.lang.Long arg0) {
+        artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
+        artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
+        return port.getStartAndEndDate(arg0);
+    }
+
+    
+
+    
+
+    
+
+    
 
 
 
