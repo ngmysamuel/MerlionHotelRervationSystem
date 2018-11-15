@@ -609,7 +609,7 @@ System.out.println("I am back in client");
         for(RoomType room: roomTypes){
             System.out.print(room.getName() + "> ");
             int n = sc.nextInt();
-            rlis.add(new ReservationLineItem(n , room));
+            rlis.add(new ReservationLineItem(new Integer(n) , room));
         }
         System.out.println("Re-confirm stay dates");
         System.out.print("Check-out Date(YYYY-MM-DD)>");

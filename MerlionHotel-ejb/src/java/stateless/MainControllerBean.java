@@ -425,7 +425,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
             em.persist(guest);
             em.flush();
         }
-        reservationControllerBean.createGuestReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guest.getId(), rooms);
+        reservationControllerBean.createWalkinReservation(dateStart, dateEnd, ReservationTypeEnum.Online, guest.getId(), rooms);
     }
     
     public List<Integer> retrieveAllocatedRooms(String passport) throws GuestNotFoundException, ReservationNotFoundException, RoomNotAllocatedException{

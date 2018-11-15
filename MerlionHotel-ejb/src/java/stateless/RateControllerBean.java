@@ -128,8 +128,8 @@ public class RateControllerBean implements RateControllerBeanRemote, RateControl
     @Override
     public BigDecimal countRate(LocalDate dateStart, LocalDate dateEnd, RoomType roomType) {
         BigDecimal total = new BigDecimal(0);
-        while(dateStart.compareTo(dateEnd) == -1){
-            total.add(retrieveRate(dateStart, roomType).getPrice());
+        while(dateStart.compareTo(dateEnd) < 0){
+            total = total.add(retrieveRate(dateStart, roomType).getPrice());
             dateStart = dateStart.plusDays(1);
         }
         return total;

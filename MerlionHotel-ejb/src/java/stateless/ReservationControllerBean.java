@@ -5,9 +5,11 @@
  */
 package stateless;
 
+import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
 import entity.Guest;
 import entity.Partner;
+import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.RoomInventory;
@@ -70,8 +72,54 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         LocalDateTime currentDateTime = LocalDateTime.now();
         BigDecimal price = new BigDecimal(0); 
         for(int i = 0; i < rooms.size(); i++){
-            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType()));
+            BigDecimal nOfRooms = new BigDecimal(rooms.get(i).getNumberOfRooms());
+            BigDecimal rr = rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType());
+            BigDecimal temp = rr.multiply(nOfRooms);
+            price = price.add(temp);
         }
+        Guest guest = em.find(Guest.class, guestId);
+        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, guest, price);
+        em.persist(newReservation);
+        guest.getReservations().add(newReservation);
+        LocalDate dateStartTemp = dateStart;
+        for (ReservationLineItem rli : rooms) { //for each room line item
+            RoomType rt = rli.getRoomType();
+            Integer numOfRooms = rli.getNumberOfRooms();
+            while (!dateStartTemp.isAfter(dateEnd)) { //for each day booked
+                try {
+                roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
+                } catch (ReservationNotFoundException e) {
+                    throw e;
+                }
+                dateStartTemp = dateStartTemp.plusDays(1);//the next day
+            }
+            dateStartTemp = dateStart;//the next room line item
+            rli.setReservation(newReservation);
+            em.persist(rli);
+        }
+        newReservation.setReservationLineItems(rooms);
+        em.flush();
+        return newReservation;
+    }
+    
+    @Override
+    public Reservation createWalkinReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, java.lang.Long guestId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        BigDecimal price = new BigDecimal(0); 
+        for(int i = 0; i < rooms.size(); i++){
+            Query q = em.createQuery("SELECT r.price FROM Rate r WHERE r.type = :inType AND r.status <> 'disabled' AND r.roomType.name = :inRoom");
+            q.setParameter("inType", RateTypeEnum.Published);
+            q.setParameter("inRoom", rooms.get(i).getRoomType().getName());
+            BigDecimal rate = (BigDecimal) q.getSingleResult();
+            LocalDate date = dateStart;
+            while(date.compareTo(dateEnd) < 0){
+                BigDecimal nOfRoom = new BigDecimal(rooms.get(i).getNumberOfRooms());
+                BigDecimal temp = rate.multiply(nOfRoom);
+                price = price.add(temp);
+                date = date.plusDays(1);
+            }
+        }
+            
         Guest guest = em.find(Guest.class, guestId);
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, guest, price);
         em.persist(newReservation);
@@ -126,9 +174,12 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             throw new ReservationNotFoundException("Date reserved is too far ahead");
         }
         BigDecimal price = new BigDecimal(0);
-//        for (ReservationLineItem rli : rooms) {
-//            price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType()));
-//        }
+        for (ReservationLineItem rli : rooms) {
+            BigDecimal nOfRooms = new BigDecimal(rli.getNumberOfRooms());
+            BigDecimal rr = rateControllerBeanLocal.countRate(dateStart, dateEnd, rli.getRoomType());
+            BigDecimal temp = rr.multiply(nOfRooms);
+            price = price.add(temp);
+        }
         Guest guest = em.find(Guest.class, guestId);
         Partner partner = em.find(Partner.class, partnerId);
         
