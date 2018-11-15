@@ -9,7 +9,6 @@ import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
 import entity.Guest;
 import entity.Partner;
-import entity.Rate;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.RoomInventory;
@@ -19,7 +18,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -43,6 +44,9 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
+    
+    @Resource 
+    EJBContext eJBContext;
     
     public void persist(Object object) {
         em.persist(object);
@@ -203,6 +207,7 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
                 RoomInventory ri = (RoomInventory) q.getSingleResult();
                 ri.setRoomAvail(ri.getRoomAvail()-numOfRooms);
                 } catch (ReservationNotFoundException e) {
+                    eJBContext.setRollbackOnly();
                     throw e;
                 }
                 dateStartTemp = dateStartTemp.plusDays(1);//the next day
@@ -210,12 +215,11 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             dateStartTemp = dateStart;//the next room line item
             rli.setReservation(newReservation);
             em.persist(rli);
-            em.flush();
         }
         List<ReservationLineItem> lsRli = newReservation.getReservationLineItems();
         lsRli.addAll(rooms);
         newReservation.setReservationLineItems(lsRli);
-        em.flush();
+        
         return newReservation;
     }
 

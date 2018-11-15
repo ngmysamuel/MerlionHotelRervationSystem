@@ -58,11 +58,11 @@ public class DataInitBean {
     public void initApplication() {
 
         EmployeeTypeEnum type = EmployeeTypeEnum.SystemAdministrator;
-        Employee e = new Employee("sys", "pass", type, "name");
-        Partner p = new Partner("partner", "pass");
+        Employee e = new Employee("1", "1", type, "name");
+        Partner p = new Partner("1", "1");
         Guest g = new Guest("guest", "02020", "DDJD");
         RegisteredGuest rg = new RegisteredGuest("registered", "pass", "0811", "passport");
-        Employee om = new Employee("om", "pass", EmployeeTypeEnum.OperationManager, "om");
+        Employee om = new Employee("2", "2", EmployeeTypeEnum.OperationManager, "om");
         Employee sales = new Employee("sales", "pass", EmployeeTypeEnum.SalesManager, "sales");
         Employee gr = new Employee("gr", "pass", EmployeeTypeEnum.GuestRelationOfficer, "gr");
 

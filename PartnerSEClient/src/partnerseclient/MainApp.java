@@ -40,10 +40,14 @@ public class MainApp {
                 System.out.println("Wrong details.");
                 continue;
             } else {
-                break;
+                operations();
             }
         }
 
+        
+    }
+    
+    public void operations() {
         while (true) {
             
             
@@ -103,19 +107,19 @@ public class MainApp {
         List<String> lsString = getStartAndEndDate(r.getId());
         System.out.print("Start date is "+lsString.get(0));
         System.out.print("    End date is "+lsString.get(1));
-        System.out.println("     Reservation ID: "+r.getId());
+        System.out.print("     Reservation ID: "+r.getId());
         List<ReservationLineItem> ls = r.getReservationLineItems();
         System.out.println("      Price is "+r.getPrice());
 //System.out.println("ReservationLineItems ls is "+ls);        
         for (ReservationLineItem rli : ls) {
-            System.out.print("RoomType booked is "+rli.getRoomType().getName());
+            System.out.print("\nRoomType booked is "+rli.getRoomType().getName());
             System.out.println();
             List<Room> ls2 = rli.getAllocatedRooms();
             for (Room rm : ls2) {
-                System.out.print("Allocated Room is "+rm.getNumber()+" and roomType is "+rm.getType().getName());
-                System.out.print("      ");
+                String s = String.format("Allocated Room is %-4d and the roomType is %-10S%n", rm.getNumber(), rm.getType().getName());
+                System.out.print(s);
             }
-            System.out.println("\n\n");
+            System.out.println("\n");
         }
         System.out.println("");
     }

@@ -23,7 +23,6 @@ import stateless.PartnerControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
 import util.exception.ReservationNotFoundException;
 
-
 @WebService(serviceName = "PartnerReservationWebService")
 @Stateless
 public class PartnerReservationWebService {
@@ -86,6 +85,7 @@ public class PartnerReservationWebService {
             g.setReservations(null);
             List<ReservationLineItem> ls2 = r.getReservationLineItems();
             for (ReservationLineItem rli : ls2) { //for each reservation line item
+System.out.println("The rli in webService viewReservationDetails() is "+rli);
                 em.detach(rli);
                 RoomType rt = rli.getRoomType();
                 em.detach(rt);
@@ -96,12 +96,17 @@ public class PartnerReservationWebService {
                 rt.setRoomInventory(null);
                 rli.getAllocatedRooms().size();
                 List<Room> ls3 = rli.getAllocatedRooms();
-                for (Room room : ls3) { //for each room
-                    em.detach(room);
-                    room.getReservationLineItems().size();
-                }
-                for (Room room : ls3) {
-                    room.setReservationLineItems(null);
+                if (ls3.isEmpty()) {
+System.out.println("the list of allocated rooms is empty for this rli: "+rli);
+                    rli.setAllocatedRooms(null);
+                } else {
+                    for (Room room : ls3) { //for each room
+                        em.detach(room);
+                        room.getReservationLineItems().size();
+                    }
+                    for (Room room : ls3) {
+                        room.setReservationLineItems(null);
+                    }
                 }
             }
             return r;

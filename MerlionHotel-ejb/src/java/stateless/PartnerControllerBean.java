@@ -63,6 +63,8 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
         Partner p = new Partner();
         if (!ls.isEmpty()) {
             p = ls.get(0);
+        } else {
+            return false;
         }
 
         if (p.getPassword().equals(password)) {
@@ -81,10 +83,12 @@ System.out.println("I am in PartnerControllerBean");
 
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException {
 System.out.println("I am in PartnerControllerBean");
-        Query q = em.createQuery("SELECT r FROM Reservation r WHERE r.id = :id");
-        q.setParameter("id", id);
-        Reservation r = new Reservation();
-        r = (Reservation) q.getSingleResult();
+        Reservation r = em.find(Reservation.class, id);
+        if (r == null) {
+System.out.println("R is null");
+            throw new ReservationNotFoundException();
+        }
+System.out.println("R is not null");
         r.getReservationLineItems().size();
 System.out.println("PartnerControllerBean the reservation is "+r);
 System.out.println("PartnerControllerBean the reservation line items is "+r.getReservationLineItems());

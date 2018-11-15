@@ -29,6 +29,7 @@ import javafx.util.Pair;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBContext;
+import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -205,7 +206,7 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     //second highest grade. 
     //Problem: I need to check through the entire length of the reservation if there will enough space. 
     //Both in the allocateRoom() and scanForUpgrades()
-    
+    @Schedule(hour = "2")
     public void timer() {
 System.out.println("I have called timer()");
         guestCheckout();
@@ -247,10 +248,11 @@ System.out.println("I have called timer()");
                             }
                         }
                     }
+                    reconcileRoomAvailability();
                 }
             }
         }    
-        reconcileRoomAvailability();
+        //reconcileRoomAvailability();
     }
     
     private void guestCheckout() {
