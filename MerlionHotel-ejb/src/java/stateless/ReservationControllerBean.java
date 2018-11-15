@@ -73,9 +73,9 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             price.add(rateControllerBeanLocal.countRate(dateStart, dateEnd, rooms.get(i).getRoomType()));
         }
         Guest guest = em.find(Guest.class, guestId);
-        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, rooms, guest, price);
+        Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, type, guest, price);
         em.persist(newReservation);
-        
+        guest.getReservations().add(newReservation);
         LocalDate dateStartTemp = dateStart;
         for (ReservationLineItem rli : rooms) { //for each room line item
             RoomType rt = rli.getRoomType();
@@ -188,7 +188,7 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         Guest guest = em.find(Guest.class, guestId);
         List<Reservation> reservations = guest.getReservations();
         for(Reservation reservation: reservations){
-            if(reservation.getDateStart().equals(LocalDate.now())){
+            if(reservation.getDateStart().compareTo(LocalDate.now()) == 0){
                 return reservation;
             }
         }

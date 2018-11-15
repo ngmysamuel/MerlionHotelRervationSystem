@@ -435,11 +435,11 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         List<ReservationLineItem> rlis = reservation.getReservationLineItems();
         for(ReservationLineItem rli: rlis){
             List<Room> rooms= rli.getAllocatedRooms();
-            if(!rooms.isEmpty() && rooms.get(0) != null){
+            try{
                 for(Room room: rooms){
                     roomNums.add(room.getNumber());
                 }
-            } else {
+            } catch(NullPointerException ex) {
                 throw new RoomNotAllocatedException();
             }
         }

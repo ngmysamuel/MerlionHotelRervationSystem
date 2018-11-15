@@ -219,9 +219,9 @@ public class MainApp {
         System.out.println("***Your Reservations***");
         List<Reservation> reservations = reservationControllerBeanRemote.retrieveAllGuestReservations(currentGuest);
         int i = 1;
-        if(reservations.isEmpty()){
-            System.out.println("***You don't have any reservations yet***");
-        }
+//        if(reservations.isEmpty()){
+//            System.out.println("***You don't have any reservations yet***");
+//        }
         for(Reservation reservation: reservations){
             System.out.println(i + ". Check-in Date " + reservation.getDateStart());
             System.out.println("   Check-out Date " + reservation.getDateEnd());
