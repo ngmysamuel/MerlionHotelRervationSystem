@@ -169,6 +169,7 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
         return bo;
     }
     
+    @Override
     public List<Boolean> search (LocalDate dateStart, LocalDate dateEnd) {
 //        RoomType roomType = em.find(RoomType.class, (long) 1);
 //        
@@ -187,13 +188,13 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
         List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         boolean full = true;
         for (RoomType rt : ls) {
-            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
+            while (dateStartTemp.compareTo(dateEnd) < 0) { //bo is an array of which room types has enough space to accomodate all the days given
                 ++i;
                 full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
                 if (!full) { //this evaluates to true but is then negated to false
                     bo.add(false);
                     break;
-                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
+                } else if (full && (dateStartTemp.isEqual(dateEnd.minusDays(1)))) {
                     bo.add(true);
                 }
                 dateStartTemp = dateStartTemp.plusDays(1);

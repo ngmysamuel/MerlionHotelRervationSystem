@@ -348,7 +348,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         Query que = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> lis = que.getResultList();
         for (int i = 0; i < lis.size(); i++) {
-            for (int j = i; j < lis.size(); j++) {
+            for (int j = i+1; j < lis.size(); j++) {
                 RoomType rt = lis.get(i);
                 RoomType rt2 = lis.get(j);
                 if (rt.getGrade() > rt2.getGrade()) {
