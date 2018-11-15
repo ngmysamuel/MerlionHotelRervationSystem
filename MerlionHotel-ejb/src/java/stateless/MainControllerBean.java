@@ -208,6 +208,7 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     
     public void timer() {
 System.out.println("I have called timer()");
+        guestCheckout();
         reconcileRoomAvailability();
         ExceptionReport er = new ExceptionReport();
         er.setDate(LocalDate.now());
@@ -250,6 +251,21 @@ System.out.println("I have called timer()");
             }
         }    
         reconcileRoomAvailability();
+    }
+    
+    private void guestCheckout() {
+        Query q = em.createQuery("select r from Reservation r where r.dateEnd = :date");
+        q.setParameter("date", LocalDate.now());
+        List<Reservation> ls = q.getResultList();
+        for (Reservation r : ls) {
+            List<ReservationLineItem> ls2 = r.getReservationLineItems();
+            for (ReservationLineItem rli : ls2) {
+                List<Room> ls3 = rli.getAllocatedRooms();
+                for (Room rm : ls3) {
+                    rm.setStatus("Available");
+                }
+            }
+        }
     }
     
     private void reconcileRoomAvailability() {
