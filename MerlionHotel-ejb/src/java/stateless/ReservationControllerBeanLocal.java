@@ -33,6 +33,8 @@ public interface ReservationControllerBeanLocal {
     List<Reservation> retrieveAllGuestReservations(long guestId);
 
     public Reservation retrieveCheckInReservation(long guestId) throws ReservationNotFoundException;
+
+    public Reservation createWalkinReservation(LocalDate dateStart, LocalDate dateEnd, ReservationTypeEnum type, Long guestId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
     
    
     

@@ -210,6 +210,7 @@ public class MainApp {
                 System.out.println("Room type: " + rli.getRoomType().getName());
                 System.out.println("Number of rooms: " + rli.getNumberOfRooms());
             }
+            System.out.println("Price: " + reservation.getPrice());
         } catch(ReservationNotFoundException ex){
             System.out.println("Reservation not found!");
         }
