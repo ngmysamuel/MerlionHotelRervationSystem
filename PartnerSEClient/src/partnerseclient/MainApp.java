@@ -105,7 +105,8 @@ public class MainApp {
         System.out.print("    End date is "+lsString.get(1));
         System.out.println("     Reservation ID: "+r.getId());
         List<ReservationLineItem> ls = r.getReservationLineItems();
-System.out.println("ReservationLineItems ls is "+ls);        
+        System.out.println("      Price is "+r.getPrice());
+//System.out.println("ReservationLineItems ls is "+ls);        
         for (ReservationLineItem rli : ls) {
             System.out.print("RoomType booked is "+rli.getRoomType().getName());
             System.out.println();
