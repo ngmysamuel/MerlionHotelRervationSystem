@@ -48,13 +48,23 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
     public RoomControllerSessionBean() {
     }
 
-    public void create(Integer roomNum, String status, Long roomTypeId) {
+    public boolean create(Integer roomNum, String status, Long roomTypeId) {
+System.out.println("stateless.RoomControllerSessionBean.create()");
         RoomType type = em.find(RoomType.class, roomTypeId);
         Room newRoom = new Room(roomNum, status, type);
-        em.persist(newRoom);
-        List<Room> ls = type.getRooms();
-        ls.add(newRoom);
-        type.setRooms(ls);
+        Query q = em.createQuery("select r from Room r where r.number = :number");
+        q.setParameter("number", roomNum);
+        List<Room> lsRm = q.getResultList();
+System.out.println(lsRm);
+        if (lsRm.isEmpty()) {
+            em.persist(newRoom);
+System.out.println("new room persisted.");
+            List<Room> ls = type.getRooms();
+            ls.add(newRoom);
+            type.setRooms(ls);
+            return true;
+        }
+        return false;
     }
 
     public void update(Long roomNum, String status, Long roomTypeId) {
@@ -62,16 +72,17 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         r.setStatus(status);
+        RoomType rt = new RoomType();
         if (roomTypeId.equals(new Long("-1"))) {
-
+            return;
         } else {
-            RoomType rt = em.find(RoomType.class, roomTypeId);
+            rt = em.find(RoomType.class, roomTypeId);
             r.setType(rt);
         }
     }
 
     public List<Room> viewAllRooms() {
-        return em.createQuery("select r from room r").getResultList();
+        return em.createQuery("select r from Room r").getResultList();
     }
 
     public void deleteRoom(Long roomNum) throws StillInUseException {
@@ -79,22 +90,24 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
         q.setParameter("roomNum", roomNum);
         Room r = (Room) q.getSingleResult();
         Long id = r.getId();
-
-        if (!r.getReservationLineItems().isEmpty()) {
-            r.setStatus("Unavailable");
-            throw new StillInUseException();
-        } else {
-            RoomType rt = r.getType();
-            List<Room> ls = rt.getRooms();
-            for (int i = 0; i < ls.size(); i++) {
-                Room r2 = ls.get(i);
-                if (r2.getId().equals(id)) {
-                    ls.remove(r2);
-                }
+        List<ReservationLineItem> lsRli1 = r.getReservationLineItems();
+        for (ReservationLineItem rli : lsRli1) {
+            if (rli.getReservation().getDateEnd().isAfter(LocalDate.now())) {
+                r.setStatus("Unavailable");
+                throw new StillInUseException();
             }
-            rt.setRooms(ls);
-            em.remove(r);
         }
+
+        RoomType rt = r.getType();
+        List<Room> ls = rt.getRooms();
+        for (int i = 0; i < ls.size(); i++) {
+            Room r2 = ls.get(i);
+            if (r2.getId().equals(id)) {
+                ls.remove(r2);
+            }
+        }
+        rt.setRooms(ls);
+        em.remove(r);
     }
 
     public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {

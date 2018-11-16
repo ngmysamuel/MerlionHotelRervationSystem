@@ -13,13 +13,13 @@ import entity.Guest;
 import entity.Partner;
 import entity.Rate;
 import entity.ReservationLineItem;
+import entity.Room;
 import entity.RoomType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javax.persistence.NoResultException;
 import stateless.MainControllerBeanRemote;
 import stateless.PartnerControllerBeanRemote;
 import util.exception.GuestNotFoundException;
@@ -194,10 +194,19 @@ public class MainApp {
                     }
                     System.out.println("How many of this rooms do you want to create?");
                     int num = sc.nextInt();
+                    List<Integer> lsInt = new ArrayList<>();
                     for (int j = 0; j < num; j++) {
-                        mainControllerBeanRemote.createRoom(rmNumber, status, roomTypeId2);
+                        boolean b = mainControllerBeanRemote.createRoom(rmNumber, status, roomTypeId2);
+                        if (!b) {
+                            lsInt.add(rmNumber);
+                        }
                         ++rmNumber;
                     }
+                    System.out.print("Rooms not created (if any): ");
+                    for (Integer rmInteger : lsInt) {
+                        System.out.print(rmInteger+" ");
+                    }
+                    updateRoomInventory(num, roomTypeId2);
                     updateRoomType(num, roomTypeId2);
                     break;
                 case 7:
@@ -238,7 +247,11 @@ public class MainApp {
                     }
                     break;
                 case 9:
-                    System.out.println(mainControllerBeanRemote.viewRooms());
+                    List<Room> lsCase9 = mainControllerBeanRemote.viewRooms();
+                    for (Room r : lsCase9) {
+                        String sCase9 = String.format("Room Number: %-5d is %-15S Its RoomType is %-15S", r.getNumber(), r.getStatus(), r.getType().getName());
+                        System.out.println(sCase9);
+                    }
                     break;
                 case 10:
                     viewExceptionReport();
@@ -249,6 +262,10 @@ public class MainApp {
                     continue;
             }
         }
+    }
+    
+    private void updateRoomInventory(Integer numberOfRooms, Long id) {
+        mainControllerBeanRemote.updateRoomInventryUponCreationOfRooms(numberOfRooms, id);
     }
 
     public void loggedInGuestRelations(String username) {

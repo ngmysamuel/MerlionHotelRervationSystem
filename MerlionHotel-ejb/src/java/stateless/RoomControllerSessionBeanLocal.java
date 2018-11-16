@@ -19,7 +19,7 @@ import util.exception.StillInUseException;
  */
 @Local
 public interface RoomControllerSessionBeanLocal {
-    public void create(Integer roomNum, String status, Long roomTypeId);
+    public boolean create(Integer roomNum, String status, Long roomTypeId);
     public void update(Long roomNum, String status, Long roomTypeId);
     public List<Room> viewAllRooms();
     public void deleteRoom(Long id) throws StillInUseException;

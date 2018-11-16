@@ -8,7 +8,6 @@ package stateless;
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
-import com.sun.prism.impl.PrismTrace;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Guest;
@@ -36,6 +35,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import util.exception.GuestNotFoundException;
 import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
@@ -183,8 +183,19 @@ try {
         }
     }
     
-    public void createRoom(Integer roomNum, String status, Long roomTypeId) {
-        roomControllerSessionBean.create(roomNum, status, roomTypeId);
+    public boolean createRoom(Integer roomNum, String status, Long roomTypeId) {
+        boolean b = roomControllerSessionBean.create(roomNum, status, roomTypeId);
+        return b;
+    }
+    
+    public void updateRoomInventryUponCreationOfRooms(Integer num, Long roomTypeId) {
+        RoomType rt = em.find(RoomType.class, roomTypeId);
+        Query q = em.createQuery("select ri from RoomInventory ri where ri.rt = :roomType");
+        q.setParameter("roomType", rt);
+        List<RoomInventory> ls = q.getResultList();
+        for (RoomInventory ri : ls) {
+            ri.setRoomAvail(ri.getRoomAvail()+num);
+        }
     }
     
     public void updateRoom(Long roomNum, String status, Long roomTypeId) {

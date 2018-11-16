@@ -52,7 +52,8 @@ public interface MainControllerBeanRemote {
     public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b);
     public void updateRomType(int num, Long id);
     public void deleteRoomType(Long id) throws StillInUseException ;
-    public void createRoom(Integer roomNum, String status, Long roomTypeId);
+    public boolean createRoom(Integer roomNum, String status, Long roomTypeId);
+    public void updateRoomInventryUponCreationOfRooms(Integer num, Long roomTypeId);
     public void updateRoom(Long roomNum, String status, Long roomTypeId);
     public void deleteRoom(Long roomNum) throws StillInUseException;
     public List<Room> viewRooms();
