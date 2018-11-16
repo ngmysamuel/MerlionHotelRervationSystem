@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import javafx.util.Pair;
 import javax.ejb.Remote;
+import javax.persistence.NoResultException;
 import util.exception.GuestNotFoundException;
 import util.exception.NoAvailableRoomsException;
 import util.exception.RateNameNotUniqueException;
@@ -46,7 +47,7 @@ public interface MainControllerBeanRemote {
     public ExceptionReport viewExceptionReport(LocalDate date);
     public void persistEr();
     public List<RoomType> viewAllRoomTypes();
-    public RoomType viewSpecificRoomType(String name);
+    public RoomType viewSpecificRoomType(String name) throws NoResultException;
     public void createRoomType(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize);
     public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b);
     public void updateRomType(int num, Long id);

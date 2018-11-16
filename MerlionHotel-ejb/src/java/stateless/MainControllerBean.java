@@ -33,6 +33,7 @@ import javax.ejb.EJBContext;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.GuestNotFoundException;
@@ -136,10 +137,18 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         return roomTypeControllerSessionBean.getRoomTypes();
     }
     
-    public RoomType viewSpecificRoomType(String name) {
+    public RoomType viewSpecificRoomType(String name) throws NoResultException {
         Query q = em.createQuery("select rt from RoomType rt where rt.name = :name");
         q.setParameter("name", name);
-        return (RoomType) q.getSingleResult();
+System.out.println("name is "+name);
+System.out.println("About to execute query");
+RoomType r = new RoomType();
+try {
+        r = (RoomType) q.getSingleResult();
+} catch (NoResultException e) {
+    return null;
+}
+        return r;
     }
     
     public void updateRoomType(String bed, String name, String amenities, String capacity, String description, String grade, String roomSize, int initialRoomAvail, Long roomTypeId, String b) {

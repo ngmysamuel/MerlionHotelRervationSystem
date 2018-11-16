@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.persistence.NoResultException;
 import stateless.MainControllerBeanRemote;
 import stateless.PartnerControllerBeanRemote;
 import util.exception.GuestNotFoundException;
@@ -78,20 +79,20 @@ public class MainApp {
         while (true) {
             System.out.println("Please select what you want to do.\n1. Create Room Type\n2. Update Room Type\n3. View Room Type Details\n4. Delete Room Type\n5. View All Room Types\n6. Create New Room\n7. Update Room\n8. Delete Room\n9. View All Rooms\n 10. View Allocation Report\n11. Exit");
             int selection = sc.nextInt();
+            sc.nextLine();
             switch (selection) {
                 case 1:
                     System.out.println("What is the name?");
-                    String name = sc.next();
+                    String name = sc.nextLine();
                     System.out.println("What are the amenities?");
-                    String amenities = sc.next();
+                    String amenities = sc.nextLine();
                     System.out.println("What is the bed size?");
-                    String bed = sc.next();
-                    sc.nextLine();
+                    String bed = sc.nextLine();
                     System.out.println("What are the description?");
                     String description = sc.nextLine();
                     System.out.println("What is the capacity?");
                     Integer capacity = sc.nextInt();
-                    
+                    sc.nextLine();
                     List<RoomType> listOfRoomTypes = mainControllerBeanRemote.sortRoomTypeAsc();
                     int highest = listOfRoomTypes.get(listOfRoomTypes.size()-1).getGrade();
                     ++highest;
@@ -124,9 +125,16 @@ public class MainApp {
                     break;
                 case 3:
                     System.out.println("What is the name?");
-                    String nameCase3 = sc.next();
-                    RoomType rtCase3 = mainControllerBeanRemote.viewSpecificRoomType(nameCase3);
-                    System.out.println(rtCase3.getDescription());
+                    sc.nextLine();
+                    String nameCase3 = sc.nextLine().trim();
+                    RoomType rtCase3 = new RoomType();
+                    rtCase3 = mainControllerBeanRemote.viewSpecificRoomType(nameCase3);
+                    if (rtCase3 == null) {
+                        System.out.println("Please try again. RoomType cannot be found. ");
+                        break;
+                    } 
+                    String s = String.format("The roomType is called: %-20S and has InitialRoomAvailability of: %-5d and can hold a maximum of %5d adults. It can be described as %-25s", rtCase3.getName(), rtCase3.getInitialRoomAvailability(), rtCase3.getCapacity(), rtCase3.getDescription());
+                    System.out.println(s);
                     break;
                 case 4:
                     System.out.println("What is the room type you want to delete for?");
@@ -148,9 +156,10 @@ public class MainApp {
                     break;
                 case 5:
                     List<RoomType> lsCase5 = mainControllerBeanRemote.sortRoomTypeAsc();
+                    System.out.println("We have the following Room Types: ");
                     for (RoomType rtCase5 : lsCase5) {
-                        System.out.println("The roomtype with name: "+rtCase5.getName());
-                        System.out.println(rtCase5.getAmenities()+"\n"+rtCase5.getGrade());
+                        String s5 = String.format("%1$-25s%2$-5d%3$-5d", rtCase5.getName(), rtCase5.getGrade(), rtCase5.getId());
+                        System.out.println(s5);
                     }
                     break;
                 case 6:
