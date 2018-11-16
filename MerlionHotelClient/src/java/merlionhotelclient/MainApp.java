@@ -7,6 +7,7 @@ package merlionhotelclient;
 
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
+import entity.Employee;
 import entity.ExceptionReport;
 import entity.Guest;
 import entity.Rate;
@@ -17,9 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ejb.EJB;
 import stateless.MainControllerBeanRemote;
 import stateless.PartnerControllerBeanRemote;
 import util.exception.GuestNotFoundException;
@@ -325,7 +323,7 @@ public class MainApp {
                 System.out.println("1. Create New Employee\n2. View All Employees\n3. Create Partner\n4. View All Partners\n5. timer\n6. Exit\n7. View Exception Report\n8. Persist a er");
                 int choice = sc.nextInt();
                 if (choice == 1) {
-                    System.out.println("What is the employee type?\n0. GuestRelations\n1. Operations\n2. Sales");
+                    System.out.println("What is the employee type?\n0. GuestRelations\n1. Operations\n2. Sales\n3. System Admin");
                     EmployeeTypeEnum employeeTypeEnum = EmployeeTypeEnum.values()[sc.nextInt()];
                     System.out.println("What is the username?");
                     String newUsername = sc.next();
@@ -333,12 +331,15 @@ public class MainApp {
                     String password = sc.next();
                     mainControllerBeanRemote.createEmployee(newUsername, password, employeeTypeEnum);
                 } else if (choice == 2) {
-                    System.out.println(mainControllerBeanRemote.viewEmployees());
+                    List<Employee> ls = mainControllerBeanRemote.viewEmployees(); 
+                    for (Employee e : ls) {
+                        String s = String.format("Employee username: %-15S and their ID is: %-7d and their type is: %-20S", e.getUsername(), e.getId(), e.getEmployeeType());
+                        System.out.println(s);
+                    }
                 } else if (choice == 3) {
-                    System.out.println("What is the employee's password?");
+                    System.out.println("What is the password?");
                     String emp = sc.next();
-                    System.out.println("What is the manager's password?");
-                    String manager = sc.next();
+                    String manager = "";
                     System.out.println("What is the username?");
                     username = sc.next();
                     mainControllerBeanRemote.createPartner(emp, manager, username);
