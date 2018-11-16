@@ -6,6 +6,7 @@
 package stateless;
 
 import Enum.ReservationTypeEnum;
+import entity.Guest;
 import entity.Reservation;
 import entity.ReservationLineItem;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public interface ReservationControllerBeanRemote {
 
     Reservation retrievePartnerReservationDetails(java.lang.Long partnerId, LocalDate dateStart, LocalDate dateEnd) throws ReservationNotFoundException;
     
-    Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, java.lang.Long guestId, java.lang.Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
+    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, Guest g, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException;
 
     List<Reservation> retrieveAllGuestReservations(long guestId);
 }

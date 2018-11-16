@@ -17,7 +17,9 @@ import javax.ejb.EJB;
 import javax.jws.WebService;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import stateless.MainControllerBeanLocal;
 import stateless.PartnerControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
@@ -136,40 +138,49 @@ System.out.println("the list of allocated rooms is empty for this rli: "+rli);
         return ls2;
     }
 
-    public Long createReservation(String startString, String endString, Long guestId, Long partnerId, HashMap hm) throws ReservationNotFoundException {
-        LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        List<ReservationLineItem> rliList = new ArrayList<ReservationLineItem>();
-        //String[] set;
-        List<String> roomTypeList = new ArrayList<>();
-        Set<String> set = hm.keySet();
-        Iterator iter = set.iterator();
-        while (iter.hasNext()) {
-            roomTypeList.add((String) iter.next());
-        }
-        System.out.println("hasmap size is " + hm.size());
-        for (int i = 0; i < hm.size(); i++) {
-            String roomTypeName = roomTypeList.get(i);
-            Integer numOfRooms = (Integer) hm.get(roomTypeName);
-            ReservationLineItem rli = new ReservationLineItem();
-            RoomType rt = (RoomType) em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :name").setParameter("name", roomTypeName).getResultList().get(0);
-            //Integer numofrooms = hm.get(roomTypeName);
-            //rli.setNumberOfRooms(numofrooms); //Integer.parseInt(numofrooms));
-            rli.setRoomType(rt);
-            rliList.add(rli);
-            rli.setNumberOfRooms(numOfRooms);
-            System.out.println("number of rli to be booked is: " + rliList.size());
-        }
-        try {
-            return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
-        } catch (ReservationNotFoundException e) {
-            throw e;
-        }
-    }
+//    public Long createReservation(String startString, String endString, Long guestId, Long partnerId, HashMap hm) throws ReservationNotFoundException {
+//        LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//        LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+//        List<ReservationLineItem> rliList = new ArrayList<ReservationLineItem>();
+//        //String[] set;
+//        List<String> roomTypeList = new ArrayList<>();
+//        Set<String> set = hm.keySet();
+//        Iterator iter = set.iterator();
+//        while (iter.hasNext()) {
+//            roomTypeList.add((String) iter.next());
+//        }
+//        System.out.println("hasmap size is " + hm.size());
+//        for (int i = 0; i < hm.size(); i++) {
+//            String roomTypeName = roomTypeList.get(i);
+//            Integer numOfRooms = (Integer) hm.get(roomTypeName);
+//            ReservationLineItem rli = new ReservationLineItem();
+//            RoomType rt = (RoomType) em.createQuery("SELECT rt FROM RoomType rt WHERE rt.name = :name").setParameter("name", roomTypeName).getResultList().get(0);
+//            //Integer numofrooms = hm.get(roomTypeName);
+//            //rli.setNumberOfRooms(numofrooms); //Integer.parseInt(numofrooms));
+//            rli.setRoomType(rt);
+//            rliList.add(rli);
+//            rli.setNumberOfRooms(numOfRooms);
+//            System.out.println("number of rli to be booked is: " + rliList.size());
+//        }
+//        try {
+//            return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
+//        } catch (ReservationNotFoundException e) {
+//            throw e;
+//        }
+//    }
 
-    public Long createReservation2(String startString, String endString, Long guestId, Long partnerId, List<String> lsString, List<Integer> lsInteger) throws ReservationNotFoundException {
+    public Long createReservation2(String startString, String endString, String email, String passportNumber, String telephone, Long partnerId, List<String> lsString, List<Integer> lsInteger) throws ReservationNotFoundException {
         LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        Query q = em.createQuery("select g from Guest g where g.email = :email");
+        q.setParameter("email", email);
+        Guest g = new Guest();
+        try {
+            g = (Guest) q.getSingleResult();
+        } catch (NoResultException e) {
+            g = new Guest(email, telephone, passportNumber);
+            em.persist(g);
+        }
         List<ReservationLineItem> rliList = new ArrayList<ReservationLineItem>();
         int lsIntegerCounter = 0;
         for (String s : lsString) {
@@ -183,7 +194,7 @@ System.out.println("the list of allocated rooms is empty for this rli: "+rli);
             ++lsIntegerCounter;
         }
         try {
-            return partnerControllerBean.createReservation(dateStart, dateEnd, guestId, partnerId, rliList);
+            return partnerControllerBean.createReservation(dateStart, dateEnd, g, partnerId, rliList);
         } catch (ReservationNotFoundException e) {
             throw e;
         }

@@ -11,6 +11,7 @@ import entity.RoomType;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -28,6 +29,9 @@ import util.exception.StillInUseException;
  */
 @Stateless
 public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionBeanRemote, RoomTypeControllerSessionBeanLocal {
+
+    @EJB
+    private MainControllerBeanLocal mainControllerBean;
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
@@ -93,7 +97,7 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     }
 
     public void create(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {
-        RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade, null);
+        RoomType newrt = new RoomType(name, description, roomSize, bed, capacity, amenities, grade, roomSize);
         newrt.setIsEnabled(true);
         manageGrade(grade, grade);
         em.persist(newrt);
@@ -129,22 +133,39 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     }
 
     private void manageGrade(Integer newGrade, Integer oldGrade) { //is called from update() and create()
+System.out.println("manage grade is called");
         if (newGrade <= oldGrade) { //new grade is 1 and old grade is 3. 1 2 3 -> 2 3 4 -> 2 3 1 || From 2 to nonexistant 1, it cannot work if I didn't have a prior grade. Because I will be selecting >= 1, I will be getting a null value
-            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :newGrade");
-            q.setParameter("newGrade", newGrade);
-            List<RoomType> ls = q.getResultList();
-            for (RoomType rt : ls) {
-                rt.setGrade(rt.getGrade() + 1);
+//            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :newGrade");
+//            q.setParameter("newGrade", newGrade);
+//            List<RoomType> ls = q.getResultList();
+            List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
+            for (int i = ls.size()-1; i >= 0; i--) {
+                RoomType rt = ls.get(i);
+                if (rt.getGrade() >= newGrade) {
+                    rt.setGrade(rt.getGrade() + 1);
+                }
                 em.flush();
             }
+//            for (RoomType rt : ls) {
+//                rt.setGrade(rt.getGrade() + 1);
+//            }
+            
         } else if (newGrade > oldGrade) { //new grade is 3 and old grade 1. 1 2 3 -> 0 1 2  -> 3 1 2 
-            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :oldGrade");
-            q.setParameter("oldGrade", oldGrade);
-            List<RoomType> ls = q.getResultList();
-            for (RoomType rt : ls) {
-                rt.setGrade(rt.getGrade() - 1);
+//            Query q = em.createQuery("select rt from RoomType rt where rt.grade >= :oldGrade");
+//            q.setParameter("oldGrade", oldGrade);
+//            List<RoomType> ls = q.getResultList();
+            List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
+            for (int i = 0; i < ls.size(); i++) {
+                RoomType rt = ls.get(i);
+                if (rt.getGrade() >= oldGrade) {
+                    rt.setGrade(rt.getGrade() - 1);
+                }
                 em.flush();
             }
+//            for (RoomType rt : ls) {
+//                rt.setGrade(rt.getGrade() - 1);
+//            }
+            
         } else {
             
             }

@@ -6,6 +6,7 @@
 package stateless;
 
 import Enum.ReservationTypeEnum;
+import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import entity.ReservationLineItem;
@@ -44,7 +45,7 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
     private EntityManager em;
 
     public Partner create(String emp, String manager, String username) {
-        Partner part = new Partner("name", "password");
+        Partner part = new Partner(username, manager);
         em.persist(part);
         em.flush();
         return part;
@@ -113,9 +114,9 @@ System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAlloca
         }
     }
 
-    public Long createReservation(LocalDate dateStart, LocalDate dateEnd, Long guestId, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+    public Long createReservation(LocalDate dateStart, LocalDate dateEnd, Guest g, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
         try {
-            Reservation r = reservationControllerBean.createPartnerReservation(dateStart, dateEnd, guestId, partnerId, rooms);
+            Reservation r = reservationControllerBean.createPartnerReservation(dateStart, dateEnd, g, partnerId, rooms);
             return r.getId();
         } catch (ReservationNotFoundException e) {
             throw e;

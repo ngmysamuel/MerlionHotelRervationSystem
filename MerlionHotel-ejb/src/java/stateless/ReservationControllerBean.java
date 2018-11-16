@@ -194,7 +194,7 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     }
 
     @Override
-    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, Long guestId, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
+    public Reservation createPartnerReservation(LocalDate dateStart, LocalDate dateEnd, Guest g, Long partnerId, List<ReservationLineItem> rooms) throws ReservationNotFoundException {
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDate oneYearOnDateTime = currentDateTime.plus(1, ChronoUnit.YEARS).toLocalDate();
         RoomInventory ri = new RoomInventory();
@@ -208,7 +208,7 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
             BigDecimal temp = rr.multiply(nOfRooms);
             price = price.add(temp);
         }
-        Guest guest = em.find(Guest.class, guestId);
+        Guest guest = g;
         Partner partner = em.find(Partner.class, partnerId);
         
         if (guest == null || partner == null) {
