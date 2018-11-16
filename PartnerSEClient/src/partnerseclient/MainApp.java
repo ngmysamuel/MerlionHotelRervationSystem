@@ -14,6 +14,7 @@ import artifacts.CreateReservation.Arg4;
 import artifacts.CreateReservation.Arg4.Entry;
 import artifacts.ReservationLineItem;
 import artifacts.Room;
+import java.util.InputMismatchException;
 
 /**
  *
@@ -49,10 +50,14 @@ public class MainApp {
     
     public void operations() {
         while (true) {
-            
-            
+            int selection = 100;
             System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Wrong Search\n8. Wrong reservation");
-            int selection = sc.nextInt();
+            try {
+                selection = sc.nextInt();
+            } catch (InputMismatchException exception) {
+                System.out.println(exception);
+                sc.next();
+            }
             if (selection == 1) {
                 makeReservation2();
             } else if (selection == 2) {
@@ -72,6 +77,7 @@ public class MainApp {
             } else {
                 System.out.println("what?");
             }
+
         }
     }
     
@@ -134,7 +140,8 @@ public class MainApp {
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;
         for (String rt : ls2) {
-            System.out.println("Room Type: " + rt + "-> " + ls1.get(i));
+            String s = String.format("Room Type: %-20S -> %-5b", rt, ls1.get(i));
+            System.out.println(s);
             ++i;
         }
         System.out.println("");

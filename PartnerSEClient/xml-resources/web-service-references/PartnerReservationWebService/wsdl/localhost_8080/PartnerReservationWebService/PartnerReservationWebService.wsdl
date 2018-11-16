@@ -16,17 +16,17 @@
 <message name="loginResponse">
 <part name="parameters" element="tns:loginResponse"/>
 </message>
-<message name="getRoomType">
-<part name="parameters" element="tns:getRoomType"/>
-</message>
-<message name="getRoomTypeResponse">
-<part name="parameters" element="tns:getRoomTypeResponse"/>
-</message>
 <message name="printRoomType">
 <part name="parameters" element="tns:printRoomType"/>
 </message>
 <message name="printRoomTypeResponse">
 <part name="parameters" element="tns:printRoomTypeResponse"/>
+</message>
+<message name="getRoomType">
+<part name="parameters" element="tns:getRoomType"/>
+</message>
+<message name="getRoomTypeResponse">
+<part name="parameters" element="tns:getRoomTypeResponse"/>
 </message>
 <message name="searchRoom">
 <part name="parameters" element="tns:searchRoom"/>
@@ -43,29 +43,29 @@
 <message name="ReservationNotFoundException">
 <part name="fault" element="tns:ReservationNotFoundException"/>
 </message>
-<message name="viewAllReservations">
-<part name="parameters" element="tns:viewAllReservations"/>
-</message>
-<message name="viewAllReservationsResponse">
-<part name="parameters" element="tns:viewAllReservationsResponse"/>
-</message>
 <message name="createReservation">
 <part name="parameters" element="tns:createReservation"/>
 </message>
 <message name="createReservationResponse">
 <part name="parameters" element="tns:createReservationResponse"/>
 </message>
-<message name="getStartAndEndDate">
-<part name="parameters" element="tns:getStartAndEndDate"/>
+<message name="viewAllReservations">
+<part name="parameters" element="tns:viewAllReservations"/>
 </message>
-<message name="getStartAndEndDateResponse">
-<part name="parameters" element="tns:getStartAndEndDateResponse"/>
+<message name="viewAllReservationsResponse">
+<part name="parameters" element="tns:viewAllReservationsResponse"/>
 </message>
 <message name="createReservation2">
 <part name="parameters" element="tns:createReservation2"/>
 </message>
 <message name="createReservation2Response">
 <part name="parameters" element="tns:createReservation2Response"/>
+</message>
+<message name="getStartAndEndDate">
+<part name="parameters" element="tns:getStartAndEndDate"/>
+</message>
+<message name="getStartAndEndDateResponse">
+<part name="parameters" element="tns:getStartAndEndDateResponse"/>
 </message>
 <portType name="PartnerReservationWebService">
 <operation name="search">
@@ -76,13 +76,13 @@
 <input wsam:Action="http://webService/PartnerReservationWebService/loginRequest" message="tns:login"/>
 <output wsam:Action="http://webService/PartnerReservationWebService/loginResponse" message="tns:loginResponse"/>
 </operation>
-<operation name="getRoomType">
-<input wsam:Action="http://webService/PartnerReservationWebService/getRoomTypeRequest" message="tns:getRoomType"/>
-<output wsam:Action="http://webService/PartnerReservationWebService/getRoomTypeResponse" message="tns:getRoomTypeResponse"/>
-</operation>
 <operation name="printRoomType">
 <input wsam:Action="http://webService/PartnerReservationWebService/printRoomTypeRequest" message="tns:printRoomType"/>
 <output wsam:Action="http://webService/PartnerReservationWebService/printRoomTypeResponse" message="tns:printRoomTypeResponse"/>
+</operation>
+<operation name="getRoomType">
+<input wsam:Action="http://webService/PartnerReservationWebService/getRoomTypeRequest" message="tns:getRoomType"/>
+<output wsam:Action="http://webService/PartnerReservationWebService/getRoomTypeResponse" message="tns:getRoomTypeResponse"/>
 </operation>
 <operation name="searchRoom">
 <input wsam:Action="http://webService/PartnerReservationWebService/searchRoomRequest" message="tns:searchRoom"/>
@@ -93,23 +93,23 @@
 <output wsam:Action="http://webService/PartnerReservationWebService/viewReservationDetailsResponse" message="tns:viewReservationDetailsResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://webService/PartnerReservationWebService/viewReservationDetails/Fault/ReservationNotFoundException"/>
 </operation>
-<operation name="viewAllReservations">
-<input wsam:Action="http://webService/PartnerReservationWebService/viewAllReservationsRequest" message="tns:viewAllReservations"/>
-<output wsam:Action="http://webService/PartnerReservationWebService/viewAllReservationsResponse" message="tns:viewAllReservationsResponse"/>
-</operation>
 <operation name="createReservation">
 <input wsam:Action="http://webService/PartnerReservationWebService/createReservationRequest" message="tns:createReservation"/>
 <output wsam:Action="http://webService/PartnerReservationWebService/createReservationResponse" message="tns:createReservationResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://webService/PartnerReservationWebService/createReservation/Fault/ReservationNotFoundException"/>
 </operation>
-<operation name="getStartAndEndDate">
-<input wsam:Action="http://webService/PartnerReservationWebService/getStartAndEndDateRequest" message="tns:getStartAndEndDate"/>
-<output wsam:Action="http://webService/PartnerReservationWebService/getStartAndEndDateResponse" message="tns:getStartAndEndDateResponse"/>
+<operation name="viewAllReservations">
+<input wsam:Action="http://webService/PartnerReservationWebService/viewAllReservationsRequest" message="tns:viewAllReservations"/>
+<output wsam:Action="http://webService/PartnerReservationWebService/viewAllReservationsResponse" message="tns:viewAllReservationsResponse"/>
 </operation>
 <operation name="createReservation2">
 <input wsam:Action="http://webService/PartnerReservationWebService/createReservation2Request" message="tns:createReservation2"/>
 <output wsam:Action="http://webService/PartnerReservationWebService/createReservation2Response" message="tns:createReservation2Response"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://webService/PartnerReservationWebService/createReservation2/Fault/ReservationNotFoundException"/>
+</operation>
+<operation name="getStartAndEndDate">
+<input wsam:Action="http://webService/PartnerReservationWebService/getStartAndEndDateRequest" message="tns:getStartAndEndDate"/>
+<output wsam:Action="http://webService/PartnerReservationWebService/getStartAndEndDateResponse" message="tns:getStartAndEndDateResponse"/>
 </operation>
 </portType>
 <binding name="PartnerReservationWebServicePortBinding" type="tns:PartnerReservationWebService">
@@ -132,7 +132,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="getRoomType">
+<operation name="printRoomType">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -141,7 +141,7 @@
 <soap:body use="literal"/>
 </output>
 </operation>
-<operation name="printRoomType">
+<operation name="getRoomType">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -171,15 +171,6 @@
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="viewAllReservations">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
 <operation name="createReservation">
 <soap:operation soapAction=""/>
 <input>
@@ -192,7 +183,7 @@
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="getStartAndEndDate">
+<operation name="viewAllReservations">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -212,6 +203,15 @@
 <fault name="ReservationNotFoundException">
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
+</operation>
+<operation name="getStartAndEndDate">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
 </operation>
 </binding>
 <service name="PartnerReservationWebService">

@@ -32,6 +32,7 @@ public class PartnerReservationWebService {
 
     @EJB
     private RoomTypeControllerSessionBeanLocal roomTypeControllerSessionBean;
+    
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
 
@@ -43,6 +44,7 @@ public class PartnerReservationWebService {
 //        return "Hello " + txt + " !";
 //    }
     public boolean login(String username, String password) {
+System.out.println(mainControllerBean);
         return partnerControllerBean.login(username, password);
     }
 
@@ -75,8 +77,9 @@ public class PartnerReservationWebService {
     }
 
     public Reservation viewReservationDetails(Long id) throws ReservationNotFoundException {
-        try {
+        //try {
             Reservation r = partnerControllerBean.viewReservationDetails(id);
+            
             em.detach(r);
             em.flush();
             Partner p = r.getPartner();
@@ -89,11 +92,13 @@ System.out.println("The rli in webService viewReservationDetails() is "+rli);
                 em.detach(rli);
                 RoomType rt = rli.getRoomType();
                 em.detach(rt);
-                rt.setRoomInventory(null);
+                //rt.setRoomInventory(null);
                 rt.setRooms(null);
                 rt.setReservationLineItems(null);
                 rt.setRates(null);
+System.out.println("room type: "+rt+" room inventory is before: "+rt.getRoomInventory());
                 rt.setRoomInventory(null);
+System.out.println("room type: "+rt+" room inventory is after: "+rt.getRoomInventory());
                 rli.getAllocatedRooms().size();
                 List<Room> ls3 = rli.getAllocatedRooms();
                 if (ls3.isEmpty()) {
@@ -110,9 +115,9 @@ System.out.println("the list of allocated rooms is empty for this rli: "+rli);
                 }
             }
             return r;
-        } catch (ReservationNotFoundException e) {
-            throw e;
-        }
+//        } catch (ReservationNotFoundException e) {
+//            throw e;
+//        }
     }
 
     public void printRoomType() {

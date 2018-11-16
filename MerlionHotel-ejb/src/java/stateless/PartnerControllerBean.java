@@ -17,7 +17,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
@@ -57,6 +56,7 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
     }
 
     public boolean login(String username, String password) {
+System.out.println(mainControllerBean);
         Query q = em.createQuery("SELECT p FROM Partner p WHERE p.username = :username");
         q.setParameter("username", username);
         List<Partner> ls = q.getResultList();
@@ -88,7 +88,7 @@ System.out.println("I am in PartnerControllerBean");
 System.out.println("R is null");
             throw new ReservationNotFoundException();
         }
-System.out.println("R is not null");
+System.out.println("ParterControllerBean R is not null");
         r.getReservationLineItems().size();
 System.out.println("PartnerControllerBean the reservation is "+r);
 System.out.println("PartnerControllerBean the reservation line items is "+r.getReservationLineItems());
@@ -96,7 +96,11 @@ System.out.println("PartnerControllerBean the reservation line items is "+r.getR
             rli.getAllocatedRooms().size();
 System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAllocatedRooms());
             rli.getReservation();
-            rli.getRoomType();
+            RoomType rt = rli.getRoomType();
+            rt.getRoomInventory().size();
+            for (RoomInventory ri : rli.getRoomType().getRoomInventory()) {
+                System.out.print("PartnerControllerBean the room inventory for room type: "+rt+" is "+ri);
+            }
         }
         return r;
     }
@@ -173,6 +177,7 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
         return bo;
     }
     
+    @Override
     public List<Boolean> search (LocalDate dateStart, LocalDate dateEnd) {
 //        RoomType roomType = em.find(RoomType.class, (long) 1);
 //        
@@ -184,6 +189,7 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
 //        em.persist(ri);
 //        em.flush();
 //System.out.println("XV id is "+ri.getId());
+System.out.println("stateless.PartnerControllerBean.search()");
 
         int i = 0;
         LocalDate dateStartTemp = dateStart;
@@ -191,13 +197,18 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
         List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         boolean full = true;
         for (RoomType rt : ls) {
-            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
+            while (dateStartTemp.compareTo(dateEnd) < 0) { //bo is an array of which room types has enough space to accomodate all the days given
                 ++i;
-                full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
+                try {
+                    full = roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, 1);
+                } catch (ReservationNotFoundException ex) {
+                    full = false;
+                }
+System.out.println("boolean full is "+full+" for date "+dateStartTemp);
                 if (!full) { //this evaluates to true but is then negated to false
                     bo.add(false);
                     break;
-                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
+                } else if (full && (dateStartTemp.isEqual(dateEnd.minusDays(1)))) {
                     bo.add(true);
                 }
                 dateStartTemp = dateStartTemp.plusDays(1);

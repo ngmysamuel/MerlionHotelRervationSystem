@@ -588,8 +588,8 @@ System.out.println("I am back in client");
         String end = sc.next();
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.parse(end);
-        List<Boolean> ls1 = this.partnerControllerBeanRemote.searchRooms(startDate, endDate);
-        List<RoomType> ls2 = this.mainControllerBeanRemote.retrieveRoomTypes();
+        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate);
+        List<RoomType> ls2 = this.mainControllerBeanRemote.sortRoomTypeAsc();
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;
         for (RoomType rt : ls2) {
@@ -602,7 +602,7 @@ System.out.println("I am back in client");
     private void reserveRooms(){
         System.out.println("***Reserve Rooms***");
         searchRooms();
-        List<RoomType> roomTypes = this.mainControllerBeanRemote.retrieveRoomTypes();
+        List<RoomType> roomTypes = this.mainControllerBeanRemote.sortRoomTypeAsc();
 
         System.out.println("Enter number of rooms booked for each type");
         List<ReservationLineItem> rlis = new ArrayList<>();

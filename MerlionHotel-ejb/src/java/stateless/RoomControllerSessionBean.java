@@ -99,11 +99,10 @@ public class RoomControllerSessionBean implements RoomControllerSessionBeanRemot
 
     public Boolean allocateRooms(RoomType rt, Integer numOfRooms, LocalDate dateStart, LocalDate dateEnd, Long id) {
         RoomInventory ri = new RoomInventory();
-        try {
-            roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms);
-        } catch (ReservationNotFoundException ex) {
+        if (!roomTypeControllerSessionBean.timerChecker(rt, dateStart, numOfRooms)) {
             return false;
         }
+        
         boolean b = setRoomsAllocated(id, rt);
         if (!b) {
             //if (0 < numOfRooms) {    

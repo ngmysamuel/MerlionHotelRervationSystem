@@ -16,4 +16,5 @@ import javax.ejb.Remote;
 @Remote
 public interface PartnerControllerBeanRemote {
     public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd);
+    List<Boolean> search (LocalDate dateStart, LocalDate dateEnd);
 }

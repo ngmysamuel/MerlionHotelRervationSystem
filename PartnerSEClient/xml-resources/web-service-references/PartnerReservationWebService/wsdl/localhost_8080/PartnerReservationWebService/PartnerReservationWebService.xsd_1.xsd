@@ -147,7 +147,10 @@
 <xs:element name="dateEnd" type="tns:localDate" minOccurs="0"/>
 <xs:element name="dateStart" type="tns:localDate" minOccurs="0"/>
 <xs:element name="id" type="xs:long" minOccurs="0"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
 <xs:element name="price" type="xs:decimal" minOccurs="0"/>
+<xs:element name="roomType" type="tns:roomType" minOccurs="0"/>
+<xs:element name="status" type="xs:string" minOccurs="0"/>
 <xs:element name="type" type="tns:rateTypeEnum" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>

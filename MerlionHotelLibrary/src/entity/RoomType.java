@@ -55,7 +55,7 @@ public class RoomType implements Serializable {
     //@JoinColumn(nullable = false)
     private List<Rate> rates;
 
-    @OneToMany(mappedBy = "roomType", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy = "roomType")
     private List<ReservationLineItem> reservationLineItems;
 
     public List<ReservationLineItem> getReservationLineItems() {

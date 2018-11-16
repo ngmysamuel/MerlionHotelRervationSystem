@@ -8,6 +8,7 @@ package stateless;
 import Enum.EmployeeTypeEnum;
 import Enum.RateTypeEnum;
 import Enum.ReservationTypeEnum;
+import com.sun.prism.impl.PrismTrace;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Guest;
@@ -285,21 +286,30 @@ System.out.println("I have called timer()");
             RoomType rt = ri.getRt();
             l.remove(rt);
         }
-        if (!l.isEmpty()) { //if l is not empty, 
+        if (!l.isEmpty()) { //if l is not empty, ie if there is still room types that do not have a room inventory
+            for (RoomType roomType : l) {
+                roomType.getRoomInventory().size();
+System.out.println("REconcile()1. Room Type's room inventroy is "+roomType.getRoomInventory());  
+            }
             for (RoomType roomType : l) {
                 RoomInventory ri = new RoomInventory();
                 ri.setRt(roomType); //REMEBER TO SET THE OTHER SIDE
                 ri.setDate(LocalDate.now());
+                q = em.createQuery("select r from Room r where r.type = :type and r.status = :status");
+                q.setParameter("status", "Available");
                 q.setParameter("type", roomType);
                 i = q.getResultList().size();
                 ri.setRoomAvail(i);
+                ri.setRoomCountForAllocation(roomType.getInitialRoomAvailability());
+System.out.println("REconcile()2. Room Type's room inventroy is "+roomType.getRoomInventory());  
                 List<RoomInventory> ls1 = roomType.getRoomInventory();
                 ls1.add(ri);
                 roomType.setRoomInventory(ls1);
+System.out.println("REconcile()3. Room Type's room inventroy is "+roomType.getRoomInventory());                
                 em.persist(ri);
-                em.flush();
             }
         }
+        em.flush();
     }
     
     private boolean scanForUpgrades(LocalDate dateStart, LocalDate dateEnd, RoomType rt, Integer numOfRooms, List<RoomType> sortedListOfRT, Long id) { //return true if the room can be upgraded
@@ -350,7 +360,7 @@ System.out.println("rtToCheck is "+rtToCheck.getName());
         Query que = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> lis = que.getResultList();
         for (int i = 0; i < lis.size(); i++) {
-            for (int j = i; j < lis.size(); j++) {
+            for (int j = i+1; j < lis.size(); j++) {
                 RoomType rt = lis.get(i);
                 RoomType rt2 = lis.get(j);
                 if (rt.getGrade() > rt2.getGrade()) {

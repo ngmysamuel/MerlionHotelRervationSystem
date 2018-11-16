@@ -157,8 +157,8 @@ public class MainApp {
         String end = sc.next();
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
-        List<Boolean> ls1 = this.partnerControllerBeanRemote.searchRooms(startDate, endDate);
-        List<RoomType> ls2 = this.mainControllerBeanRemote.retrieveRoomTypes();
+        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate);
+        List<RoomType> ls2 = this.mainControllerBeanRemote.sortRoomTypeAsc();
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;
         for (RoomType rt : ls2) {
@@ -171,7 +171,7 @@ public class MainApp {
     private void reserveRooms(){
         System.out.println("***Reserve Rooms***");
         searchRooms();
-        List<RoomType> roomTypes = this.mainControllerBeanRemote.retrieveRoomTypes();
+        List<RoomType> roomTypes = this.mainControllerBeanRemote.sortRoomTypeAsc();
 
         System.out.println("Enter number of rooms booked for each type");
         List<ReservationLineItem> rlis = new ArrayList<>();
@@ -220,9 +220,9 @@ public class MainApp {
         System.out.println("***Your Reservations***");
         List<Reservation> reservations = reservationControllerBeanRemote.retrieveAllGuestReservations(currentGuest);
         int i = 1;
-//        if(reservations.isEmpty()){
-//            System.out.println("***You don't have any reservations yet***");
-//        }
+        if(reservations.isEmpty()){
+            System.out.println("***You don't have any reservations yet***");
+        }
         for(Reservation reservation: reservations){
             System.out.println(i + ". Check-in Date " + reservation.getDateStart());
             System.out.println("   Check-out Date " + reservation.getDateEnd());

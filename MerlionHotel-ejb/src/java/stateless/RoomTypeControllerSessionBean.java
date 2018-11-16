@@ -66,14 +66,14 @@ public class RoomTypeControllerSessionBean implements RoomTypeControllerSessionB
     }
     
     //for timer to check
-    public boolean timerChecker(RoomType rt, LocalDate date, Integer numOfRooms) throws ReservationNotFoundException {
+    public boolean timerChecker(RoomType rt, LocalDate date, Integer numOfRooms) {
         int roomsAvail;
         Query q1 = em.createQuery("select r from Room r where r.status = :status and r.type = :type");
         q1.setParameter("status", "Available");
         q1.setParameter("type", rt);
         roomsAvail = q1.getResultList().size();   
         if (roomsAvail < numOfRooms ) {
-            throw new ReservationNotFoundException("not enough rooms");
+            return false;
         }
 
         return true;
