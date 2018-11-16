@@ -10,6 +10,7 @@ import Enum.RateTypeEnum;
 import entity.Employee;
 import entity.ExceptionReport;
 import entity.Guest;
+import entity.Partner;
 import entity.Rate;
 import entity.ReservationLineItem;
 import entity.RoomType;
@@ -344,7 +345,13 @@ public class MainApp {
                     username = sc.next();
                     mainControllerBeanRemote.createPartner(emp, manager, username);
                 } else if (choice == 4) {
-                    System.out.println(mainControllerBeanRemote.viewPartners());
+                    List<Partner> ls = mainControllerBeanRemote.viewPartners();
+                    for (Partner p : ls) {
+                        String s = String.format("Partner username: %-15s and their ID is: %-7d", p.getUsername(), p.getId());
+                        System.out.println(s);
+                    }
+                    
+                    
                 } else if (choice == 5) {
 System.out.println("I am about to call timer()");
                     mainControllerBeanRemote.timer();
