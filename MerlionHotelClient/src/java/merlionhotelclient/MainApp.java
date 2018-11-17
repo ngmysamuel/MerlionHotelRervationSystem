@@ -127,7 +127,6 @@ public class MainApp {
                     System.out.println("What is the name?");
                     //sc.nextLine();
                     String nameCase3 = sc.nextLine().trim();
-System.out.println(nameCase3);
                     RoomType rtCase3 = new RoomType();
                     rtCase3 = mainControllerBeanRemote.viewSpecificRoomType(nameCase3);
                     if (rtCase3 == null) {
@@ -159,7 +158,7 @@ System.out.println(nameCase3);
                     List<RoomType> lsCase5 = mainControllerBeanRemote.sortRoomTypeAsc();
                     System.out.println("We have the following Room Types: ");
                     for (RoomType rtCase5 : lsCase5) {
-                        String s5 = String.format("%1$-25s%2$-5d%3$-5d", rtCase5.getName(), rtCase5.getGrade(), rtCase5.getId());
+                        String s5 = String.format("%1$-25s with grade: %2$-5d and ID %3$-5d", rtCase5.getName(), rtCase5.getGrade(), rtCase5.getId());
                         System.out.println(s5);
                     }
                     break;
@@ -366,11 +365,11 @@ System.out.println(nameCase3);
                     }
                 } else if (choice == 3) {
                     System.out.println("What is the password?");
-                    String emp = sc.next();
+                    String password = sc.next();
                     String manager = "";
                     System.out.println("What is the username?");
-                    username = sc.next();
-                    mainControllerBeanRemote.createPartner(emp, manager, username);
+                    String usernameCase3 = sc.next();
+                    mainControllerBeanRemote.createPartner(password, manager, usernameCase3);
                 } else if (choice == 4) {
                     List<Partner> ls = mainControllerBeanRemote.viewPartners();
                     for (Partner p : ls) {
@@ -397,6 +396,10 @@ System.out.println("I am about to call timer()");
 
     private void viewExceptionReport() {
         ExceptionReport er = mainControllerBeanRemote.viewExceptionReport(LocalDate.now());
+        if (er == null) {
+            System.out.println("Today's allocation is not done yet.");
+            return;
+        }
         List<String> ls = er.getExceptions();
         if (ls.isEmpty()) {
             System.out.println("There is no excpetions");

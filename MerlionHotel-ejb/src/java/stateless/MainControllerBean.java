@@ -126,7 +126,13 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
     public ExceptionReport viewExceptionReport(LocalDate date) {
         Query q = em.createQuery("select er from ExceptionReport er where er.date = :date");
         q.setParameter("date", date);
-        return (ExceptionReport) q.getSingleResult();
+        ExceptionReport er = new ExceptionReport();
+        try {
+            er = (ExceptionReport) q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        return er;
     }
     
     public void createRoomType(String bed, String name, String amenities, int capacity, String description, int grade, int roomSize) {

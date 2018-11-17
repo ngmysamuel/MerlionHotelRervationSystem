@@ -46,8 +46,8 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
 
-    public Partner create(String emp, String manager, String username) {
-        Partner part = new Partner(username, manager);
+    public Partner create(String password, String manager, String username) {
+        Partner part = new Partner(username, password);
         em.persist(part);
         em.flush();
         return part;
