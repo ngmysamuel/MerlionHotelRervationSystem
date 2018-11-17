@@ -16,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -31,16 +32,20 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @NotNull
     @Column(nullable=false)
     private String name;
     
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private EmployeeTypeEnum employeeType;
     
+    @NotNull
     @Column(nullable = false)
     private String password;
     
+    @NotNull
     @Column (nullable = false, unique = true)
     private String username;
     

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import artifacts.ReservationLineItem;
-import artifacts.Room;
 import java.math.BigDecimal;
 import java.util.InputMismatchException;
 
@@ -159,6 +158,19 @@ public class MainApp {
         String telephone = sc.next();
         System.out.println("What is partner id?");
         Long partnerId = sc.nextLong();
+        
+        System.out.println("The following room types still have rooms available: ");
+        List<Boolean> ls1 = search(startString, endString, "1");
+        List<String> ls2 = getRoomType();
+        for (int i2 = 0; i2 < ls1.size(); i2++) {
+            String rt = ls2.get(i2);
+            BigDecimal bd = getPrice(startString, endString, rt, 1);
+            if (ls1.get(i2)){
+                String s = String.format("Room Type: %-20S Price per night is %-4f", rt, bd);
+                System.out.println(s);
+            } 
+        }
+        
         List<String> lsString = new ArrayList<>();
         List<Integer> lsInteger = new ArrayList<>();
         List<String> ls = getRoomType();

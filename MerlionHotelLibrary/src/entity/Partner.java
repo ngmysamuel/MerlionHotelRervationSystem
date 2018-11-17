@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -26,10 +27,15 @@ public class Partner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotNull
     @Column(nullable = false)
     private String password;
+    
+    @NotNull
     @Column(nullable=false, unique=true)
     private String username;
+    
     @OneToMany(mappedBy = "partner")
     private List<Reservation> reservations;
 

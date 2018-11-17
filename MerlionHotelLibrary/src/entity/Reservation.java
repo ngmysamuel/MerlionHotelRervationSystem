@@ -22,6 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -36,21 +38,25 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotNull
     @Column(nullable=false)
     private LocalDateTime reservationDateTime;
     
-    
+    @NotNull
     @Column(nullable=false)
     private LocalDate dateStart;
     
-    
+    @NotNull
     @Column(nullable=false)
     private LocalDate dateEnd;
     
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private ReservationTypeEnum type;
     
+    @NotNull
     @JoinColumn(nullable = false)
     @OneToMany(mappedBy = "reservation")
     private List<ReservationLineItem> reservationLineItems = new ArrayList<>();
@@ -59,6 +65,8 @@ public class Reservation implements Serializable {
     private Guest guest;
     @ManyToOne
     private Partner partner;
+    
+    @NotNull
     @Column(nullable = false)
     private BigDecimal price;
     

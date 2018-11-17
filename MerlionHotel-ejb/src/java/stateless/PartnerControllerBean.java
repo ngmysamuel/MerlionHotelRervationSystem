@@ -12,16 +12,20 @@ import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.RoomInventory;
 import entity.RoomType;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -45,11 +49,25 @@ public class PartnerControllerBean implements PartnerControllerBeanRemote, Partn
 
     @PersistenceContext(unitName = "MerlionHotel-ejbPU")
     private EntityManager em;
+    
+    ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+    Validator validator = vf.getValidator();
 
     public Partner create(String password, String manager, String username) {
         Partner part = new Partner(username, password);
-        em.persist(part);
-        em.flush();
+        Set<ConstraintViolation<Partner>> constraintViolations = validator.validate(part);
+        if (constraintViolations.size() > 0) {
+            Iterator<ConstraintViolation<Partner>> iterator = constraintViolations.iterator();
+            while (iterator.hasNext()) {
+                ConstraintViolation<Partner> cv = iterator.next();
+                System.err.println(cv.getRootBeanClass().getName() + "." + cv.getPropertyPath() + " " + cv.getMessage());
+                System.err.println(cv.getRootBeanClass().getSimpleName() + "." + cv.getPropertyPath() + " " + cv.getMessage());
+                return null;
+            }
+        } else {
+            em.persist(part);
+            em.flush();
+        }
         return part;
     }
 

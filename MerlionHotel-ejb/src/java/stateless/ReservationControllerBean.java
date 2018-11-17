@@ -17,7 +17,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.EJBContext;
@@ -27,6 +29,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -47,6 +53,9 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
     
     @Resource 
     EJBContext eJBContext;
+    
+    ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+    Validator validator = vf.getValidator();
     
     public void persist(Object object) {
         em.persist(object);
@@ -216,7 +225,18 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         }
         
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);
-        em.persist(newReservation);
+        Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(newReservation);
+        if (constraintViolations.size() > 0) {
+            Iterator<ConstraintViolation<Reservation>> iterator = constraintViolations.iterator();
+            while (iterator.hasNext()) {
+                ConstraintViolation<Reservation> cv = iterator.next();
+                System.err.println(cv.getRootBeanClass().getName() + "." + cv.getPropertyPath() + " " + cv.getMessage());
+                System.err.println(cv.getRootBeanClass().getSimpleName() + "." + cv.getPropertyPath() + " " + cv.getMessage());
+                throw new ReservationNotFoundException(cv.getMessage());
+            }
+        } else {
+            em.persist(newReservation);
+        }
         
         LocalDate dateStartTemp = dateStart;
         for (ReservationLineItem rli : rooms) { //for each room line item
