@@ -12,12 +12,14 @@ import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.RoomInventory;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.ReservationNotFoundException;
@@ -144,42 +146,6 @@ System.out.println("PartnerControllerBean the allocated rooms is "+rli.getAlloca
 
     @Override
     public List<Boolean> searchRooms(LocalDate dateStart, LocalDate dateEnd) {
-        RoomType roomType = em.find(RoomType.class, (long) 1);
-        
-        RoomInventory ri = new RoomInventory();
-        ri.setDate(LocalDate.now());
-        ri.setRt(roomType);
-        ri.setRoomCountForAllocation(123);
-        ri.setRoomAvail(123);
-        em.persist(ri);
-        em.flush();
-        int i = 0;
-        LocalDate dateStartTemp = dateStart;
-        List<Boolean> bo = new ArrayList<>();
-        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
-        for (RoomType rt : ls) {
-System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
-            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
-                ++i;
-                boolean full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
-                if (!full) { //this evaluates to true but is then negated to false
-                    bo.add(false);
-                    break;
-                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
-                    bo.add(true);
-                }
-                dateStartTemp = dateStartTemp.plusDays(1);
-            }
-            dateStartTemp = dateStart;
-        }
-//        
-//        bo.add(Boolean.TRUE);
-//        bo.add(Boolean.TRUE);
-        return bo;
-    }
-    
-    @Override
-    public List<Boolean> search (LocalDate dateStart, LocalDate dateEnd) {
 //        RoomType roomType = em.find(RoomType.class, (long) 1);
 //        
 //        RoomInventory ri = new RoomInventory();
@@ -189,23 +155,50 @@ System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
 //        ri.setRoomAvail(123);
 //        em.persist(ri);
 //        em.flush();
-//System.out.println("XV id is "+ri.getId());
+//        int i = 0;
+//        LocalDate dateStartTemp = dateStart;
+        List<Boolean> bo = new ArrayList<>();
+//
+//        bo.add(Boolean.TRUE);        List<RoomType> ls = roomTypeControllerSessionBean.getRoomTypes();
+//        for (RoomType rt : ls) {
+//System.out.println("partnerControllerBean rt.getGrade() is "+rt.getGrade());
+//            while (!dateStartTemp.isAfter(dateEnd)) { //bo is an array of which room types has enough space to accomodate all the days given
+//                ++i;
+//                boolean full = roomInventorySessionBean.isItFull(dateStartTemp, rt);
+//                if (!full) { //this evaluates to true but is then negated to false
+//                    bo.add(false);
+//                    break;
+//                } else if (full&& (dateStartTemp.isEqual(dateEnd))) {
+//                    bo.add(true);
+//                }
+//                dateStartTemp = dateStartTemp.plusDays(1);
+//            }
+//            dateStartTemp = dateStart;
+//        }
+////        
+//        bo.add(Boolean.TRUE);
+        return bo;
+    }
+    
+   
+    
+    public List<Boolean> search (LocalDate dateStart, LocalDate dateEnd, String numOfRoom) {
 System.out.println("stateless.PartnerControllerBean.search()");
-
+        Integer numOfRooms = Integer.valueOf(numOfRoom);
         int i = 0;
         LocalDate dateStartTemp = dateStart;
         List<Boolean> bo = new ArrayList<>();
         List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         boolean full = true;
+        RoomInventory ri = new RoomInventory();
         for (RoomType rt : ls) {
             while (dateStartTemp.compareTo(dateEnd) < 0) { //bo is an array of which room types has enough space to accomodate all the days given
                 ++i;
                 try {
-                    full = roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, 1);
+                    full = roomTypeControllerSessionBean.editAndCreateRoomInventoryIfNecessary(rt, dateStartTemp, numOfRooms);
                 } catch (ReservationNotFoundException ex) {
                     full = false;
                 }
-System.out.println("boolean full is "+full+" for date "+dateStartTemp);
                 if (!full) { //this evaluates to true but is then negated to false
                     bo.add(false);
                     break;

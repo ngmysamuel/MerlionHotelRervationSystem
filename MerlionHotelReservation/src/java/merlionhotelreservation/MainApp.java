@@ -157,7 +157,7 @@ public class MainApp {
         String end = sc.next();
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
-        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate);
+        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate, "1");
         List<RoomType> ls2 = this.mainControllerBeanRemote.sortRoomTypeAsc();
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;

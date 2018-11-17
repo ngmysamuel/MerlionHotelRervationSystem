@@ -142,12 +142,12 @@ public class MainControllerBean implements MainControllerBeanRemote, MainControl
         q.setParameter("name", name);
 System.out.println("name is "+name);
 System.out.println("About to execute query");
-RoomType r = new RoomType();
-try {
-        r = (RoomType) q.getSingleResult();
-} catch (NoResultException e) {
-    return null;
-}
+        RoomType r = new RoomType();
+        try {
+            r = (RoomType) q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
         return r;
     }
     

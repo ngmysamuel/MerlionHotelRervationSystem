@@ -193,6 +193,29 @@ public class DataInitBean {
         Rate jp = new Rate(RateTypeEnum.Published, junior, "Junior Published", new BigDecimal(180));
         Rate gn = new Rate(RateTypeEnum.Normal, grand, "Grand Normal", new BigDecimal(200));
         Rate gp = new Rate(RateTypeEnum.Published, grand, "Grand Published", new BigDecimal(250));
+        
+        List<Rate> lsRate = new ArrayList<>();
+        lsRate.add(dn);
+        lsRate.add(dp);
+        deluxe.setRates(lsRate);
+        lsRate.clear();
+        lsRate.add(pn);
+        lsRate.add(pp);
+        premiere.setRates(lsRate);
+        lsRate.clear();
+        lsRate.add(fn);
+        lsRate.add(fp);
+        family.setRates(lsRate);
+        lsRate.clear();
+        lsRate.add(jn);
+        lsRate.add(jp);
+        junior.setRates(lsRate);
+        lsRate.clear();
+        lsRate.add(gn);
+        lsRate.add(gp);
+        grand.setRates(lsRate);
+        
+        
         em.persist(dn);
         em.persist(dp);
         em.persist(pn);

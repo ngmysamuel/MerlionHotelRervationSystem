@@ -6,6 +6,10 @@
 
 <xs:element name="createReservation2Response" type="tns:createReservation2Response"/>
 
+<xs:element name="getPrice" type="tns:getPrice"/>
+
+<xs:element name="getPriceResponse" type="tns:getPriceResponse"/>
+
 <xs:element name="getRoomType" type="tns:getRoomType"/>
 
 <xs:element name="getRoomTypeResponse" type="tns:getRoomTypeResponse"/>
@@ -37,16 +41,6 @@
 <xs:element name="viewReservationDetails" type="tns:viewReservationDetails"/>
 
 <xs:element name="viewReservationDetailsResponse" type="tns:viewReservationDetailsResponse"/>
-
-<xs:complexType name="getRoomType">
-<xs:sequence/>
-</xs:complexType>
-
-<xs:complexType name="getRoomTypeResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
 
 <xs:complexType name="viewAllReservations">
 <xs:sequence/>
@@ -161,6 +155,31 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="getRoomType">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="getRoomTypeResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getPrice">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+<xs:element name="arg1" type="xs:string" minOccurs="0"/>
+<xs:element name="arg2" type="xs:string" minOccurs="0"/>
+<xs:element name="arg3" type="xs:int" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getPriceResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="login">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -211,6 +230,18 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="getStartAndEndDate">
+<xs:sequence>
+<xs:element name="arg0" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getStartAndEndDateResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="searchRoom">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
@@ -224,22 +255,11 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="getStartAndEndDate">
-<xs:sequence>
-<xs:element name="arg0" type="xs:long" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getStartAndEndDateResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="search">
 <xs:sequence>
 <xs:element name="arg0" type="xs:string" minOccurs="0"/>
 <xs:element name="arg1" type="xs:string" minOccurs="0"/>
+<xs:element name="arg2" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

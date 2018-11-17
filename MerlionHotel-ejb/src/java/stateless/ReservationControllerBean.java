@@ -212,7 +212,7 @@ public class ReservationControllerBean implements ReservationControllerBeanRemot
         Partner partner = em.find(Partner.class, partnerId);
         
         if (guest == null || partner == null) {
-            throw new ReservationNotFoundException("There is no such guest or partner.");
+            throw new ReservationNotFoundException("There is no such partner.");
         }
         
         Reservation newReservation = new Reservation(currentDateTime, dateStart, dateEnd, guest, partner, price);

@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 import artifacts.ReservationLineItem;
 import artifacts.Room;
+import java.math.BigDecimal;
 import java.util.InputMismatchException;
 
 /**
@@ -50,7 +51,7 @@ public class MainApp {
     public void operations() {
         while (true) {
             int selection = 100;
-            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit\n6. Print roomType\n7. Wrong Search\n8. Wrong reservation");
+            System.out.println("What do you want to do? \n1. Create Reservation\n2. Search Rooms\n3. View All Reservations\n4. View a Paticular Reservation\n5. Exit");
             try {
                 selection = sc.nextInt();
             } catch (InputMismatchException exception) {
@@ -67,7 +68,7 @@ public class MainApp {
                 viewAParticularReservation();
             } else if (selection == 5) {
                 break;
-            } else if (selection == 6) {
+            } /*else if (selection == 6) {
                 printRoomType();
             } else if (selection == 7) {
                 sear();
@@ -80,22 +81,21 @@ public class MainApp {
         }
     }
     
-    public void sear() {
-        System.out.println("Type in the date you want to start. DD/MM/YYYY");
-        String startString = sc.next();
-        System.out.println("Type in the date you want to end. DD/MM/YYYY");
-        String endString = sc.next();
-        search(startString, endString);
-    }
+//    public void sear() {
+//        System.out.println("Type in the date you want to start. DD/MM/YYYY");
+//        String startString = sc.next();
+//        System.out.println("Type in the date you want to end. DD/MM/YYYY");
+//        String endString = sc.next();
+//        search(startString, endString, "1");
+//    }
     
     public void viewAllReservations() {
         List<Reservation> ls = new ArrayList<>();
         ls = viewAllReservations_1();
         for (Reservation r : ls) {
             List<String> lsString = getStartAndEndDate(r.getId());
-            System.out.print("Start date is "+lsString.get(0));
-            System.out.print("    End date is "+lsString.get(1));
-            System.out.println("     Reservation ID "+r.getId()+": ");
+            String s = String.format("Reservation ID is %-3d Start date is %-15s End date is %-15s", r.getId(), lsString.get(0), lsString.get(1));
+            System.out.println(s);
         }
     }
     
@@ -106,26 +106,19 @@ public class MainApp {
         try {
             r = viewReservationDetails(id);
         } catch (ReservationNotFoundException_Exception e) {
-            System.out.println("Oops");
+            System.out.println("Reservation not found.");
             return;
         }
         List<String> lsString = getStartAndEndDate(r.getId());
-        System.out.print("Start date is "+lsString.get(0));
-        System.out.print("    End date is "+lsString.get(1));
-        System.out.print("     Reservation ID: "+r.getId());
+        String s = String.format("Reservation ID is %-3d Start date is %-15s End date is %-15s Booked by Guest: %-25s", r.getId(), lsString.get(0), lsString.get(1), r.getGuest().getEmail());
+        System.out.println(s);
         List<ReservationLineItem> ls = r.getReservationLineItems();
-        System.out.println("      Price is "+r.getPrice());
-//System.out.println("ReservationLineItems ls is "+ls);        
+        System.out.println("Price is "+r.getPrice());  
         for (ReservationLineItem rli : ls) {
-            System.out.print("\nRoomType booked is "+rli.getRoomType().getName());
-            System.out.println();
-            List<Room> ls2 = rli.getAllocatedRooms();
-            for (Room rm : ls2) {
-                String s = String.format("Allocated Room is %-4d and the roomType is %-10S%n", rm.getNumber(), rm.getType().getName());
-                System.out.print(s);
-            }
-            System.out.println("\n");
+            s = String.format("%-3d rooms of RoomType: %-15S booked", rli.getNumberOfRooms(), rli.getRoomType().getName());
+            System.out.println(s);
         }
+        System.out.println("The guest will be informed of their allocated room upon checking in.");
         System.out.println("");
     }
     
@@ -134,63 +127,23 @@ public class MainApp {
         String startString = sc.next();
         System.out.println("Type in the date you want to end. DD/MM/YYYY");
         String endString = sc.next();
-        List<Boolean> ls1 = search(startString, endString);
+        System.out.println("How many rooms do you want to book?");
+        String numOfRooms = sc.next();
+        Integer numOfRoom = Integer.valueOf(numOfRooms);
+        List<Boolean> ls1 = search(startString, endString, numOfRooms);
         List<String> ls2 = getRoomType();
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;
         for (String rt : ls2) {
-            String s = String.format("Room Type: %-20S -> %-5b", rt, ls1.get(i));
-            System.out.println(s);
+            BigDecimal bd = getPrice(startString, endString, rt, numOfRoom);
+            if (ls1.get(i)){
+                String s = String.format("Room Type: %-20S is possible for %3d rooms. Price is expected to be %-4f", rt, numOfRoom, bd);
+                System.out.println(s);
+            }
             ++i;
         }
         System.out.println("");
     }
-
-//    private void makeReservation() {
-//        Arg4 arg = new Arg4();
-//        System.out.println("Type in the date you want to start. DD/MM/YYYY");
-//        String startString = sc.next();
-//        System.out.println("Type in the date you want to end. DD/MM/YYYY");
-//        String endString = sc.next();
-//        System.out.println("What is the guest id?");
-//        Long guestId = sc.nextLong();
-//        System.out.println("What is partner id?");
-//        Long partnerId = sc.nextLong();
-//        List<String> ls = getRoomType();
-//        String rt = "";
-//        while (true) {
-//            System.out.println("What room type?");
-//            if (ls.size() > 0) {
-//                for (int i = 1; i <= ls.size(); i++) {
-//                    System.out.println(i + ". " + ls.get(i - 1));
-//                }
-//                int j = sc.nextInt();
-//                rt = ls.get(j - 1);
-//            } else {
-//                System.out.println("There are no room types initiated yet. Please look for the staff to create some rooms for some room types. So sorry.");
-//                return;
-//            }
-//            System.out.println("How many rooms?");
-//            Integer k = sc.nextInt();
-//            Entry e = new Entry();
-//            e.setKey(rt);
-//            e.setValue(k);
-//            arg.getEntry().add(e);
-//System.out.println("ls2 size is "+arg.getEntry().size());
-//            System.out.println("Do you want to book more? Press 1 for yes and 2 for no");
-//            int l = sc.nextInt();
-//            if (l == 2) {
-//                break;
-//            }
-//        }
-//        try {
-//            createReservation2(startString, endString, guestId, partnerId, arg);
-//            System.out.println("STOTTTOTO");
-//        } catch (ReservationNotFoundException_Exception e) {
-//            System.out.println("Oh no, reservation is not ok");
-//            System.out.println(e.getMessage());
-//        }
-//    }
 
     private void makeReservation2() {
 //        Arg4 arg = new Arg4();
@@ -200,7 +153,7 @@ public class MainApp {
         String endString = sc.next();
         System.out.println("What is the guest email?");
         String email = sc.next();
-        System.out.println("What is the guest passpwort number?");
+        System.out.println("What is the guest passport number?");
         String passportNumber = sc.next();
         System.out.println("What is the guest telephone?");
         String telephone = sc.next();
@@ -266,11 +219,7 @@ public class MainApp {
         port.printRoomType();
     }
 
-    private static java.util.List<java.lang.Boolean> search(java.lang.String arg0, java.lang.String arg1) {
-        artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
-        artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
-        return port.search(arg0, arg1);
-    }
+  
 
     private static java.util.List<java.lang.String> getRoomType() {
         artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
@@ -293,6 +242,20 @@ public class MainApp {
         artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
         return port.createReservation2(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
+
+    private static java.util.List<java.lang.Boolean> search(java.lang.String arg0, java.lang.String arg1, java.lang.String arg2) {
+        artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
+        artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
+        return port.search(arg0, arg1, arg2);
+    }
+
+    private static BigDecimal getPrice(java.lang.String arg0, java.lang.String arg1, java.lang.String arg2, java.lang.Integer arg3) {
+        artifacts.PartnerReservationWebService_Service service = new artifacts.PartnerReservationWebService_Service();
+        artifacts.PartnerReservationWebService port = service.getPartnerReservationWebServicePort();
+        return port.getPrice(arg0, arg1, arg2, arg3);
+    }
+
+    
 
     
 

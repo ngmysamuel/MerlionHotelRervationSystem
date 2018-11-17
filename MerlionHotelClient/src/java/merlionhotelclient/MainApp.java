@@ -125,15 +125,16 @@ public class MainApp {
                     break;
                 case 3:
                     System.out.println("What is the name?");
-                    sc.nextLine();
+                    //sc.nextLine();
                     String nameCase3 = sc.nextLine().trim();
+System.out.println(nameCase3);
                     RoomType rtCase3 = new RoomType();
                     rtCase3 = mainControllerBeanRemote.viewSpecificRoomType(nameCase3);
                     if (rtCase3 == null) {
                         System.out.println("Please try again. RoomType cannot be found. ");
                         break;
                     } 
-                    String s = String.format("The roomType is called: %-20S and has InitialRoomAvailability of: %-5d and can hold a maximum of %5d adults. It can be described as %-25s", rtCase3.getName(), rtCase3.getInitialRoomAvailability(), rtCase3.getCapacity(), rtCase3.getDescription());
+                    String s = String.format("The roomType is called: %-20S and has InitialRoomAvailability of: %-5d \nIt can hold a maximum of %5d adults. \nIt can be described as %-25s", rtCase3.getName(), rtCase3.getInitialRoomAvailability(), rtCase3.getCapacity(), rtCase3.getDescription());
                     System.out.println(s);
                     break;
                 case 4:
@@ -400,8 +401,10 @@ System.out.println("I am about to call timer()");
         if (ls.isEmpty()) {
             System.out.println("There is no excpetions");
         } else {
+            System.out.println("\n");
             for (String s : ls) {
                 System.out.println(s);
+                System.out.println("\n");
             }
         }
     }
@@ -622,7 +625,7 @@ System.out.println("I am back in client");
         String end = sc.next();
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.parse(end);
-        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate);
+        List<Boolean> ls1 = this.partnerControllerBeanRemote.search(startDate, endDate, "1");
         List<RoomType> ls2 = this.mainControllerBeanRemote.sortRoomTypeAsc();
         System.out.println("Result of Room Search with the dates given: \n");
         int i = 0;

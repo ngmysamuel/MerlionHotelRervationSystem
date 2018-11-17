@@ -6,6 +6,7 @@ import entity.Reservation;
 import entity.ReservationLineItem;
 import entity.Room;
 import entity.RoomType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,12 +23,16 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import stateless.MainControllerBeanLocal;
 import stateless.PartnerControllerBeanLocal;
+import stateless.RateControllerBeanLocal;
 import stateless.RoomTypeControllerSessionBeanLocal;
 import util.exception.ReservationNotFoundException;
 
 @WebService(serviceName = "PartnerReservationWebService")
 @Stateless
 public class PartnerReservationWebService {
+
+    @EJB
+    private RateControllerBeanLocal rateControllerBean;
 
     @EJB
     private MainControllerBeanLocal mainControllerBean;
@@ -100,26 +105,9 @@ System.out.println("The rli in webService viewReservationDetails() is "+rli);
                 rt.setRates(null);
 System.out.println("room type: "+rt+" room inventory is before: "+rt.getRoomInventory());
                 rt.setRoomInventory(null);
-System.out.println("room type: "+rt+" room inventory is after: "+rt.getRoomInventory());
-                rli.getAllocatedRooms().size();
-                List<Room> ls3 = rli.getAllocatedRooms();
-                if (ls3.isEmpty()) {
-System.out.println("the list of allocated rooms is empty for this rli: "+rli);
-                    rli.setAllocatedRooms(null);
-                } else {
-                    for (Room room : ls3) { //for each room
-                        em.detach(room);
-                        room.getReservationLineItems().size();
-                    }
-                    for (Room room : ls3) {
-                        room.setReservationLineItems(null);
-                    }
-                }
+                rli.setAllocatedRooms(null);
             }
             return r;
-//        } catch (ReservationNotFoundException e) {
-//            throw e;
-//        }
     }
 
     public void printRoomType() {
@@ -130,7 +118,9 @@ System.out.println("the list of allocated rooms is empty for this rli: "+rli);
         List<RoomType> ls = mainControllerBean.sortRoomTypeAsc();
         List<String> ls2 = new ArrayList<>();
         for (RoomType rt : ls) {
-            if (rt.getInitialRoomAvailability() == null) {
+System.out.println(rt.getInitialRoomAvailability() == null);
+System.out.println(rt+" has the following rate: "+rt.getRates());
+            if (rt.getInitialRoomAvailability() == null || rt.getRates().isEmpty()) {
                 continue;
             }
             ls2.add(rt.getName());
@@ -206,10 +196,24 @@ System.out.println("the list of allocated rooms is empty for this rli: "+rli);
         return partnerControllerBean.searchRooms(dateStart, dateEnd);
     }
 
-    public List<Boolean> search(String startString, String endString) {
+    public List<Boolean> search(String startString, String endString, String numOfRooms) {
         LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        return partnerControllerBean.search(dateStart, dateEnd);
+        return partnerControllerBean.search(dateStart, dateEnd, numOfRooms);
+    }
+    
+    public BigDecimal getPrice(String startString, String endString, String roomType, Integer numOfRoom) {
+        BigDecimal price = new BigDecimal(0);
+        BigDecimal numOfRooms = new BigDecimal(numOfRoom);
+        LocalDate dateStart = LocalDate.parse(startString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        LocalDate dateEnd = LocalDate.parse(endString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        Query q = em.createQuery("select rt from RoomType rt where rt.name = :name");
+        q.setParameter("name", roomType);
+        RoomType rt = (RoomType) q.getSingleResult();
+        BigDecimal rr = rateControllerBean.countRate(dateStart, dateEnd, rt);
+        BigDecimal temp = rr.multiply(numOfRooms);
+        price = price.add(temp);
+        return price;
     }
 
     public List<String> getStartAndEndDate(Long id) {
